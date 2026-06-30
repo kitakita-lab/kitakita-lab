@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF9F5"/>
+      <stop offset="1" stop-color="#F4F0E8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="120" cy="120" r="260" fill="#F6E1D6" opacity="0.55"/>
+  <circle cx="1080" cy="520" r="220" fill="#EAEDE6" opacity="0.6"/>
+
+  <g transform="translate(96, 250)">
+    <g transform="translate(0, -120)">
+      <rect width="56" height="56" rx="14" fill="#1F1B16"/>
+      <text x="28" y="29" text-anchor="middle" dominant-baseline="central"
+            font-family="Georgia, serif" font-size="32" font-weight="700" fill="#FBF9F5">K</text>
+      <text x="74" y="29" dominant-baseline="central"
+            font-family="Georgia, serif" font-size="30" font-weight="600" fill="#1F1B16">KitaKita Lab</text>
+    </g>
+
+    <text x="0" y="40" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="62" font-weight="700" fill="#1F1B16">ハンドメイド作家が、</text>
+    <text x="0" y="120" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="62" font-weight="700" fill="#1F1B16">もっと挑戦できる</text>
+    <text x="0" y="200" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="62" font-weight="700" fill="#BC5A35">世界をつくる。</text>
+  </g>
+</svg>

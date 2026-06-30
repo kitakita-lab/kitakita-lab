@@ -1,0 +1,68 @@
+/**
+ * News データ。
+ *
+ * 将来的なCMS化を想定したデータ構造です。
+ * `body` は段落の配列で、各お知らせの詳細ページに表示されます。
+ * CMS導入時は、この配列を API レスポンス（同じ型）に置き換えるだけで移行できます。
+ */
+
+export type NewsCategory = 'お知らせ' | 'プレスリリース' | 'イベント' | 'メディア'
+
+export type NewsItem = {
+  /** URL スラッグ（/news/:slug） */
+  slug: string
+  title: string
+  /** ISO 形式の日付（YYYY-MM-DD） */
+  date: string
+  category: NewsCategory
+  excerpt: string
+  /** 詳細本文（段落の配列） */
+  body: string[]
+}
+
+export const newsItems: NewsItem[] = [
+  {
+    slug: 'kitakita-lab-launch',
+    title: 'KitaKita Lab を始動しました',
+    date: '2025-04-01',
+    category: 'お知らせ',
+    excerpt:
+      'ハンドメイド作家がもっと挑戦できる世界をつくるためのプロジェクト「KitaKita Lab」を始動しました。',
+    body: [
+      'このたび、ハンドメイド作家がもっと挑戦できる世界をつくることを目指すプロジェクト「KitaKita Lab」を始動しました。',
+      'KitaKita Labは、作品を販売するだけでなく、企業コラボワークショップ、商業施設イベント、自治体・教育機関との連携、調査活動などを通じて、作家が活躍できる場所を増やしていきます。',
+      '私たちのビジョンに共感してくださる作家・企業・自治体・商業施設・メディアの皆さまとの出会いを、心よりお待ちしています。',
+    ],
+  },
+  {
+    slug: 'creators-recruitment-open',
+    title: '一緒に活動する作家の募集を開始しました',
+    date: '2025-04-15',
+    category: 'お知らせ',
+    excerpt:
+      'KitaKita Labの考え方に共感してくださる作家の募集を開始しました。挑戦したい気持ちを、かたちにしませんか。',
+    body: [
+      'KitaKita Labでは、私たちの考え方に共感し、ともに活動してくださる作家を募集しています。',
+      'ワークショップ講師、イベント出店、企業案件への挑戦、将来講師を目指す方など、さまざまなかたちでの参加を歓迎します。',
+      '「もっと挑戦してみたい」という想いがあれば、経験は問いません。まずはお気軽にご連絡ください。',
+    ],
+  },
+  {
+    slug: 'research-coming-soon',
+    title: '調査活動に関する情報を順次公開予定です',
+    date: '2025-05-01',
+    category: 'プレスリリース',
+    excerpt:
+      'ハンドメイド作家・市場に関する調査結果を、今後プレスリリースで順次公開していく予定です。',
+    body: [
+      'KitaKita Labでは、ハンドメイド作家や市場の実態を可視化する調査活動に取り組んでいます。',
+      '今後、調査結果をプレスリリースとして順次公開していく予定です。作家がもっと挑戦できる環境づくりのための基礎データとして、広く活用いただけるよう整えてまいります。',
+      '最新情報はこのNewsページでお知らせします。',
+    ],
+  },
+]
+
+/** 日付の新しい順に並べ替えたお知らせ一覧。 */
+export const sortedNews = [...newsItems].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+)
