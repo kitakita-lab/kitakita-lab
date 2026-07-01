@@ -15,7 +15,9 @@ export default {
         ink: {
           DEFAULT: '#1F1B16',
           muted: '#6B645B',
-          soft: '#928A7E',
+          // Darkened from #928A7E (3.2:1) to meet WCAG AA (≈5:1 on paper)
+          // for small de-emphasised text such as dates and captions.
+          soft: '#736B5F',
         },
         // Clay — warm terracotta accent (handmade warmth)
         clay: {
