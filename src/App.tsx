@@ -1,35 +1,37 @@
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { HomePage } from '@/pages/HomePage'
+import { lazyWithRetry } from '@/lib/lazyWithRetry'
 
 // Home is eager (landing page → best LCP). Secondary pages are code-split so
-// the initial bundle stays small; each route loads on demand.
-const WorkshopPage = lazy(() =>
+// the initial bundle stays small; each route loads on demand. lazyWithRetry
+// self-heals stale-chunk errors that can occur right after a redeploy.
+const WorkshopPage = lazyWithRetry(() =>
   import('@/pages/WorkshopPage').then((m) => ({ default: m.WorkshopPage })),
 )
-const ResearchPage = lazy(() =>
+const ResearchPage = lazyWithRetry(() =>
   import('@/pages/ResearchPage').then((m) => ({ default: m.ResearchPage })),
 )
-const CollaborationPage = lazy(() =>
+const CollaborationPage = lazyWithRetry(() =>
   import('@/pages/CollaborationPage').then((m) => ({ default: m.CollaborationPage })),
 )
-const CreatorsPage = lazy(() =>
+const CreatorsPage = lazyWithRetry(() =>
   import('@/pages/CreatorsPage').then((m) => ({ default: m.CreatorsPage })),
 )
-const NewsPage = lazy(() =>
+const NewsPage = lazyWithRetry(() =>
   import('@/pages/NewsPage').then((m) => ({ default: m.NewsPage })),
 )
-const NewsDetailPage = lazy(() =>
+const NewsDetailPage = lazyWithRetry(() =>
   import('@/pages/NewsDetailPage').then((m) => ({ default: m.NewsDetailPage })),
 )
-const FaqPage = lazy(() =>
+const FaqPage = lazyWithRetry(() =>
   import('@/pages/FaqPage').then((m) => ({ default: m.FaqPage })),
 )
-const ContactPage = lazy(() =>
+const ContactPage = lazyWithRetry(() =>
   import('@/pages/ContactPage').then((m) => ({ default: m.ContactPage })),
 )
-const NotFoundPage = lazy(() =>
+const NotFoundPage = lazyWithRetry(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
 
