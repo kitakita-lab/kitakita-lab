@@ -10,7 +10,7 @@ export const site = {
   tagline: 'ハンドメイド作家が、もっと挑戦できる世界をつくる。',
   description:
     'KitaKita Labは、ハンドメイド作家がもっと挑戦できる世界をつくるプロジェクトです。企業コラボ、商業施設イベント、自治体・教育機関との連携、ワークショップ、調査活動を通じて、作家が活躍できる場所を増やします。',
-  url: 'https://kitakita-lab.vercel.app',
+  url: 'https://kitakita-lab.com',
   ogImage: '/ogp.svg',
   email: 'hello@kitakita-lab.jp',
   locale: 'ja_JP',
