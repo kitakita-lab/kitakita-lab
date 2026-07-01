@@ -60,7 +60,8 @@ export function ContactForm() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!validate()) return
-    // TODO: 本番では実際の送信処理に接続する。
+    // NOTE: 現在はモック送信（仕様）。本運用開始時にフォームサービスまたは
+    // API エンドポイントへの送信処理に置き換える（README「お問い合わせフォームについて」参照）。
     setSubmitted(true)
   }
 
