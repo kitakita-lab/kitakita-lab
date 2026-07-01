@@ -22,6 +22,9 @@ npm run dev      # 開発サーバー起動（http://localhost:5173）
 npm run build    # 型チェック + 本番ビルド（dist/）
 npm run preview  # ビルド結果のプレビュー
 npm run lint     # ESLint
+npm run test           # テスト実行（1回）
+npm run test:watch     # テスト実行（ウォッチモード）
+npm run test:coverage  # テスト + カバレッジレポート生成
 ```
 
 ## ディレクトリ構成
@@ -41,8 +44,60 @@ src/
 ├─ pages/                # 各ページ
 ├─ data/                 # ★ コンテンツ（CMS化を見据えたデータ層）
 ├─ hooks/                # カスタムフック
-└─ lib/                  # 小さなユーティリティ
+├─ lib/                  # 小さなユーティリティ
+└─ test/                 # ★ テスト基盤（setup / 共通ユーティリティ）
 ```
+
+## テスト（KitaKita Lab 標準テスト基盤）
+
+**Vitest + Testing Library + jsdom** によるテスト環境です。
+この構成は「KitaKita Lab 標準テンプレート」として、他プロジェクト
+（シフト作成サポートアプリ、ikyu公式サイト等）へそのまま横展開できます。
+
+### 構成
+
+| ファイル | 役割 |
+| --- | --- |
+| `vitest.config.ts` | テスト設定（jsdom / setup / カバレッジ閾値） |
+| `src/test/setup.ts` | jsdom に無いブラウザ API のモック集約（IntersectionObserver 等）+ jest-dom |
+| `src/test/test-utils.tsx` | Provider（Router / Helmet）込みの共通 `renderWithProviders` |
+| `src/**/*.test.ts(x)` | テスト本体（**テスト対象の隣**に配置する） |
+
+### 実行方法
+
+```bash
+npm run test           # 全テスト実行（CI と同じ）
+npm run test:watch     # 開発中のウォッチ実行
+npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート生成）
+```
+
+カバレッジレポートは `coverage/index.html` をブラウザで開いて確認できます。
+
+### カバレッジ基準（品質ゲート）
+
+`vitest.config.ts` の `coverage.thresholds` で強制されます（下回ると失敗）。
+
+| 指標 | 基準 |
+| --- | --- |
+| Statements | 80% 以上 |
+| Functions | 80% 以上 |
+| Branches | 70% 以上 |
+| Lines | 80% 以上 |
+
+### 新規コンポーネント追加時のテストルール
+
+1. **テストファイルはテスト対象の隣に置く**（`Button.tsx` → `Button.test.tsx`）
+2. **render は必ず `@/test/test-utils` の `renderWithProviders` を使う**（Testing Library を直接 import しない）
+3. **ユーザー視点で書く**：`getByRole` / `getByLabelText` を優先し、クラス名や DOM 構造に依存しない
+4. **ページを追加したら** `src/App.test.tsx` のルートテーブルに 1 行追加する
+5. **データファイル（`src/data/`）を追加したら**、整合性テスト（一意性・形式）を追加する（例: `news.test.ts`）
+6. ブラウザ API のモックが必要になったら **`src/test/setup.ts` に集約**する（テスト内で個別にモックしない）
+
+### 他プロジェクトへの横展開手順
+
+1. `vitest.config.ts` と `src/test/` をコピー
+2. `package.json` に devDependencies（vitest / @testing-library/* / jsdom / @vitest/coverage-v8）と `test` 系 scripts を追加
+3. `src/test/test-utils.tsx` の Provider をそのプロジェクトの構成（テーマ / ストア等）に合わせて調整
 
 ## コンテンツの追加・編集（CMS化前提の設計）
 
