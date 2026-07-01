@@ -36,10 +36,40 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Load fonts without blocking render: the page paints immediately with the
+         system-font fallback, then swaps to the web fonts once loaded. -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&display=swap"
-      rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&display=swap"
+      />
+    </noscript>
+
+    <!-- Structured data (Organization) for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "KitaKita Lab",
+        "alternateName": "キタキタラボ",
+        "url": "https://kitakita-lab.com/",
+        "logo": "https://kitakita-lab.com/favicon.svg",
+        "image": "https://kitakita-lab.com/ogp.svg",
+        "description": "ハンドメイド作家がもっと挑戦できる世界をつくるプロジェクト。企業コラボ、商業施設イベント、自治体・教育機関との連携、ワークショップ、調査活動を通じて、作家が活躍できる場所を増やします。",
+        "email": "hello@kitakita-lab.jp"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -10,10 +10,12 @@ type LogoProps = {
 /** Wordmark logo linking home. */
 export function Logo({ className, invert = false }: LogoProps) {
   return (
+    // Accessible name comes from the visible wordmark (the decorative "K"
+    // badge is aria-hidden), keeping visible text and accessible name in
+    // sync for voice-control users.
     <Link
       to="/"
       className={cn('group inline-flex items-center gap-2.5', className)}
-      aria-label={`${site.name} ホームへ`}
     >
       <span
         className={cn(
