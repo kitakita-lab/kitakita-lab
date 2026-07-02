@@ -1,6 +1,11 @@
 /**
- * 活動内容（Activities）データ。
- * トップページの Activities セクションと各詳細ページへの導線に使用。
+ * Activities（いま育てている挑戦）データ。
+ *
+ * Activities は「事業紹介」ではなく「現在この実験室で育てている挑戦」。
+ * 挑戦は増えていく前提のため、この配列に追加するだけで掲載できます。
+ * status:
+ *   - growing  … いま育てている挑戦
+ *   - sprouting … これから芽を出す挑戦（準備中）
  */
 
 export type Activity = {
@@ -11,55 +16,61 @@ export type Activity = {
   href?: string
   /** Lucide-style icon key resolved in the UI. */
   icon: 'workshop' | 'research' | 'collab' | 'event' | 'creators' | 'market'
+  status: 'growing' | 'sprouting'
 }
 
 export const activities: Activity[] = [
   {
     id: 'workshop',
-    title: 'オリジナルワークショップ',
+    title: 'ワークショップという挑戦',
     summary:
-      '作家とともに企画する、ものづくりの体験。参加者にとっては「つくる楽しさ」との出会いの場であり、作家にとっては挑戦の舞台になります。',
+      'つくる楽しさに、はじめて触れる場所。参加者には「できた！」を、作家には講師という新しい舞台を育てます。',
     href: '/workshop',
     icon: 'workshop',
+    status: 'growing',
   },
   {
     id: 'collab',
-    title: '企業コラボワークショップ',
+    title: '企業との共同実験',
     summary:
-      '企業のブランドや想いを、ハンドメイドの体験として届ける。作家の表現力と企業のメッセージが出会う場をつくります。',
+      'ブランドの想いを、手ざわりのある体験に。企業のメッセージと作家の表現が出会うと、新しい何かが芽を出します。',
     href: '/collaboration',
     icon: 'collab',
+    status: 'growing',
   },
   {
     id: 'event',
-    title: '商業施設イベント',
+    title: 'まちに賑わいを育てる',
     summary:
-      '商業施設の賑わいづくりと、作家の活躍の場を同時に生み出す。出店・体験・展示など、施設に合わせた企画を設計します。',
+      '商業施設やイベントの場に、つくり手の熱を。訪れた人の「きた！」と、出店者の挑戦が同時に育つ企画をつくります。',
     href: '/collaboration',
     icon: 'event',
+    status: 'growing',
   },
   {
     id: 'public',
-    title: '自治体・教育機関との企画',
+    title: '地域・学びとの種まき',
     summary:
-      '地域の魅力発信や教育プログラムに、ハンドメイドの力を。自治体・学校と連携し、まちと人にやさしい企画を届けます。',
+      '自治体や教育機関とともに、地域の魅力や子どもたちの創造力に水をやる。まちと人にやさしい挑戦を育てます。',
     href: '/collaboration',
     icon: 'market',
+    status: 'growing',
   },
   {
     id: 'research',
-    title: '調査活動',
+    title: '声を数字にする調査',
     summary:
-      'ハンドメイド市場やつくり手の声を可視化する。データと現場の実感の両面から、業界の未来を考える材料をつくります。',
+      'つくり手と市場の声を可視化して、次の挑戦の土壌を耕す。データは、挑戦を育てるための養分です。',
     href: '/research',
     icon: 'research',
+    status: 'growing',
   },
   {
-    id: 'creators',
-    title: 'ハンドメイド市場の活性化',
+    id: 'next',
+    title: 'つぎに芽を出す挑戦',
     summary:
-      '作家が挑戦し、活躍し、次の作家が育つ循環を。市場そのものを大きく、あたたかくしていくことを目指します。',
-    href: '/creators',
+      '中小企業支援、AI活用、Webサービス、商品開発——実験室では、次の種がもう発芽の準備をしています。',
     icon: 'creators',
+    status: 'sprouting',
   },
 ]

@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 
 /**
- * 作家募集への導線。重要コンテンツのため、トップでも独立した
- * 「共感を呼ぶ」セクションとして配置する。
+ * 仲間への導線。「募集」ではなく「一緒に育てる人を探している」という
+ * ブランドの姿勢を伝える（docs/BRAND.md: 挑戦を、ひとりにしない）。
  */
 export function CreatorsCallout() {
   return (
@@ -19,18 +19,18 @@ export function CreatorsCallout() {
           <div className="relative mx-auto max-w-2xl text-center">
             <span className="eyebrow">Creators</span>
             <h2 className="mt-4 text-3xl leading-tight sm:text-4xl lg:text-[2.5rem]">
-              この景色を、
+              あなたの「きた」を、
               <br className="sm:hidden" />
-              一緒につくる仲間へ。
+              一緒に育てませんか。
             </h2>
             <p className="mt-6 text-base leading-relaxed text-ink-muted sm:text-lg">
-              KitaKita Labは、「一緒に活動する作家」ではなく、
-              この考え方に共感してくれる仲間を探しています。
-              いまの実績よりも、「挑戦してみたい」という気持ちを大切にしています。
+              実績や経験は、あとから育ちます。
+              私たちが探しているのは、「やってみたい」という小さな芽を
+              持っている人。この実験室には、その芽を育てる土があります。
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button to="/creators" size="lg">
-                募集の想いを見る
+                仲間募集の想いを見る
                 <Icon name="arrow" size={18} />
               </Button>
               <Button to="/contact" size="lg" variant="secondary">

@@ -5,29 +5,29 @@ import { Reveal } from '@/components/ui/Reveal'
 const futures = [
   {
     step: '01',
-    title: '挑戦が、あたりまえになる',
-    body: '「やってみたい」と思ったとき、いつでも一歩を踏み出せる。挑戦することが特別ではなく、あたりまえになる世界へ。',
+    title: '挑戦が、日常になる',
+    body: '「やってみたい」が特別なことではなく、あたりまえに芽を出す毎日へ。始める理由に、大きさはいらない。',
   },
   {
     step: '02',
-    title: '作家が、地域や社会とつながる',
-    body: '企業・自治体・商業施設・教育機関と作家がつながり、ものづくりの力が社会のあちこちで活きていく。',
+    title: '北海道が、挑戦の産地になる',
+    body: '食や自然だけじゃない。この土地から生まれる「挑戦」も、北海道の名産にしていく。',
   },
   {
     step: '03',
-    title: 'ハンドメイド市場が、大きくなる',
-    body: 'つくり手が増え、活躍の場が広がり、次の世代の作家が育つ。あたたかい循環が、市場そのものを育てていく。',
+    title: '「きた！」が、循環する',
+    body: '誰かの挑戦が実り、それが次の誰かの「きた」になる。喜びがめぐる生態系を、ここから。',
   },
 ]
 
-/** Vision — the future we're aiming for, shown as a small numbered journey. */
+/** Vision — 目指す景色を、3つの季節の移ろいのように。 */
 export function Vision() {
   return (
     <Section id="vision" tone="paper" spacing="lg">
       <SectionHeading
         eyebrow="Vision"
         title={<>私たちが目指す、これからの景色</>}
-        description="KitaKita Labが描くのは、作家ひとりの成功ではなく、ものづくりに関わる人すべてが前に進める未来です。"
+        description="KitaKita Labが見ているのは、誰かひとりの成功ではありません。挑戦の種が方々で芽吹き、実り、また次の種になる——そんな景色です。"
       />
 
       <div className="mt-14 grid gap-6 sm:gap-8 lg:grid-cols-3">

@@ -1,9 +1,33 @@
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 
+/** 「きたきた」に重なる4つの意味。ブランドの核（docs/BRAND.md）。 */
+const kitaMeanings = [
+  {
+    kana: '北',
+    title: '北海道の「きた」',
+    body: '私たちの出発点であり、帰る場所。この土地から始めます。',
+  },
+  {
+    kana: '来た',
+    title: 'やってきた の「きた」',
+    body: 'ここまで歩いてきた道のり。積み重ねてきた時間。',
+  },
+  {
+    kana: 'きた！',
+    title: '届いた日の「きた！」',
+    body: '箱を開ける瞬間の、あの弾む気持ち。つくり手と受け手の喜び。',
+  },
+  {
+    kana: '機会',
+    title: 'チャンスがきた の「きた」',
+    body: '出店の話がきた。仲間がきた。アイデアがきた。未来がきた。',
+  },
+]
+
 /**
- * 「KitaKita Labとは」— the story of why this exists.
- * Editorial, prose-led, generous line height.
+ * 「KitaKita Labとは」— ブランドの物語。
+ * 何をしている会社かではなく、どんな価値観で挑戦を育てるかを語る。
  */
 export function About() {
   return (
@@ -18,23 +42,36 @@ export function About() {
 
         <Reveal delay={80} className="max-w-prose space-y-6 text-lg leading-loose text-ink/85">
           <p>
-            ハンドメイド作家として活動するなかで、いつも感じていたことがあります。
-            「もっと挑戦したいのに、その場所が足りない」ということ。
+            KitaKita Labは、<span className="font-medium text-ink">北海道から、新しい挑戦を育てるブランド</span>です。
           </p>
           <p>
-            すばらしい作品をつくる人はたくさんいる。けれど、その力を発揮できる舞台は、
-            まだまだ限られています。だったら——
-            <span className="font-medium text-ink">場所そのものを、自分たちでつくればいい。</span>
+            ハンドメイド作家の活動から始まった私たちは、知っています。
+            挑戦は、計画どおりには来ないこと。ある日ふいに「きた」ること。
+            そして、やってきた挑戦をひとりで育てるのは、少し心細いということも。
           </p>
           <p>
-            KitaKita Labは、その想いから生まれたプロジェクトです。
-            企業や自治体、商業施設、教育機関とともに、作家が挑戦できる機会を企画し、
-            ワークショップや調査活動を通じて、ハンドメイドの可能性を広げていきます。
+            ここでいう挑戦に、大きさは関係ありません。
+            人の一歩も、地域の企画も、企業の新しい試みも、
+            生まれたてのアイデアも——すべてが育てる対象です。
           </p>
           <p className="text-ink-muted">
-            これは、ひとりの作家の挑戦から始まった、みんなのためのプロジェクトです。
+            Labは、研究所ではありません。完成したものを飾る場所でもありません。
+            挑戦を試し、育て、かたちにする——そんな実験室です。
           </p>
         </Reveal>
+      </div>
+
+      {/* 4つの「きた」 */}
+      <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
+        {kitaMeanings.map((m, i) => (
+          <Reveal key={m.title} delay={i * 80}>
+            <div className="flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6">
+              <span className="font-serif text-3xl text-clay-400">{m.kana}</span>
+              <h3 className="mt-4 text-base text-ink">{m.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{m.body}</p>
+            </div>
+          </Reveal>
+        ))}
       </div>
     </Section>
   )

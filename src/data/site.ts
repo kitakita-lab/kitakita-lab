@@ -7,9 +7,11 @@
 export const site = {
   name: 'KitaKita Lab',
   nameJa: 'キタキタラボ',
-  tagline: 'ハンドメイド作家が、もっと挑戦できる世界をつくる。',
+  tagline: '北海道から、新しい挑戦を育てる。',
+  /** ブランドフィロソフィー（docs/BRAND.md 参照）。要所でのみ掲げる。 */
+  philosophy: '挑戦は、待つものではなく、育てるもの。',
   description:
-    'KitaKita Labは、ハンドメイド作家がもっと挑戦できる世界をつくるプロジェクトです。企業コラボ、商業施設イベント、自治体・教育機関との連携、ワークショップ、調査活動を通じて、作家が活躍できる場所を増やします。',
+    'KitaKita Lab（キタキタラボ）は、北海道から新しい挑戦を育てるブランドです。ハンドメイド、ワークショップ、地域や企業との企画——人・地域・アイデアにやってきた「きた！」を見過ごさず、試し、育て、かたちにして社会へ届けます。',
   url: 'https://kitakita-lab.com',
   ogImage: '/ogp.svg',
   email: 'hello@kitakita-lab.jp',

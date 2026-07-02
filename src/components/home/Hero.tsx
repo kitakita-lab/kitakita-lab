@@ -3,8 +3,9 @@ import { Icon } from '@/components/ui/Icon'
 import { NavLink } from '@/components/layout/NavLink'
 
 /**
- * Hero — the opening of the story. Generous whitespace, a single strong
- * statement, and a quiet supporting line. No heavy effects.
+ * Hero — ブランドの第一声。
+ * 4つの「きた」（北海道 / やってきた / きた！ / チャンスがきた）を
+ * 説明ではなく体験として届ける。詳細は docs/BRAND.md。
  */
 export function Hero() {
   return (
@@ -21,31 +22,31 @@ export function Hero() {
 
       <div className="container-content relative pb-20 pt-20 sm:pb-28 sm:pt-28 lg:pb-36 lg:pt-32">
         <div className="max-w-3xl animate-fade-up">
-          <span className="eyebrow">A project for handmade creators</span>
+          <span className="eyebrow">Growing challenges from Hokkaido</span>
 
           <h1 className="mt-6 font-serif text-[2.6rem] leading-[1.18] tracking-tight text-ink sm:text-6xl lg:text-[4.25rem] lg:leading-[1.12]">
-            ハンドメイド作家が、
-            <br className="hidden sm:block" />
-            もっと挑戦できる
+            <span className="text-clay-600">「きた」</span>を、
             <br />
-            <span className="text-clay-600">世界をつくる。</span>
+            育てる。
           </h1>
 
           <p className="mt-8 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-            KitaKita Labは、作品を売るための場所ではありません。
+            出店の話がきた。仲間がきた。アイデアがきた。
             <br className="hidden sm:block" />
-            作家が挑戦し、活躍できる「場所」そのものを増やしていく、
+            ——挑戦は、ある日突然やってくる。
+            <br className="hidden sm:block" />
+            KitaKita Labは、そのひとつひとつを試し、育て、
             <wbr />
-            ものづくりのためのプロジェクトです。
+            かたちにして届ける、北海道の実験室です。
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button href="/#about" size="lg">
-              KitaKita Labの想いを読む
+              ブランドの物語を読む
               <Icon name="arrow" size={18} />
             </Button>
             <Button to="/creators" size="lg" variant="secondary">
-              作家として参加する
+              一緒に挑戦を育てる
             </Button>
           </div>
         </div>
@@ -54,7 +55,7 @@ export function Hero() {
         <div className="mt-20 hidden items-center gap-3 text-sm text-ink-soft sm:flex">
           <NavLink href="/#about" className="link-underline">
             <span className="inline-block h-px w-10 bg-ink-soft/50" />
-            なぜ、始めたのか
+            「きたきた」に込めた、4つの意味
           </NavLink>
         </div>
       </div>

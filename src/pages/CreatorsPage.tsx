@@ -14,13 +14,13 @@ export function CreatorsPage() {
       <Seo
         title="Creators"
         path="/creators"
-        description="KitaKita Labの考え方に共感してくれる作家を募集しています。ワークショップ講師、イベント出店、企業案件への挑戦、将来講師を目指す方まで。挑戦したい気持ちを大切にします。"
+        description="KitaKita Labは「挑戦は、待つものではなく、育てるもの。」という考え方に共感してくれる仲間を探しています。ワークショップ講師、イベント出店、企業案件への挑戦、将来講師を目指す方まで。実績より「やってみたい」を大切にします。"
       />
 
       <PageHeader
         eyebrow="Creators"
         title={<>「挑戦してみたい」を、<br className="hidden sm:block" />ここから。</>}
-        description="KitaKita Labは、ただ一緒に活動する作家を探しているのではありません。この考え方に共感し、ものづくりの未来を一緒につくっていける仲間を探しています。"
+        description="KitaKita Labが探しているのは、スキルの高い人ではなく、「やってみたい」という芽を持っている人です。作家はもちろん、この考え方に共感してくれる人なら、いまの肩書きは問いません。挑戦は、ここで一緒に育てられます。"
       >
         <Button to="/contact" size="lg">
           仲間になる・話を聞く
@@ -80,12 +80,12 @@ export function CreatorsPage() {
       <Section tone="paper" spacing="lg">
         <Reveal className="mx-auto max-w-prose text-center">
           <p className="font-serif text-2xl leading-relaxed text-ink sm:text-[1.75rem] sm:leading-relaxed">
-            うまくいくかどうかは、やってみないとわからない。
+            挑戦は、待つものではなく、育てるもの。
             <br />
-            でも、その一歩を、ひとりにはしません。
+            そして、ひとりで育てなくていいもの。
           </p>
           <p className="mt-6 text-base leading-relaxed text-ink-muted">
-            まずは話してみることから。あなたのつくりたいもの、挑戦してみたいことを聞かせてください。
+            まずは話してみることから。あなたにやってきた「きた」を、聞かせてください。
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button to="/contact" size="lg">
