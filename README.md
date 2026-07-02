@@ -99,6 +99,61 @@ npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート
 2. `package.json` に devDependencies（vitest / @testing-library/* / jsdom / @vitest/coverage-v8）と `test` 系 scripts を追加
 3. `src/test/test-utils.tsx` の Provider をそのプロジェクトの構成（テーマ / ストア等）に合わせて調整
 
+## CI（KitaKita Lab 標準 CI）
+
+**GitHub Actions** による継続的インテグレーションです。
+`.github/workflows/ci.yml` と `.nvmrc` をコピーするだけで他プロジェクトへ横展開できます
+（`typecheck` / `lint` / `test:coverage` / `build` の npm scripts があることが前提）。
+
+### 実行タイミングと内容
+
+| トリガー | 実行内容 |
+| --- | --- |
+| Pull Request 作成・更新時 | install → typecheck → lint → test + coverage → build → 成果物確認 |
+| main への push 時 | 同上（マージ後の main が壊れていないことを保証） |
+
+- **Node バージョン**: `.nvmrc`（LTS = 22）を単一の情報源とし、CI・ローカルで統一
+- **キャッシュ**: `~/.npm`（setup-node）と `node_modules`（actions/cache）の二段構え。
+  ロックファイルが変わらなければ `npm ci` 自体をスキップ
+- **カバレッジ**: `vitest.config.ts` の閾値（S80/F80/B70/L80）を CI でも強制。
+  レポートは Actions の **Artifacts**（`coverage-report`）に14日間保存
+
+### Actions の確認方法
+
+1. GitHub リポジトリの **Actions** タブを開く
+2. 対象のワークフロー実行（コミット名で探す）をタップ
+3. **quality** ジョブ → 各ステップの ✓ / ✗ を確認
+4. カバレッジは実行ページ下部の **Artifacts → coverage-report** をダウンロードし `index.html` を開く
+
+### CI が失敗したときの確認手順
+
+1. Actions の失敗ステップ（赤い ✗）を開いてログを読む
+2. **同じコマンドをローカルで再現する**:
+   - Typecheck 失敗 → `npm run typecheck`
+   - Lint 失敗 → `npm run lint`
+   - Test / Coverage 失敗 → `npm run test:coverage`（閾値未達もここで失敗する）
+   - Build 失敗 → `npm run build`
+3. 修正して同じブランチへ push すると CI が自動で再実行される
+
+### 開発フロー（標準）
+
+```
+1. main からブランチを作成（feat/xxx, fix/xxx, chore/xxx）
+2. 実装 + テスト追加（テストルールは上記参照）
+3. ローカルで npm run lint && npm run typecheck && npm run test && npm run build
+4. push して Pull Request を作成 → CI が自動実行
+5. CI が緑になったことを確認してからレビュー・マージ
+6. マージ後、main の CI が緑であることを確認
+```
+
+### 将来追加予定（ci.yml のコメントにも記載）
+
+- **Codecov**: カバレッジの可視化・PRコメント（lcov 出力済みのため導入は1ステップ）
+- **Playwright**: E2E テスト（別ジョブとして追加）
+- **CodeQL**: セキュリティ静的解析（別ワークフロー）
+- **Dependabot**: 依存関係の自動更新（`.github/dependabot.yml`）
+- **Release Please**: リリースノート・バージョニング自動化
+
 ## コンテンツの追加・編集（CMS化前提の設計）
 
 コンテンツはコンポーネントから分離し、`src/data/` の配列で管理しています。

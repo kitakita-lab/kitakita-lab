@@ -1,0 +1,98 @@
+# =============================================================================
+# KitaKita Lab 標準 CI
+# =============================================================================
+# このワークフローは「KitaKita Lab 標準テンプレート」です。
+# 他プロジェクト（シフト作成サポートアプリ / ikyu公式サイト / ikyuメンテナンス
+# サイト / 新海家の秘伝の書 等）へは、このファイルと .nvmrc をコピーするだけで
+# 同じ CI が動きます（package.json に typecheck / lint / test:coverage / build
+# の各 scripts があることが前提）。
+#
+# 実行内容: install → typecheck → lint → test + coverage → build → 成果物確認
+#
+# ---------------------------------------------------------------------------
+# 【将来追加予定】このファイルに追記しやすい順に:
+#   - Codecov        : 「Test & Coverage」直後に codecov/codecov-action を追加
+#                      （coverage/lcov.info を生成済みなのでそのまま渡せる）
+#   - Playwright E2E : quality とは別 job「e2e」を追加（needs: quality）
+#   - CodeQL         : .github/workflows/codeql.yml として別ファイルで追加
+#   - Dependabot     : .github/dependabot.yml を追加（npm / weekly）
+#   - Release Please : .github/workflows/release-please.yml として別ファイルで追加
+# ---------------------------------------------------------------------------
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# 同一ブランチの古い実行はキャンセルして CI 時間を節約
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# 最小権限の原則（チェックアウトとログ出力のみ）
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node バージョンは .nvmrc を単一の情報源とする（LTS を指定）
+      # cache: npm で ~/.npm（ダウンロードキャッシュ）も自動キャッシュされる
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # node_modules 本体のキャッシュ:
+      # ロックファイルと Node バージョンが同じ間は npm ci をスキップできる
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node${{ hashFiles('.nvmrc') }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # テストとカバレッジは同時取得（二重実行を避ける）。
+      # vitest.config.ts の閾値（S80/F80/B70/L80）を下回るとここで失敗する
+      - name: Test & Coverage
+        run: npm run test:coverage
+
+      # カバレッジレポートを Artifact として保存（失敗時も保存して調査に使う）
+      # Codecov 導入時は coverage/lcov.info をこの直後のステップで送信する
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+      - name: Build
+        run: npm run build
+
+      # ビルド成果物が正しく生成されたことを確認
+      - name: Verify build output
+        run: |
+          test -f dist/index.html || { echo "::error::dist/index.html が生成されていません"; exit 1; }
+          test -d dist/assets || { echo "::error::dist/assets が生成されていません"; exit 1; }
+          echo "Build output OK:"
+          ls -la dist/
