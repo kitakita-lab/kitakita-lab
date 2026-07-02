@@ -13,7 +13,7 @@ type CtaBandProps = {
 /** Reusable closing call-to-action band (dark). */
 export function CtaBand({
   title = 'あなたの「きた」を、聞かせてください。',
-  description = '挑戦の種は、どんなに小さくても大丈夫。作家・企業・自治体・商業施設・メディア——一緒に育てたい方からのご連絡をお待ちしています。',
+  description = '挑戦の種は、どんなに小さくても。作家も、企業も、自治体も——一緒に育てたい方を待っています。',
   primary = { label: 'お問い合わせ', to: '/contact' },
   secondary = { label: '一緒に挑戦を育てる', to: '/creators' },
 }: CtaBandProps) {

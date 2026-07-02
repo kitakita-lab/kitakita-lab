@@ -17,11 +17,10 @@ export function Mission() {
           </p>
         </Reveal>
         <Reveal delay={160}>
-          <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
-            チャンスがきた、その瞬間に「育てられる場所」があるかどうかで、
-            未来は変わります。人、地域、企業、作家、アイデア——
-            やってきた挑戦を見過ごさず、試し、育て、
-            かたちにして社会へ届ける。それが私たちの役割です。
+          <p className="mx-auto mt-8 max-w-xl text-base leading-loose text-ink-muted sm:text-lg">
+            合図がきた、その瞬間に育てられる場所があるかどうかで、未来は変わる。
+            <br />
+            私たちは、その場所になる。
           </p>
         </Reveal>
       </div>

@@ -1,11 +1,12 @@
-import { Button } from '@/components/ui/Button'
-import { Icon } from '@/components/ui/Icon'
 import { NavLink } from '@/components/layout/NavLink'
 
 /**
- * Hero — ブランドの第一声。
- * 4つの「きた」（北海道 / やってきた / きた！ / チャンスがきた）を
- * 説明ではなく体験として届ける。詳細は docs/BRAND.md。
+ * Hero — ブランドの第一声。説明しない。感じさせる。
+ *
+ * 「きた。」だけを主役に置き、意味の解釈は読み手に委ねる
+ * （4つの「きた」は About の物語で回収する）。
+ * CTAボタンは意図的に置かない。世界観に浸ってもらい、
+ * 行動導線はスクロール先（Creators / CTA band）が受け持つ。
  */
 export function Hero() {
   return (
@@ -20,42 +21,55 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="container-content relative pb-20 pt-20 sm:pb-28 sm:pt-28 lg:pb-36 lg:pt-32">
-        <div className="max-w-3xl animate-fade-up">
-          <span className="eyebrow">Growing challenges from Hokkaido</span>
-
-          <h1 className="mt-6 font-serif text-[2.6rem] leading-[1.18] tracking-tight text-ink sm:text-6xl lg:text-[4.25rem] lg:leading-[1.12]">
-            <span className="text-clay-600">「きた」</span>を、
-            <br />
-            育てる。
-          </h1>
-
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-            出店の話がきた。仲間がきた。アイデアがきた。
-            <br className="hidden sm:block" />
-            ——挑戦は、ある日突然やってくる。
-            <br className="hidden sm:block" />
-            KitaKita Labは、そのひとつひとつを試し、育て、
-            <wbr />
-            かたちにして届ける、北海道の実験室です。
+      <div className="container-content relative flex min-h-[82vh] flex-col justify-center pb-24 pt-16 sm:min-h-[86vh] sm:pb-32">
+        <div className="mx-auto w-full max-w-3xl text-center">
+          <p
+            className="animate-fade-up text-xs font-medium uppercase tracking-[0.35em] text-ink-soft"
+          >
+            KitaKita
           </p>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button href="/#about" size="lg">
-              ブランドの物語を読む
-              <Icon name="arrow" size={18} />
-            </Button>
-            <Button to="/creators" size="lg" variant="secondary">
-              一緒に挑戦を育てる
-            </Button>
-          </div>
+          {/* 全角括弧込みで実質5文字幅。vw連動+nowrapで常に1行に収める */}
+          <h1
+            className="mt-8 animate-fade-up whitespace-nowrap font-serif text-[min(16vw,9rem)] leading-none tracking-tight text-ink sm:mt-10"
+            style={{ animationDelay: '120ms' }}
+          >
+            「<span className="text-clay-600">きた</span>。」
+          </h1>
+
+          <p
+            className="mt-10 animate-fade-up font-serif text-xl leading-relaxed text-ink sm:mt-14 sm:text-2xl"
+            style={{ animationDelay: '360ms' }}
+          >
+            それは、
+            <br className="sm:hidden" />
+            何かが始まる合図。
+          </p>
+
+          <p
+            className="mt-8 animate-fade-up text-sm leading-loose text-ink-muted sm:text-base"
+            style={{ animationDelay: '560ms' }}
+          >
+            北海道から、
+            <br className="sm:hidden" />
+            人・地域・アイデアの挑戦を育てる。
+          </p>
         </div>
 
-        {/* Quiet anchor cue */}
-        <div className="mt-20 hidden items-center gap-3 text-sm text-ink-soft sm:flex">
-          <NavLink href="/#about" className="link-underline">
-            <span className="inline-block h-px w-10 bg-ink-soft/50" />
-            「きたきた」に込めた、4つの意味
+        {/* Quiet scroll cue — the only interactive element in the hero */}
+        <div
+          className="absolute inset-x-0 bottom-10 flex animate-fade-in justify-center"
+          style={{ animationDelay: '900ms' }}
+        >
+          <NavLink
+            href="/#about"
+            className="group flex flex-col items-center gap-3 text-xs tracking-wider2 text-ink-soft transition-colors hover:text-clay-600"
+          >
+            この合図の、物語へ
+            <span
+              className="block h-10 w-px bg-ink-soft/40 transition-colors group-hover:bg-clay-400"
+              aria-hidden="true"
+            />
           </NavLink>
         </div>
       </div>
