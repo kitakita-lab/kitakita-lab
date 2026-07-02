@@ -171,7 +171,7 @@ export function ContactForm() {
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? 'message-error' : undefined}
           className={cn(fieldClass, 'resize-y', errors.message && 'border-red-400')}
-          placeholder="ご相談内容や、挑戦してみたいことをお聞かせください。"
+          placeholder="ご相談内容や、進めてみたいことをお聞かせください。"
         />
         {errors.message && (
           <p id="message-error" className="mt-1.5 text-sm text-red-600">

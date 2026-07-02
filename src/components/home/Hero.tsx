@@ -1,73 +1,65 @@
 import { NavLink } from '@/components/layout/NavLink'
 
 /**
- * Hero — ブランドの第一声。説明しない。感じさせる。
- *
- * 「きた。」だけを主役に置き、意味の解釈は読み手に委ねる
- * （4つの「きた」は About の物語で回収する）。
- * CTAボタンは意図的に置かない。世界観に浸ってもらい、
- * 行動導線はスクロール先（Creators / CTA band）が受け持つ。
+ * Hero — ブランドの人格が最初に話す場所。
+ * 名前の説明をしない。約束もしない。哲学を、静かに置くだけ。
+ * 意味の解釈は読む人に委ねる（docs/BRAND.md）。
  */
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-paper">
-      {/* Soft ambient shapes */}
+      {/* 雪原の空気 — わずかな朝の光 */}
       <div
-        className="pointer-events-none absolute -left-32 top-10 h-[26rem] w-[26rem] rounded-full bg-clay-100/50 blur-3xl"
+        className="pointer-events-none absolute -left-40 top-0 h-[30rem] w-[30rem] rounded-full bg-sage-100/50 blur-3xl"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -right-24 top-40 h-80 w-80 rounded-full bg-sage-100/60 blur-3xl"
+        className="pointer-events-none absolute -right-32 bottom-10 h-96 w-96 rounded-full bg-clay-50/60 blur-3xl"
         aria-hidden="true"
       />
 
-      <div className="container-content relative flex min-h-[82vh] flex-col justify-center pb-24 pt-16 sm:min-h-[86vh] sm:pb-32">
+      {/* NOTE: 縦書きの装飾ラベルは、フォント未対応環境でグリフが崩れるため
+          実機検証が済むまで見送り（docs/BRAND.md 世界観の将来課題）。 */}
+      <div className="container-content relative flex min-h-[84vh] flex-col justify-center pb-24 pt-16 sm:min-h-[88vh] sm:pb-32">
         <div className="mx-auto w-full max-w-3xl text-center">
-          <p
-            className="animate-fade-up text-xs font-medium uppercase tracking-[0.35em] text-ink-soft"
-          >
-            KitaKita
+          <p className="animate-fade-up text-[11px] font-medium uppercase tracking-[0.4em] text-ink-soft">
+            KitaKita Lab
           </p>
 
-          {/* 全角括弧込みで実質5文字幅。vw連動+nowrapで常に1行に収める */}
           <h1
-            className="mt-8 animate-fade-up whitespace-nowrap font-serif text-[min(16vw,9rem)] leading-none tracking-tight text-ink sm:mt-10"
-            style={{ animationDelay: '120ms' }}
+            className="mt-12 animate-fade-up font-serif text-4xl font-medium leading-snug tracking-[0.08em] text-ink sm:mt-14 sm:text-5xl lg:text-[3.4rem]"
+            style={{ animationDelay: '150ms' }}
           >
-            「<span className="text-clay-600">きた</span>。」
+            少し進めてみる。
           </h1>
 
           <p
-            className="mt-10 animate-fade-up font-serif text-xl leading-relaxed text-ink sm:mt-14 sm:text-2xl"
-            style={{ animationDelay: '360ms' }}
+            className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.14em] text-ink-muted sm:mt-14 sm:text-lg"
+            style={{ animationDelay: '400ms' }}
           >
-            それは、
-            <br className="sm:hidden" />
-            何かが始まる合図。
+            少し前へ。少し良く。少し豊かに。
           </p>
 
           <p
-            className="mt-8 animate-fade-up text-sm leading-loose text-ink-muted sm:text-base"
-            style={{ animationDelay: '560ms' }}
+            className="mt-10 animate-fade-up text-xs tracking-[0.28em] text-ink-soft"
+            style={{ animationDelay: '620ms' }}
           >
-            北海道から、
-            <br className="sm:hidden" />
-            人・地域・アイデアの挑戦を育てる。
+            北海道から
           </p>
         </div>
 
-        {/* Quiet scroll cue — the only interactive element in the hero */}
+        {/* 地平線へおりる、細い線 */}
         <div
           className="absolute inset-x-0 bottom-10 flex animate-fade-in justify-center"
-          style={{ animationDelay: '900ms' }}
+          style={{ animationDelay: '950ms' }}
         >
           <NavLink
             href="/#about"
-            className="group flex flex-col items-center gap-3 text-xs tracking-wider2 text-ink-soft transition-colors hover:text-clay-600"
+            className="group flex flex-col items-center gap-3 text-[11px] tracking-wider2 text-ink-soft transition-colors hover:text-sage-700"
           >
-            この合図の、物語へ
+            私たちのこと
             <span
-              className="block h-10 w-px bg-ink-soft/40 transition-colors group-hover:bg-clay-400"
+              className="block h-10 w-px bg-ink-soft/40 transition-colors group-hover:bg-sage-500"
               aria-hidden="true"
             />
           </NavLink>

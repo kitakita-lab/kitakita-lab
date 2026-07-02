@@ -1,11 +1,12 @@
 /**
- * Activities（いま育てている挑戦）データ。
+ * Activities（いま、育てているもの）データ。
  *
- * Activities は「事業紹介」ではなく「現在この実験室で育てている挑戦」。
- * 挑戦は増えていく前提のため、この配列に追加するだけで掲載できます。
+ * 活動一覧ではなく「同じ思想（少し進めてみる）から生まれた、育てているもの」。
+ * ワークショップも AI もシステムも EC も、根はひとつ。
+ * 増えていく前提のため、この配列に追加するだけで掲載されます。
  * status:
- *   - growing  … いま育てている挑戦
- *   - sprouting … これから芽を出す挑戦（準備中）
+ *   - growing  … いま育てているもの
+ *   - sprouting … これから育てるもの（準備中）
  */
 
 export type Activity = {
@@ -14,63 +15,47 @@ export type Activity = {
   summary: string
   /** Optional internal link to a dedicated page. */
   href?: string
-  /** Lucide-style icon key resolved in the UI. */
-  icon: 'workshop' | 'research' | 'collab' | 'event' | 'creators' | 'market'
   status: 'growing' | 'sprouting'
 }
 
 export const activities: Activity[] = [
   {
     id: 'workshop',
-    title: 'ワークショップという挑戦',
-    summary:
-      'つくる楽しさに、はじめて触れる場所。参加者には「できた！」を、作家には講師という新しい舞台を育てます。',
+    title: 'ワークショップ',
+    summary: '手を動かすと、少し進む。つくる時間を、体験として届けています。',
     href: '/workshop',
-    icon: 'workshop',
     status: 'growing',
   },
   {
     id: 'collab',
-    title: '企業との共同実験',
-    summary:
-      'ブランドの想いを、手ざわりのある体験に。企業のメッセージと作家の表現が出会うと、新しい何かが芽を出します。',
+    title: '企業・地域との企画',
+    summary: '商業施設、自治体、学校。まちの中に、進めてみる場をつくっています。',
     href: '/collaboration',
-    icon: 'collab',
-    status: 'growing',
-  },
-  {
-    id: 'event',
-    title: 'まちに賑わいを育てる',
-    summary:
-      '商業施設やイベントの場に、つくり手の熱を。訪れた人の「きた！」と、出店者の挑戦が同時に育つ企画をつくります。',
-    href: '/collaboration',
-    icon: 'event',
-    status: 'growing',
-  },
-  {
-    id: 'public',
-    title: '地域・学びとの種まき',
-    summary:
-      '自治体や教育機関とともに、地域の魅力や子どもたちの創造力に水をやる。まちと人にやさしい挑戦を育てます。',
-    href: '/collaboration',
-    icon: 'market',
     status: 'growing',
   },
   {
     id: 'research',
-    title: '声を数字にする調査',
-    summary:
-      'つくり手と市場の声を可視化して、次の挑戦の土壌を耕す。データは、挑戦を育てるための養分です。',
+    title: '調査',
+    summary: 'つくり手と市場の声を、数字にして残す。次に進む人の地図になるように。',
     href: '/research',
-    icon: 'research',
+    status: 'growing',
+  },
+  {
+    id: 'tech',
+    title: 'AIとシステムづくり',
+    summary: '毎日の面倒を、少し軽く。小さな道具を、試しながらつくっています。',
+    status: 'growing',
+  },
+  {
+    id: 'craft-ec',
+    title: 'ものづくりとEC',
+    summary: 'つくったものが、誰かに届くまで。売り場も、届け方も、育てています。',
     status: 'growing',
   },
   {
     id: 'next',
-    title: 'つぎに芽を出す挑戦',
-    summary:
-      '中小企業支援、AI活用、Webサービス、商品開発——実験室では、次の種がもう発芽の準備をしています。',
-    icon: 'creators',
+    title: 'まだ名前のないもの',
+    summary: '次に育てるものを、いくつか温めています。決めすぎないのも、この場所らしさ。',
     status: 'sprouting',
   },
 ]

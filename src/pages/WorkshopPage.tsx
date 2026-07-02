@@ -19,7 +19,7 @@ export function WorkshopPage() {
       <PageHeader
         eyebrow="Workshop"
         title={<>つくる楽しさを、<br className="hidden sm:block" />体験として届ける。</>}
-        description="少人数レッスンから企業コラボ、商業施設イベントまで。作家とともに企画するワークショップは、参加者には「つくる喜び」を、作家には「挑戦の舞台」を生み出します。"
+        description="少人数レッスンから企業コラボ、商業施設イベントまで。手を動かすと、少し進む。参加者には「つくる喜び」を、作家には「はじめての舞台」を。"
       />
 
       <Section tone="paper" spacing="lg">

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="16" fill="#1F1B16"/>
+  <rect width="64" height="64" rx="16" fill="#1F2622"/>
   <text x="50%" y="50%" dy="0.02em" text-anchor="middle" dominant-baseline="central"
-        font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="700" fill="#FBF9F5">K</text>
+        font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="700" fill="#F7F8F6">K</text>
 </svg>

@@ -1,25 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FBF9F5"/>
-      <stop offset="1" stop-color="#F4F0E8"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F2F5F3"/>
+      <stop offset="1" stop-color="#F7F8F6"/>
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <circle cx="120" cy="120" r="260" fill="#F6E1D6" opacity="0.55"/>
-  <circle cx="1080" cy="520" r="220" fill="#EAEDE6" opacity="0.6"/>
+  <circle cx="150" cy="120" r="240" fill="#E2E9E5" opacity="0.5"/>
+  <circle cx="1060" cy="540" r="200" fill="#F5F1E6" opacity="0.6"/>
 
-  <g transform="translate(96, 250)">
-    <g transform="translate(0, -120)">
-      <rect width="56" height="56" rx="14" fill="#1F1B16"/>
-      <text x="28" y="29" text-anchor="middle" dominant-baseline="central"
-            font-family="Georgia, serif" font-size="32" font-weight="700" fill="#FBF9F5">K</text>
-      <text x="74" y="29" dominant-baseline="central"
-            font-family="Georgia, serif" font-size="30" font-weight="600" fill="#1F1B16">KitaKita Lab</text>
+  <g transform="translate(96, 236)">
+    <g transform="translate(0, -116)">
+      <rect width="52" height="52" rx="12" fill="#1F2622"/>
+      <text x="26" y="27" text-anchor="middle" dominant-baseline="central"
+            font-family="Georgia, serif" font-size="30" font-weight="700" fill="#F7F8F6">K</text>
+      <text x="70" y="27" dominant-baseline="central"
+            font-family="Georgia, serif" font-size="28" font-weight="600" fill="#1F2622">KitaKita Lab</text>
     </g>
 
-    <text x="0" y="50" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="76" font-weight="700"><tspan fill="#BC5A35">「きた」</tspan><tspan fill="#1F1B16">を、育てる。</tspan></text>
-    <text x="0" y="150" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="34" font-weight="500" fill="#6B645B">北海道から、新しい挑戦を育てる。</text>
-    <text x="0" y="215" font-family="'Hiragino Sans', sans-serif" font-size="24" fill="#928A7E">挑戦は、待つものではなく、育てるもの。</text>
+    <text x="0" y="70" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="72" font-weight="600" letter-spacing="6" fill="#1F2622">少し進めてみる<tspan fill="#8F7433">。</tspan></text>
+    <text x="0" y="160" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="30" letter-spacing="4" fill="#57615B">少し前へ。少し良く。少し豊かに。</text>
+    <text x="0" y="228" font-family="'Hiragino Sans', sans-serif" font-size="21" letter-spacing="6" fill="#66706A">北海道から</text>
   </g>
 </svg>

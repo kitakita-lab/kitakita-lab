@@ -12,10 +12,10 @@ type CtaBandProps = {
 
 /** Reusable closing call-to-action band (dark). */
 export function CtaBand({
-  title = 'あなたの「きた」を、聞かせてください。',
-  description = '挑戦の種は、どんなに小さくても。作家も、企業も、自治体も——一緒に育てたい方を待っています。',
+  title = '話すことから、始めませんか。',
+  description = '相談でも、雑談でも。進めてみたいことがあれば、聞かせてください。',
   primary = { label: 'お問い合わせ', to: '/contact' },
-  secondary = { label: '一緒に挑戦を育てる', to: '/creators' },
+  secondary = { label: '一緒に進める話', to: '/creators' },
 }: CtaBandProps) {
   return (
     <Section tone="ink" spacing="lg">
