@@ -23,10 +23,10 @@ export function CreatorsCallout() {
               <br className="sm:hidden" />
               一緒に育てませんか。
             </h2>
-            <p className="mt-6 text-base leading-relaxed text-ink-muted sm:text-lg">
-              実績や経験は、あとから育ちます。
-              私たちが探しているのは、「やってみたい」という小さな芽を
-              持っている人。この実験室には、その芽を育てる土があります。
+            <p className="mt-6 text-base leading-loose text-ink-muted sm:text-lg">
+              実績は、あとから育つ。
+              <br />
+              必要なのは、「やってみたい」という小さな芽だけ。
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button to="/creators" size="lg">

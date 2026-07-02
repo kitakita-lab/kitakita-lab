@@ -16,7 +16,7 @@ export function Activities() {
       <SectionHeading
         eyebrow="Activities"
         title="いま、この実験室で育てている挑戦"
-        description="完成品の一覧ではありません。どれも育ちざかりの挑戦です。ここに並ぶ数は、これからも増えていきます。"
+        description="どれも、育ちざかり。この棚は、これからも増えていきます。"
       />
 
       <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
