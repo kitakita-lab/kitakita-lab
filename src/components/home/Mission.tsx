@@ -1,7 +1,7 @@
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 
-/** Mission — a single, quiet, large statement. */
+/** Mission — 果たす役割をひとつの大きな声で。 */
 export function Mission() {
   return (
     <Section id="mission" tone="tint" spacing="lg">
@@ -11,17 +11,17 @@ export function Mission() {
         </Reveal>
         <Reveal delay={80}>
           <p className="mt-6 font-serif text-2xl leading-relaxed text-ink sm:text-3xl lg:text-[2.5rem] lg:leading-[1.5]">
-            作家が活躍できる場所を、
+            すべての「きた」に、
             <br />
-            <span className="text-clay-600">増やしていく。</span>
+            <span className="text-clay-600">育つ場所を。</span>
           </p>
         </Reveal>
         <Reveal delay={160}>
           <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
-            販売するだけでは、挑戦は広がらない。
-            ワークショップ、企業コラボ、地域や教育機関との連携——
-            あらゆるかたちで、作家が一歩を踏み出せる舞台をつくることが、
-            私たちの使命です。
+            チャンスがきた、その瞬間に「育てられる場所」があるかどうかで、
+            未来は変わります。人、地域、企業、作家、アイデア——
+            やってきた挑戦を見過ごさず、試し、育て、
+            かたちにして社会へ届ける。それが私たちの役割です。
           </p>
         </Reveal>
       </div>

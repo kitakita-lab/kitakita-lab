@@ -12,10 +12,10 @@ type CtaBandProps = {
 
 /** Reusable closing call-to-action band (dark). */
 export function CtaBand({
-  title = 'まだ見ぬ場所を、一緒につくる。',
-  description = 'KitaKita Labのビジョンに共感してくださる、作家・企業・自治体・商業施設・メディアの皆さまからのご連絡をお待ちしています。',
+  title = 'あなたの「きた」を、聞かせてください。',
+  description = '挑戦の種は、どんなに小さくても大丈夫。作家・企業・自治体・商業施設・メディア——一緒に育てたい方からのご連絡をお待ちしています。',
   primary = { label: 'お問い合わせ', to: '/contact' },
-  secondary = { label: '作家として参加する', to: '/creators' },
+  secondary = { label: '一緒に挑戦を育てる', to: '/creators' },
 }: CtaBandProps) {
   return (
     <Section tone="ink" spacing="lg">

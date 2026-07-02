@@ -18,8 +18,8 @@
             font-family="Georgia, serif" font-size="30" font-weight="600" fill="#1F1B16">KitaKita Lab</text>
     </g>
 
-    <text x="0" y="40" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="62" font-weight="700" fill="#1F1B16">ハンドメイド作家が、</text>
-    <text x="0" y="120" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="62" font-weight="700" fill="#1F1B16">もっと挑戦できる</text>
-    <text x="0" y="200" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="62" font-weight="700" fill="#BC5A35">世界をつくる。</text>
+    <text x="0" y="50" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="76" font-weight="700"><tspan fill="#BC5A35">「きた」</tspan><tspan fill="#1F1B16">を、育てる。</tspan></text>
+    <text x="0" y="150" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="34" font-weight="500" fill="#6B645B">北海道から、新しい挑戦を育てる。</text>
+    <text x="0" y="215" font-family="'Hiragino Sans', sans-serif" font-size="24" fill="#928A7E">挑戦は、待つものではなく、育てるもの。</text>
   </g>
 </svg>
