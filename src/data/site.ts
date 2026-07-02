@@ -7,11 +7,11 @@
 export const site = {
   name: 'KitaKita Lab',
   nameJa: 'キタキタラボ',
-  tagline: '北海道から、新しい挑戦を育てる。',
+  tagline: '少し進めてみる。',
   /** ブランドフィロソフィー（docs/BRAND.md 参照）。要所でのみ掲げる。 */
-  philosophy: '挑戦は、待つものではなく、育てるもの。',
+  philosophy: '少し進めてみる。',
   description:
-    'KitaKita Lab（キタキタラボ）は、北海道から新しい挑戦を育てるブランドです。ハンドメイド、ワークショップ、地域や企業との企画——人・地域・アイデアにやってきた「きた！」を見過ごさず、試し、育て、かたちにして社会へ届けます。',
+    'KitaKita Lab（キタキタラボ）は、北海道の「少し進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。少し前へ、少し良く、少し豊かになる時間と出会いを届けます。',
   url: 'https://kitakita-lab.com',
   ogImage: '/ogp.svg',
   email: 'hello@kitakita-lab.jp',

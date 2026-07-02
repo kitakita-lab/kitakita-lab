@@ -8,11 +8,11 @@ import { App } from './App'
  * ページを追加したら、このテーブルに 1 行追加すること（README のテストルール参照）。
  */
 const routes: Array<{ path: string; heading: string | RegExp }> = [
-  { path: '/', heading: /「きた。」/ },
+  { path: '/', heading: /少し進めてみる。/ },
   { path: '/workshop', heading: /つくる楽しさを、/ },
   { path: '/research', heading: /現場の声を、/ },
   { path: '/collaboration', heading: /ものづくりの力で、/ },
-  { path: '/creators', heading: /「挑戦してみたい」を、/ },
+  { path: '/creators', heading: /その「少し」を、/ },
   { path: '/news', heading: 'お知らせ' },
   { path: '/faq', heading: 'よくある質問' },
   { path: '/contact', heading: 'お問い合わせ' },

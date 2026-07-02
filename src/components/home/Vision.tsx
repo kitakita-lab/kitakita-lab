@@ -5,29 +5,29 @@ import { Reveal } from '@/components/ui/Reveal'
 const futures = [
   {
     step: '01',
-    title: '挑戦が、日常になる',
-    body: '始める理由に、大きさはいらない。「やってみたい」が、あたりまえに芽を出す毎日へ。',
+    title: '「少し」に、勇気がいらなくなる',
+    body: '進めてみるのに、覚悟も宣言もいらない。散歩くらいの気軽さで。',
   },
   {
     step: '02',
-    title: '北海道が、挑戦の産地になる',
-    body: '食や自然だけじゃない。「挑戦」も、この土地の名産にする。',
+    title: '北海道の日常に、進む楽しさを',
+    body: '特別な日じゃなくていい。この土地の毎日の中に、小さな前進を。',
   },
   {
     step: '03',
-    title: '「きた！」が、循環する',
-    body: '誰かの実りが、次の誰かの合図になる。喜びは、めぐる。',
+    title: '受け取ったものが、めぐっていく',
+    body: '応援は、使っても減らない。手から手へ、ずっと先まで。',
   },
 ]
 
-/** Vision — 目指す景色を、3つの季節の移ろいのように。 */
+/** Vision — 目指す景色。大きな未来ではなく、確かな景色を。 */
 export function Vision() {
   return (
     <Section id="vision" tone="paper" spacing="lg">
       <SectionHeading
         eyebrow="Vision"
-        title={<>私たちが目指す、これからの景色</>}
-        description="ひとりの成功ではなく、挑戦が芽吹き、実り、また種になる景色を。"
+        title={<>目指している景色</>}
+        description="劇的な変化ではなく、こんな景色を思い描いています。"
       />
 
       <div className="mt-14 grid gap-6 sm:gap-8 lg:grid-cols-3">

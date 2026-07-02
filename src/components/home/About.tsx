@@ -2,9 +2,9 @@ import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 
 /**
- * 「KitaKita Labとは」— ブランドストーリー。
- * 名前の意味を箇条書きで説明せず、ひとつの物語として読ませ、
- * 最後に「だから存在する」へ着地する（docs/BRAND.md）。
+ * 「私たちのこと」— 会社紹介ではなく、人格の自己紹介。
+ * 原点（助けられてきた）→ 姿勢（歩くのは、あなた）→
+ * この場所の意味（少し進めてみる。解釈は委ねる）の順で語る。
  */
 export function About() {
   return (
@@ -13,35 +13,35 @@ export function About() {
         <Reveal>
           <span className="eyebrow">About</span>
           <h2 className="mt-3 text-3xl leading-tight sm:text-4xl">
-            KitaKita Labとは
+            私たちのこと
           </h2>
         </Reveal>
 
         <Reveal delay={80} className="max-w-prose space-y-8 text-lg leading-loose text-ink/85">
           <p>
-            北の空の下で、私たちは何度もその声を聞いてきました。
-            「出店の話が、きた」「新しい仕事が、きた」
-            「いいアイデアが、きた」——そして、
-            届いた箱を開けた誰かの、「きた！」。
+            私たちは、たくさんの人に助けられてきました。
+            話を聞いてくれた人。応援してくれた人。
+            つないでくれた人。そっと背中を押してくれた人。
+            今の私たちは、その人たちでできています。
           </p>
           <p>
-            挑戦は、いつも小さな「きた」から始まります。
-            けれど、せっかくやってきたその合図を、
-            ひとりで育てるのは、少し心細い。
+            だから今度は、返していく番です。
           </p>
           <p>
-            だから、KitaKita Lab。
+            といっても、大きなことはできません。
+            人生を変えるとか、成功させるとか、
+            そういう約束はしないことにしています。
+            歩くのは、あなただからです。
           </p>
           <p>
-            ここは、北海道の小さな実験室。
-            人も、地域も、アイデアも。
-            やってきた挑戦を試し、育て、
-            かたちにして、送り出す。
+            私たちにできるのは、道が少し豊かになるような
+            時間と、体験と、出会いを用意しておくこと。
+            ここは、そのための場所です。
           </p>
-          <p className="font-serif text-xl text-ink sm:text-2xl">
-            次の「きた。」は、
-            <br className="sm:hidden" />
-            あなたの番かもしれません。
+          <p className="font-serif text-xl leading-relaxed text-ink sm:text-2xl">
+            何を進めるかは、あなたが決めてください。
+            <br />
+            作品でも、仕事でも、人生でも。
           </p>
         </Reveal>
       </div>

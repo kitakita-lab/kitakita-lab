@@ -1,48 +1,59 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * KitaKita Lab デザイントークン — 「雪原の実験室」
+ * 北海道の自然から採った配色（docs/BRAND.md 世界観の章を参照）。
+ *
+ * トークン名は歴史的経緯で paper / clay / sage のままだが、意味は:
+ *   paper = 雪（青緑がかった冷たい白）
+ *   ink   = 冬の森の影（緑を含む墨色）
+ *   clay  = 真鍮（実験器具の金物。アクセントは控えめに）
+ *   sage  = 針葉樹（エゾマツの深緑。主役色）
+ *
+ * @type {import('tailwindcss').Config}
+ */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Warm neutral base — 生成り / paper
+        // 雪 — base
         paper: {
-          DEFAULT: '#FBF9F5',
-          50: '#FDFCFA',
-          100: '#FBF9F5',
-          200: '#F4F0E8',
+          DEFAULT: '#F7F8F6',
+          50: '#FCFCFB',
+          100: '#F7F8F6',
+          200: '#EDF0EE',
         },
-        // Ink — text
+        // 冬の森の影 — text
         ink: {
-          DEFAULT: '#1F1B16',
-          muted: '#6B645B',
-          // Darkened from #928A7E (3.2:1) to meet WCAG AA (≈5:1 on paper)
-          // for small de-emphasised text such as dates and captions.
-          soft: '#736B5F',
+          DEFAULT: '#1F2622',
+          muted: '#57615B',
+          // 小さな補助テキスト用。雪の上で WCAG AA (≥4.5:1)
+          soft: '#66706A',
         },
-        // Clay — warm terracotta accent (handmade warmth)
+        // 真鍮 — accent (600 は本文サイズの文字にも使える AA 対応値)
         clay: {
-          50: '#FBF1EC',
-          100: '#F6E1D6',
-          200: '#EBC2AD',
-          300: '#DD9C7C',
-          400: '#CE7651',
-          500: '#BC5A35',
-          600: '#A14A2B',
-          700: '#7F3A23',
-          800: '#5E2C1C',
-          900: '#3F1F15',
+          50: '#F5F1E6',
+          100: '#EBE3CF',
+          200: '#D8C9A4',
+          300: '#C4B080',
+          400: '#A98D53',
+          500: '#8F7433',
+          600: '#7A5E28',
+          700: '#634C20',
+          800: '#4A3918',
+          900: '#332711',
         },
-        // Sage — secondary calm accent
+        // 針葉樹 — primary deep green
         sage: {
-          100: '#EAEDE6',
-          300: '#B9C2AC',
-          500: '#7C8A6B',
-          700: '#566049',
+          100: '#E2E9E5',
+          300: '#A7BAB0',
+          500: '#55705F',
+          700: '#2F4A3E',
         },
-        line: '#E8E2D8',
+        line: '#E2E6E3',
       },
       fontFamily: {
         sans: [
+          '"Zen Kaku Gothic New"',
           '"Noto Sans JP"',
           'system-ui',
           '-apple-system',
@@ -68,8 +79,8 @@ export default {
         xl2: '1.25rem',
       },
       boxShadow: {
-        soft: '0 1px 2px rgba(31,27,22,0.04), 0 8px 30px rgba(31,27,22,0.06)',
-        lift: '0 2px 4px rgba(31,27,22,0.05), 0 18px 50px rgba(31,27,22,0.10)',
+        soft: '0 1px 2px rgba(31,38,34,0.04), 0 8px 30px rgba(31,38,34,0.06)',
+        lift: '0 2px 4px rgba(31,38,34,0.05), 0 18px 50px rgba(31,38,34,0.10)',
       },
       keyframes: {
         'fade-up': {
@@ -87,5 +98,4 @@ export default {
       },
     },
   },
-  plugins: [],
 }

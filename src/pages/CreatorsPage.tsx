@@ -14,13 +14,13 @@ export function CreatorsPage() {
       <Seo
         title="Creators"
         path="/creators"
-        description="KitaKita Labは「挑戦は、待つものではなく、育てるもの。」という考え方に共感してくれる仲間を探しています。ワークショップ講師、イベント出店、企業案件への挑戦、将来講師を目指す方まで。実績より「やってみたい」を大切にします。"
+        description="KitaKita Labは、一緒に「少し進めてみる」仲間を探しています。ワークショップ講師、イベント出店、はじめての企業案件まで。実績より、進めてみたい気持ちを大切にします。"
       />
 
       <PageHeader
         eyebrow="Creators"
-        title={<>「挑戦してみたい」を、<br className="hidden sm:block" />ここから。</>}
-        description="KitaKita Labが探しているのは、スキルの高い人ではなく、「やってみたい」という芽を持っている人です。作家はもちろん、この考え方に共感してくれる人なら、いまの肩書きは問いません。挑戦は、ここで一緒に育てられます。"
+        title={<>その「少し」を、<br className="hidden sm:block" />ここから。</>}
+        description="探しているのは、スキルの高い人ではありません。進めてみたいことがある人です。作家はもちろん、この考え方が好きな人なら、いまの肩書きは問いません。"
       >
         <Button to="/contact" size="lg">
           仲間になる・話を聞く
@@ -55,7 +55,7 @@ export function CreatorsPage() {
         <SectionHeading
           eyebrow="Who we look for"
           title="こんな方を募集しています"
-          description="今のステージはさまざまでかまいません。挑戦したい気持ちがあれば、それがいちばんの資格です。"
+          description="いまのステージは、さまざまでかまいません。進めてみたい気持ちがあれば、それで十分です。"
         />
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
           {creatorRoles.map((role, i) => (
@@ -80,12 +80,12 @@ export function CreatorsPage() {
       <Section tone="paper" spacing="lg">
         <Reveal className="mx-auto max-w-prose text-center">
           <p className="font-serif text-2xl leading-relaxed text-ink sm:text-[1.75rem] sm:leading-relaxed">
-            挑戦は、待つものではなく、育てるもの。
+            うまくいくかは、わかりません。
             <br />
-            そして、ひとりで育てなくていいもの。
+            でも、ひとりで進めるより、きっといい。
           </p>
           <p className="mt-6 text-base leading-relaxed text-ink-muted">
-            まずは話してみることから。あなたにやってきた「きた」を、聞かせてください。
+            まずは話してみることから。進めてみたいことを、聞かせてください。
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button to="/contact" size="lg">
