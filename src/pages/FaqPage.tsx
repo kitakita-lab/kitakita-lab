@@ -37,7 +37,7 @@ export function FaqPage() {
                   <div className="mt-4 border-t border-line">
                     {items.map((item) => (
                       <AccordionItem
-                        key={item.question}
+                        key={item.id}
                         question={item.question}
                         answer={item.answer}
                       />

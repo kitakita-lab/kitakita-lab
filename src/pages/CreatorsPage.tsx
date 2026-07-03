@@ -19,7 +19,7 @@ export function CreatorsPage() {
 
       <PageHeader
         eyebrow="Creators"
-        title={<>その「少し」を、<br className="hidden sm:block" />ここから。</>}
+        title={<>その「少し」を<br />ここから。</>}
         description={
           <>
             探しているのは、スキルの高い人<span className="whitespace-nowrap">ではありません</span>。

@@ -35,9 +35,17 @@ export function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 transition-all duration-300',
+        // backdrop-blur-md is always applied (not toggled with `scrolled`):
+        // toggling backdrop-filter on/off on a position:sticky element via a
+        // scroll-driven class change is a known trigger for the sticky
+        // element's compositing layer to be torn down and rebuilt mid-scroll,
+        // which can leave its hit-testing region stale — the header still
+        // paints correctly but stops receiving taps until another repaint.
+        // Left always-on, it has no visible effect while bg-paper/0 is fully
+        // transparent, so this changes nothing visually.
+        'sticky top-0 z-50 backdrop-blur-md transition-colors duration-300',
         scrolled
-          ? 'border-b border-line bg-paper/85 backdrop-blur-md'
+          ? 'border-b border-line bg-paper/85'
           : 'border-b border-transparent bg-paper/0',
       )}
     >
