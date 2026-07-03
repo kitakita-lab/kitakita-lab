@@ -35,9 +35,15 @@ const NotFoundPage = lazyWithRetry(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
 
-/** Minimal, layout-stable fallback (avoids CLS while a route chunk loads). */
+/**
+ * Minimal, layout-stable fallback shown while a route chunk loads.
+ * min-h-screen (not a smaller fraction) keeps the Footer below the fold
+ * during the loading state itself, so pages with more content than a
+ * shorter placeholder don't yank the Footer into view and back out —
+ * measured as a large CLS spike on Workshop once its content grew.
+ */
 function RouteFallback() {
-  return <div className="min-h-[60vh]" aria-hidden="true" />
+  return <div className="min-h-screen" aria-hidden="true" />
 }
 
 export function App() {

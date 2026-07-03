@@ -11,7 +11,10 @@
       name="description"
       content="KitaKita Lab（キタキタラボ）は、北海道の「少し進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。少し前へ、少し良く、少し豊かになる時間と出会いを届けます。"
     />
-    <link rel="canonical" href="https://kitakita-lab.com/" />
+
+    <!-- canonical is set per-route by <Seo> (react-helmet-async); a static
+         one here would linger as a duplicate, since Helmet only manages
+         tags it renders itself, not pre-existing static ones. -->
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />

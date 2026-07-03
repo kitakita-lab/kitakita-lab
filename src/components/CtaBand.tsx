@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 
 type CtaBandProps = {
-  title?: string
+  title?: ReactNode
   description?: string
   primary?: { label: string; to: string }
   secondary?: { label: string; to: string }
@@ -15,9 +16,10 @@ export function CtaBand({
   title = '話すことから、始めませんか。',
   description = '相談でも、雑談でも。進めてみたいことがあれば、聞かせてください。',
   primary = { label: 'お問い合わせ', to: '/contact' },
-  // NOTE: Creators セクション（CreatorsCallout）の主ボタンが「一緒に進める話」の
-  // ため、ホーム画面内で同じ文言が連続しないよう、ここは別表現にしている。
-  secondary = { label: '仲間になる', to: '/creators' },
+  // NOTE: 「仲間になる」は採用ページのような直接的な響きになるため見直し。
+  // Hero/Vision で繰り返される「少し」「〜てみる」の語調に合わせ、
+  // 低い温度から始められる言い回しにしている（docs/BRAND.md）。
+  secondary = { label: '少し関わってみる', to: '/creators' },
 }: CtaBandProps) {
   return (
     <Section tone="ink" spacing="lg">
@@ -29,7 +31,16 @@ export function CtaBand({
           {description}
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button to={primary.to} size="lg" variant="primary" className="bg-paper text-ink hover:bg-clay-200">
+          {/* !bg-paper/!text-ink: cn()は単純結合でTailwindのクラス競合を解決しないため、
+              variant="primary"のbg-ink/text-paperとの衝突でtext-paperが優先され文字が
+              背景色と同化していた（実測: color/backgroundColorが同一値）。!importantで
+              意図した配色を確実に反映する。 */}
+          <Button
+            to={primary.to}
+            size="lg"
+            variant="primary"
+            className="!bg-paper !text-ink hover:!bg-clay-200"
+          >
             {primary.label}
             <Icon name="arrow" size={18} />
           </Button>
