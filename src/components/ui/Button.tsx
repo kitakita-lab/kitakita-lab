@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
-type Variant = 'primary' | 'secondary' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'invert' | 'invertOutline'
 type Size = 'md' | 'lg'
 
 const base =
@@ -14,6 +14,17 @@ const variants: Record<Variant, string> = {
   secondary:
     'bg-transparent text-ink border border-line hover:border-ink/40 hover:bg-paper-200',
   ghost: 'bg-transparent text-ink hover:text-clay-600',
+  // For use on dark (tone="ink") sections, where primary/secondary's colors
+  // would blend into the background. Defined as their own variants (not a
+  // className override layered on primary/secondary) so there's no bg-*/
+  // text-* class ever competing with another for the same element — cn()
+  // is a plain string join with no Tailwind-conflict resolution, so two
+  // classes touching the same property left the winner up to arbitrary
+  // build-order, which previously made a button's text render the same
+  // color as its background.
+  invert: 'bg-paper text-ink hover:bg-clay-200 shadow-soft hover:shadow-lift',
+  invertOutline:
+    'bg-transparent text-paper border border-paper/30 hover:border-paper/60 hover:bg-paper/5',
 }
 
 const sizes: Record<Size, string> = {

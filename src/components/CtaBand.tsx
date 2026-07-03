@@ -31,26 +31,12 @@ export function CtaBand({
           {description}
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          {/* !bg-paper/!text-ink: cn()は単純結合でTailwindのクラス競合を解決しないため、
-              variant="primary"のbg-ink/text-paperとの衝突でtext-paperが優先され文字が
-              背景色と同化していた（実測: color/backgroundColorが同一値）。!importantで
-              意図した配色を確実に反映する。 */}
-          <Button
-            to={primary.to}
-            size="lg"
-            variant="primary"
-            className="!bg-paper !text-ink hover:!bg-clay-200"
-          >
+          <Button to={primary.to} size="lg" variant="invert">
             {primary.label}
             <Icon name="arrow" size={18} />
           </Button>
           {secondary && (
-            <Button
-              to={secondary.to}
-              size="lg"
-              variant="secondary"
-              className="border-paper/30 text-paper hover:border-paper/60 hover:bg-paper/5"
-            >
+            <Button to={secondary.to} size="lg" variant="invertOutline">
               {secondary.label}
             </Button>
           )}
