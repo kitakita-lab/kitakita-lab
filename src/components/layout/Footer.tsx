@@ -14,15 +14,18 @@ export function Footer() {
             <p className="mt-5 text-sm leading-relaxed text-paper/65">
               {site.tagline}
             </p>
-            <p className="mt-4 text-sm text-paper/65">
-              お問い合わせ：
-              <a
-                href={`mailto:${site.email}`}
-                className="underline decoration-paper/30 underline-offset-4 transition-colors hover:text-clay-200"
-              >
-                {site.email}
-              </a>
-            </p>
+            {/* メールアドレスは正式取得後に site.email へ設定すると表示される */}
+            {site.email && (
+              <p className="mt-4 text-sm text-paper/65">
+                お問い合わせ：
+                <a
+                  href={`mailto:${site.email}`}
+                  className="break-all underline decoration-paper/30 underline-offset-4 transition-colors hover:text-clay-200"
+                >
+                  {site.email}
+                </a>
+              </p>
+            )}
           </div>
 
           {footerGroups.map((group) => (

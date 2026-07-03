@@ -8,7 +8,8 @@ import { App } from './App'
  * ページを追加したら、このテーブルに 1 行追加すること（README のテストルール参照）。
  */
 const routes: Array<{ path: string; heading: string | RegExp }> = [
-  { path: '/', heading: /少し進めてみる。/ },
+  // 哲学の単独表記は句点なし（docs/BRAND.md）— 句点が復活したら検知できるよう完全一致で見る
+  { path: '/', heading: /^少し進めてみる$/ },
   { path: '/workshop', heading: /つくる楽しさを、/ },
   { path: '/research', heading: /現場の声を、/ },
   { path: '/collaboration', heading: /ものづくりの力で、/ },

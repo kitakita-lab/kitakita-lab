@@ -180,7 +180,7 @@ export function ContactForm() {
         )}
       </div>
 
-      <div className="flex items-center gap-4 pt-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2">
         <Button type="submit" size="lg">
           送信する
           <Icon name="arrow" size={18} />

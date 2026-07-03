@@ -18,7 +18,7 @@
             font-family="Georgia, serif" font-size="28" font-weight="600" fill="#1F2622">KitaKita Lab</text>
     </g>
 
-    <text x="0" y="70" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="72" font-weight="600" letter-spacing="6" fill="#1F2622">少し進めてみる<tspan fill="#8F7433">。</tspan></text>
+    <text x="0" y="70" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="72" font-weight="600" letter-spacing="6" fill="#1F2622">少し進めてみ<tspan fill="#8F7433">る</tspan></text>
     <text x="0" y="160" font-family="'Hiragino Mincho ProN', Georgia, serif" font-size="30" letter-spacing="4" fill="#57615B">少し前へ。少し良く。少し豊かに。</text>
     <text x="0" y="228" font-family="'Hiragino Sans', sans-serif" font-size="21" letter-spacing="6" fill="#66706A">北海道から</text>
   </g>

@@ -3,83 +3,66 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Reveal } from '@/components/ui/Reveal'
 import { Icon } from '@/components/ui/Icon'
 import { NavLink } from '@/components/layout/NavLink'
-import { activities } from '@/data/activities'
+import { flowSteps } from '@/data/activities'
 
 /**
- * Activities — カードではなく、罫線の「目録」。
- * ばらばらに見える活動が、同じ思想から生まれていることを
- * ひとつの静かなリストで示す（docs/BRAND.md: 世界観）。
+ * Activities — 「何をやる会社か」ではなく「どんな流れをつくる会社か」。
+ * 〜てみる、の連なりを罫線の目録で見せ、ワークショップ・AI・EC などは
+ * 流れの中の実例として置く（docs/BRAND.md）。
  */
 export function Activities() {
   return (
     <Section id="activities" tone="tint" spacing="lg">
       <SectionHeading
         eyebrow="Activities"
-        title="いま、育てているもの"
-        description="ばらばらに見えるかもしれません。ぜんぶ、「少し進めてみる」から生まれています。"
+        title="私たちが、つくっている流れ"
+        description="ワークショップも、AIも、ECも。ぜんぶ、この流れのどこかにあります。"
       />
 
-      <ul className="mt-14 border-t border-line">
-        {activities.map((activity, i) => {
-          const sprouting = activity.status === 'sprouting'
-          const number = sprouting ? '──' : String(i + 1).padStart(2, '0')
-
-          const inner = (
-            <div className="grid gap-2 py-8 sm:grid-cols-[5rem_1fr_auto] sm:items-baseline sm:gap-8">
+      <ol className="mt-14 border-t border-line">
+        {flowSteps.map((step, i) => (
+          <Reveal
+            key={step.id}
+            as="li"
+            delay={Math.min(i, 4) * 60}
+            className="border-b border-line"
+          >
+            <div className="grid gap-3 py-9 sm:grid-cols-[5rem_1fr] sm:gap-8">
               <span
-                className={`font-serif text-sm tracking-[0.2em] ${
-                  sprouting ? 'text-ink-soft' : 'text-clay-400'
-                }`}
+                className="font-serif text-sm tracking-[0.2em] text-clay-400"
                 aria-hidden="true"
               >
-                {number}
+                {String(i + 1).padStart(2, '0')}
               </span>
               <div>
-                <h3
-                  className={`font-serif text-xl tracking-[0.06em] sm:text-2xl ${
-                    sprouting ? 'text-ink-soft' : 'text-ink'
-                  }`}
-                >
-                  {activity.title}
+                <h3 className="font-serif text-2xl tracking-[0.08em] text-ink sm:text-[1.75rem]">
+                  {step.verb}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                  {activity.summary}
+                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+                  {step.summary}
                 </p>
+                <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                  {step.examples.map((ex) => (
+                    <li key={ex.label} className="text-sm">
+                      {ex.href ? (
+                        <NavLink
+                          href={ex.href}
+                          className="inline-flex items-center gap-1 text-sage-700 underline decoration-sage-300 underline-offset-4 transition-colors hover:text-sage-500"
+                        >
+                          {ex.label}
+                          <Icon name="arrow" size={13} />
+                        </NavLink>
+                      ) : (
+                        <span className="text-ink-soft">{ex.label}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <span
-                className={`hidden items-center gap-1.5 text-xs tracking-wider2 sm:inline-flex ${
-                  sprouting
-                    ? 'text-ink-soft'
-                    : 'text-sage-700 transition-colors group-hover:text-sage-500'
-                }`}
-              >
-                {activity.href ? (
-                  <>
-                    見る
-                    <Icon name="arrow" size={14} />
-                  </>
-                ) : sprouting ? (
-                  '準備中'
-                ) : (
-                  '育成中'
-                )}
-              </span>
             </div>
-          )
-
-          return (
-            <Reveal key={activity.id} as="li" delay={Math.min(i, 4) * 60} className="border-b border-line">
-              {activity.href ? (
-                <NavLink href={activity.href} className="group block">
-                  {inner}
-                </NavLink>
-              ) : (
-                inner
-              )}
-            </Reveal>
-          )
-        })}
-      </ul>
+          </Reveal>
+        ))}
+      </ol>
     </Section>
   )
 }
