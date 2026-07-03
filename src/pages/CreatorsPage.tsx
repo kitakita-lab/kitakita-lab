@@ -45,7 +45,17 @@ export function CreatorsPage() {
       <Section tone="paper" spacing="lg">
         <SectionHeading
           eyebrow="Our values"
-          title="私たちが、大切にしていること"
+          title={
+            // 「私たちが」/「大切にしていること」の意味のまとまりで2行に固定。
+            // 320px幅では2行目が約3px溢れて「と」だけ孤立するため、極小の
+            // トラッキング詰め（フォントサイズは不変）で2行に収める。sm以上は
+            // 余裕があるので通常字間に戻す（Hero.tsx と同じ狭幅対応の考え方）。
+            <span className="tracking-[-0.02em] sm:tracking-normal">
+              私たちが
+              <br />
+              大切にしていること
+            </span>
+          }
           description="スキルや実績よりも、この考え方に「いいな」と思えるかどうか。それが、いちばん大切な出発点です。"
         />
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
