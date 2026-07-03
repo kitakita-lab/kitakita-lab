@@ -19,11 +19,11 @@ export function PageHeader({ eyebrow, title, description, children }: PageHeader
       <div className="container-content relative py-16 sm:py-20 lg:py-24">
         <Reveal className="max-w-prose">
           <span className="eyebrow">{eyebrow}</span>
-          <h1 className="mt-4 text-4xl leading-[1.15] sm:text-5xl lg:text-[3.25rem]">
+          <h1 className="mt-4 text-balance text-4xl leading-[1.15] sm:text-5xl lg:text-[3.25rem]">
             {title}
           </h1>
           {description && (
-            <p className="mt-6 text-base leading-relaxed text-ink-muted sm:text-lg">
+            <p className="mt-6 text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
               {description}
             </p>
           )}

@@ -15,7 +15,9 @@ export function CtaBand({
   title = '話すことから、始めませんか。',
   description = '相談でも、雑談でも。進めてみたいことがあれば、聞かせてください。',
   primary = { label: 'お問い合わせ', to: '/contact' },
-  secondary = { label: '一緒に進める話', to: '/creators' },
+  // NOTE: Creators セクション（CreatorsCallout）の主ボタンが「一緒に進める話」の
+  // ため、ホーム画面内で同じ文言が連続しないよう、ここは別表現にしている。
+  secondary = { label: '仲間になる', to: '/creators' },
 }: CtaBandProps) {
   return (
     <Section tone="ink" spacing="lg">

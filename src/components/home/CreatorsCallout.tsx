@@ -18,15 +18,14 @@ export function CreatorsCallout() {
           />
           <div className="relative mx-auto max-w-2xl text-center">
             <span className="eyebrow">Creators</span>
-            <h2 className="mt-4 text-3xl leading-tight sm:text-4xl lg:text-[2.5rem]">
-              その「少し」、
-              <br className="sm:hidden" />
-              一緒に進めませんか。
+            {/* text-balance / text-pretty: 手動の<br>だと幅によって「か。」だけの
+                孤立行や「十分」が割れる改行が発生するため、行の折り返しをブラウザの
+                自動バランス調整に委ねる（実機幅 320/375/390/430px で確認済み）。 */}
+            <h2 className="mt-4 text-balance text-3xl leading-tight sm:text-4xl lg:text-[2.5rem]">
+              その「少し」、一緒に進めませんか。
             </h2>
-            <p className="mt-6 text-base leading-loose text-ink-muted sm:text-lg">
-              大きな一歩じゃなくていい。
-              <br />
-              進めてみたいことがあれば、それで十分です。
+            <p className="mt-6 text-pretty text-base leading-loose text-ink-muted sm:text-lg">
+              大きな一歩じゃなくていい。進めてみたいことがあれば、それで十分です。
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button to="/creators" size="lg">
