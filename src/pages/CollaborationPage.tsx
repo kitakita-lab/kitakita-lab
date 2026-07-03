@@ -48,7 +48,13 @@ export function CollaborationPage() {
 
       <PageHeader
         eyebrow="Collaboration"
-        title={<>ものづくりの力で、<br className="hidden sm:block" />一緒に何かを生み出す。</>}
+        title={
+          <>
+            ものづくりの力で、
+            <br className="hidden sm:block" />
+            一緒に<span className="whitespace-nowrap">何か</span>を生み出す。
+          </>
+        }
         description="企業・商業施設・自治体・教育機関の皆さまと連携し、作家の表現力を活かした企画を実現します。賑わいづくりから、ブランド体験、地域・教育の取り組みまで。"
       />
 

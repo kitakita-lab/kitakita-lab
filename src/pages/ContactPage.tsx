@@ -24,7 +24,7 @@ export function ContactPage() {
       <PageHeader
         eyebrow="Contact"
         title="お問い合わせ"
-        description="作家としての参加、企業・自治体との連携、取材のご依頼など、どんなことでもお気軽にご連絡ください。"
+        description="うまく言葉にならなくても、大丈夫です。まずは、聞かせてください。"
       />
 
       <Section tone="paper" spacing="lg">

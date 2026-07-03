@@ -17,7 +17,13 @@ export function ResearchPage() {
 
       <PageHeader
         eyebrow="Research"
-        title={<>現場の声を、<br className="hidden sm:block" />数字とことばにする。</>}
+        title={
+          <>
+            現場の声を、
+            <br className="hidden sm:block" />
+            数字と<span className="whitespace-nowrap">ことば</span>にする。
+          </>
+        }
         description="つくり手と市場の声を、数字にして残しています。次に進む人の地図になるように。調査結果は、今後プレスリリースとして順次公開予定です。"
       />
 
