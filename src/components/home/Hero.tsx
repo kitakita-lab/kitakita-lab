@@ -26,15 +26,18 @@ export function Hero() {
             KitaKita Lab
           </p>
 
+          {/* tracking を狭幅のみ詰める: text-4xl+tracking-0.08em は 320px 幅で
+              コンテナ(272px)を数px超え、不格好な改行を起こすための調整
+              （フォントサイズは変更しない）。 */}
           <h1
-            className="mt-12 animate-fade-up font-serif text-4xl font-medium leading-snug tracking-[0.08em] text-ink sm:mt-14 sm:text-5xl lg:text-[3.4rem]"
+            className="mt-12 animate-fade-up font-serif text-4xl font-medium leading-snug tracking-normal text-ink sm:mt-14 sm:text-5xl sm:tracking-[0.08em] lg:text-[3.4rem]"
             style={{ animationDelay: '150ms' }}
           >
             少し進めてみる
           </h1>
 
           <p
-            className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.14em] text-ink-muted sm:mt-14 sm:text-lg"
+            className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.03em] text-ink-muted sm:mt-14 sm:text-lg sm:tracking-[0.14em]"
             style={{ animationDelay: '400ms' }}
           >
             少し前へ。少し良く。少し豊かに。
