@@ -22,7 +22,7 @@ export function CreatorsPage() {
         title={<>その「少し」を、<br className="hidden sm:block" />ここから。</>}
         description={
           <>
-            探しているのは、スキルの高い人<span className="whitespace-nowrap">ではありません</span>。進めてみたいことがある人です。作家はもちろん、この考え方が好きな人なら、<span className="whitespace-nowrap">いま</span>の<span className="whitespace-nowrap">肩書き</span>は問いません。
+            探しているのは、スキルの高い人<span className="whitespace-nowrap">ではありません</span>。一歩踏み出してみたい人<span className="whitespace-nowrap">です</span>。作家はもちろん、この考え方が好きな人<span className="whitespace-nowrap">なら</span>、<span className="whitespace-nowrap">いま</span>の<span className="whitespace-nowrap">肩書き</span>は問いません。
           </>
         }
       >
