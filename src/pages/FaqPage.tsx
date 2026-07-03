@@ -54,7 +54,7 @@ export function FaqPage() {
         title="疑問は、解消できましたか？"
         description="ここに載っていないご質問も、お気軽にお問い合わせください。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
-        secondary={{ label: '作家募集を見る', to: '/creators' }}
+        secondary={{ label: '一緒に進めてみる', to: '/creators' }}
       />
     </>
   )

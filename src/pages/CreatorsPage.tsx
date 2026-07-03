@@ -20,10 +20,14 @@ export function CreatorsPage() {
       <PageHeader
         eyebrow="Creators"
         title={<>その「少し」を、<br className="hidden sm:block" />ここから。</>}
-        description="探しているのは、スキルの高い人ではありません。進めてみたいことがある人です。作家はもちろん、この考え方が好きな人なら、いまの肩書きは問いません。"
+        description={
+          <>
+            探しているのは、スキルの高い人<span className="whitespace-nowrap">ではありません</span>。進めてみたいことがある人です。作家はもちろん、この考え方が好きな人なら、<span className="whitespace-nowrap">いま</span>の<span className="whitespace-nowrap">肩書き</span>は問いません。
+          </>
+        }
       >
         <Button to="/contact" size="lg">
-          仲間になる・話を聞く
+          お問い合わせ
           <Icon name="arrow" size={18} />
         </Button>
       </PageHeader>
