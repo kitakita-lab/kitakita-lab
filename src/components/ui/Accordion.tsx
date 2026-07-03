@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react'
 import { useId, useState } from 'react'
 import { Icon } from './Icon'
 
 type AccordionItemProps = {
-  question: string
+  question: ReactNode
   answer: string
   defaultOpen?: boolean
 }
