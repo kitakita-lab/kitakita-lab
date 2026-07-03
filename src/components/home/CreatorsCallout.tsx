@@ -29,7 +29,7 @@ export function CreatorsCallout() {
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button to="/creators" size="lg">
-                一緒に進める話
+                一緒に進めてみる
                 <Icon name="arrow" size={18} />
               </Button>
               <Button to="/contact" size="lg" variant="secondary">

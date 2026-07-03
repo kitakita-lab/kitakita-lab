@@ -16,10 +16,10 @@ export function CtaBand({
   title = '話すことから、始めませんか。',
   description = '相談でも、雑談でも。進めてみたいことがあれば、聞かせてください。',
   primary = { label: 'お問い合わせ', to: '/contact' },
-  // NOTE: 「仲間になる」は採用ページのような直接的な響きになるため見直し。
-  // Hero/Vision で繰り返される「少し」「〜てみる」の語調に合わせ、
-  // 低い温度から始められる言い回しにしている（docs/BRAND.md）。
-  secondary = { label: '少し関わってみる', to: '/creators' },
+  // NOTE: Creators への導線は、CreatorsCallout / FaqPage も含めて
+  // 「一緒に進めてみる」に統一している。同じ役割のCTAが違う文言で
+  // 複数存在すると迷わせるため（docs/BRAND.md）。
+  secondary = { label: '一緒に進めてみる', to: '/creators' },
 }: CtaBandProps) {
   return (
     <Section tone="ink" spacing="lg">
