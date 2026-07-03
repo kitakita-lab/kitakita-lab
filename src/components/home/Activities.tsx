@@ -15,7 +15,12 @@ export function Activities() {
     <Section id="activities" tone="tint" spacing="lg">
       <SectionHeading
         eyebrow="Activities"
-        title="私たちが、つくっている流れ"
+        title={
+          <>
+            私たちが、
+            <span className="whitespace-nowrap">つくっている流れ</span>
+          </>
+        }
         description="ワークショップも、AIも、ECも。ぜんぶ、この流れのどこかにあります。"
       />
 
