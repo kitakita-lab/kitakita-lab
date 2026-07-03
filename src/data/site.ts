@@ -7,14 +7,16 @@
 export const site = {
   name: 'KitaKita Lab',
   nameJa: 'キタキタラボ',
-  tagline: '少し進めてみる。',
+  tagline: '少し進めてみる',
   /** ブランドフィロソフィー（docs/BRAND.md 参照）。要所でのみ掲げる。 */
-  philosophy: '少し進めてみる。',
+  philosophy: '少し進めてみる',
   description:
     'KitaKita Lab（キタキタラボ）は、北海道の「少し進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。少し前へ、少し良く、少し豊かになる時間と出会いを届けます。',
   url: 'https://kitakita-lab.com',
   ogImage: '/ogp.svg',
-  email: 'hello@kitakita-lab.jp',
+  // TODO: 正式なメールアドレス取得後にここへ設定する。
+  // 空文字の間は Footer / Contact ページのメール表示が自動で非表示になる。
+  email: '',
   locale: 'ja_JP',
 } as const
 

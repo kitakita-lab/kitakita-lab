@@ -30,7 +30,7 @@ export function Hero() {
             className="mt-12 animate-fade-up font-serif text-4xl font-medium leading-snug tracking-[0.08em] text-ink sm:mt-14 sm:text-5xl lg:text-[3.4rem]"
             style={{ animationDelay: '150ms' }}
           >
-            少し進めてみる。
+            少し進めてみる
           </h1>
 
           <p

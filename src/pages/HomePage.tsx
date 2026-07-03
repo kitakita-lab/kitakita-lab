@@ -12,7 +12,7 @@ import { CtaBand } from '@/components/CtaBand'
 /**
  * トップページ = 人格と出会う体験。
  * 哲学(Hero) → 自己紹介(About) → 誠実さ(Philosophy) → 約束(Promise)
- * → 景色(Vision) → 育てているもの(Activities) → 隣の席(Creators)
+ * → 景色(Vision) → つくっている流れ(Activities) → 隣の席(Creators)
  * → いま(News) → 会話(CTA) の順で読み進む構成。
  */
 export function HomePage() {

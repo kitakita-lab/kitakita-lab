@@ -43,18 +43,25 @@ export function ContactPage() {
                 ))}
               </ul>
 
-              <div className="mt-10 rounded-xl2 border border-line bg-paper-50 p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-clay-50 text-clay-600">
-                  <Icon name="mail" size={20} />
-                </span>
-                <p className="mt-4 text-sm text-ink-muted">メールでのお問い合わせ</p>
-                <a
-                  href={`mailto:${site.email}`}
-                  className="mt-1 inline-block text-lg text-ink underline decoration-line underline-offset-4 transition-colors hover:text-clay-600"
-                >
-                  {site.email}
-                </a>
-              </div>
+              {/* TODO: 正式なメールアドレス取得後、site.email に設定すると表示される */}
+              {site.email ? (
+                <div className="mt-10 rounded-xl2 border border-line bg-paper-50 p-6">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-clay-50 text-clay-600">
+                    <Icon name="mail" size={20} />
+                  </span>
+                  <p className="mt-4 text-sm text-ink-muted">メールでのお問い合わせ</p>
+                  <a
+                    href={`mailto:${site.email}`}
+                    className="mt-1 inline-block break-all text-lg text-ink underline decoration-line underline-offset-4 transition-colors hover:text-clay-600"
+                  >
+                    {site.email}
+                  </a>
+                </div>
+              ) : (
+                <p className="mt-10 text-sm leading-relaxed text-ink-soft">
+                  いまは、下のフォームからご連絡いただけます。
+                </p>
+              )}
             </div>
           </Reveal>
 

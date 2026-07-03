@@ -1,61 +1,67 @@
 /**
- * Activities（いま、育てているもの）データ。
+ * Activities（私たちがつくる流れ）データ。
  *
- * 活動一覧ではなく「同じ思想（少し進めてみる）から生まれた、育てているもの」。
- * ワークショップも AI もシステムも EC も、根はひとつ。
- * 増えていく前提のため、この配列に追加するだけで掲載されます。
- * status:
- *   - growing  … いま育てているもの
- *   - sprouting … これから育てるもの（準備中）
+ * 事業一覧ではなく「どんな流れをつくる会社か」を表す。
+ * 流れはすべて「〜てみる」——哲学（少し進めてみる）の動詞が
+ * そのまま会社の動きになっている。
+ * ワークショップ・AI・EC などの活動は、この流れの中の実例として置く。
+ * 実例は examples に追加するだけで掲載されます。
  */
 
-export type Activity = {
+export type FlowStep = {
   id: string
-  title: string
+  /** 流れの動詞（〜てみる） */
+  verb: string
+  /** 一行の説明 */
   summary: string
-  /** Optional internal link to a dedicated page. */
-  href?: string
-  status: 'growing' | 'sprouting'
+  /** この段階の実例（href は任意） */
+  examples: Array<{ label: string; href?: string }>
 }
 
-export const activities: Activity[] = [
+export const flowSteps: FlowStep[] = [
   {
-    id: 'workshop',
-    title: 'ワークショップ',
-    summary: '手を動かすと、少し進む。つくる時間を、体験として届けています。',
-    href: '/workshop',
-    status: 'growing',
+    id: 'meet',
+    verb: '会ってみる',
+    summary: 'はじまりは、顔を合わせること。人が集まる場を、まちの中につくります。',
+    examples: [
+      { label: 'ワークショップ', href: '/workshop' },
+      { label: 'イベント・マルシェ', href: '/collaboration' },
+    ],
   },
   {
-    id: 'collab',
-    title: '企業・地域との企画',
-    summary: '商業施設、自治体、学校。まちの中に、進めてみる場をつくっています。',
-    href: '/collaboration',
-    status: 'growing',
+    id: 'talk',
+    verb: '話してみる',
+    summary: '進めてみたいことを、言葉にしてみる。それだけで、少し進みます。',
+    examples: [
+      { label: 'ご相談', href: '/contact' },
+      { label: '企業・地域との企画', href: '/collaboration' },
+    ],
   },
   {
-    id: 'research',
-    title: '調査',
-    summary: 'つくり手と市場の声を、数字にして残す。次に進む人の地図になるように。',
-    href: '/research',
-    status: 'growing',
+    id: 'make',
+    verb: 'つくってみる',
+    summary: '完成を待たずに、小さく手を動かす。試作から始めます。',
+    examples: [
+      { label: 'ものづくり' },
+      { label: 'AI・システムの試作' },
+    ],
   },
   {
-    id: 'tech',
-    title: 'AIとシステムづくり',
-    summary: '毎日の面倒を、少し軽く。小さな道具を、試しながらつくっています。',
-    status: 'growing',
+    id: 'deliver',
+    verb: '届けてみる',
+    summary: 'つくったものを、誰かのところへ。届いた先で、次が生まれます。',
+    examples: [
+      { label: 'EC・出店' },
+      { label: 'ワークショップでの発表', href: '/workshop' },
+    ],
   },
   {
-    id: 'craft-ec',
-    title: 'ものづくりとEC',
-    summary: 'つくったものが、誰かに届くまで。売り場も、届け方も、育てています。',
-    status: 'growing',
-  },
-  {
-    id: 'next',
-    title: 'まだ名前のないもの',
-    summary: '次に育てるものを、いくつか温めています。決めすぎないのも、この場所らしさ。',
-    status: 'sprouting',
+    id: 'continue',
+    verb: 'つづけてみる',
+    summary: 'ふりかえって、また少し。声を数字にして、次に進む人の地図に。',
+    examples: [
+      { label: '調査', href: '/research' },
+      { label: '次の企画へ' },
+    ],
   },
 ]
