@@ -96,7 +96,7 @@ export function WorkshopPage() {
       <Seo
         title="Workshop"
         path="/workshop"
-        description="KitaKita Lab および作家 ikyu のワークショップ・活動実績。つくる楽しさを届ける体験の場を企画しています。"
+        description="作家 ikyu の「ワークショップをやってみたい」を、KitaKita Lab が企業とのご縁と企画でかたちにした取り組み。つくる楽しさを届ける体験の場です。"
       />
 
       <PageHeader
@@ -119,8 +119,8 @@ export function WorkshopPage() {
           </h2>
           <p className="mt-6 text-base leading-loose text-ink-muted sm:text-lg">
             ワークショップは、何かを教わる時間である以上に、自分の手で少し進めてみる時間だと考えています。
-            うまくできるかどうかより、手を動かしてみたかどうか。KitaKita Labと作家 ikyu は、
-            そんな時間を、企業・商業施設・自治体・教育機関など、さまざまな場所に届けています。
+            うまくできるかどうかより、手を動かしてみたかどうか。この場を開いたのは、作家 ikyu。
+            KitaKita Lab は、企業とのご縁と企画で、その最初の一歩をいっしょに形にしました。
           </p>
         </Reveal>
       </Section>
