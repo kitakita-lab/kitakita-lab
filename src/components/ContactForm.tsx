@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { cn } from '@/lib/cn'
+import { site } from '@/data/site'
 
 type Inquiry = '作家として参加したい' | '企業・自治体・施設の連携' | '取材・メディア' | 'その他'
 
@@ -29,10 +30,23 @@ const initialState: FormState = {
 const fieldClass =
   'w-full rounded-xl border border-line bg-paper-50 px-4 py-3 text-[15px] text-ink placeholder:text-ink-soft transition-colors focus:border-clay-400 focus:bg-paper'
 
+/** 入力内容を site.email 宛の mailto: URL に組み立てる。 */
+function buildMailtoHref(form: FormState): string {
+  const subject = `[${form.inquiry}] お問い合わせ`
+  const body = [
+    `お名前: ${form.name}`,
+    `メールアドレス: ${form.email}`,
+    `お問い合わせ種別: ${form.inquiry}`,
+    '',
+    form.message,
+  ].join('\n')
+  return `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+}
+
 /**
- * Contact form — 仮実装。
- * 送信はモックで、実際の送信先はありません。本番では onSubmit を
- * フォームサービス（Formspree 等）や API エンドポイントに接続してください。
+ * Contact form — サーバーを持たない構成のため、送信は利用者のメールソフト
+ * 経由で行う。入力内容を site.email 宛の mailto: に組み立てて開くだけで、
+ * 独自の送信バックエンドは持たない（＝送信可否を偽らない）。
  */
 export function ContactForm() {
   const [form, setForm] = useState<FormState>(initialState)
@@ -60,8 +74,9 @@ export function ContactForm() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!validate()) return
-    // NOTE: 現在はモック送信（仕様）。本運用開始時にフォームサービスまたは
-    // API エンドポイントへの送信処理に置き換える（README「お問い合わせフォームについて」参照）。
+    // 利用者のメールソフトを、宛先・件名・本文を埋めた状態で開く。
+    // 実際の送信は利用者がメールソフト上で行う。
+    window.location.href = buildMailtoHref(form)
     setSubmitted(true)
   }
 
@@ -75,11 +90,11 @@ export function ContactForm() {
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-clay-100 text-clay-600">
           <Icon name="check" size={28} />
         </span>
-        <h3 className="mt-5 text-xl text-ink">送信ありがとうございます</h3>
+        <h3 className="mt-5 text-xl text-ink">メールソフトを開きました</h3>
         <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-ink-muted">
-          内容を確認のうえ、担当者よりご連絡します。
+          内容をご確認のうえ、そのまま送信してください。
           <br />
-          ※ こちらはデモ実装です。実際の送信は行われていません。
+          うまく開かないときは、{site.email} まで直接お送りください。
         </p>
         <button
           type="button"
@@ -185,7 +200,9 @@ export function ContactForm() {
           送信する
           <Icon name="arrow" size={18} />
         </Button>
-        <p className="text-xs text-ink-soft">※ 現在はデモ実装です</p>
+        <p className="text-xs text-ink-soft">
+          送信すると、お使いのメールソフトが開きます。
+        </p>
       </div>
     </form>
   )

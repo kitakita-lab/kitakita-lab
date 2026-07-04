@@ -12,7 +12,7 @@ const routes: Array<{ path: string; heading: string | RegExp }> = [
   { path: '/', heading: /^少し進めてみる$/ },
   { path: '/workshop', heading: /つくる楽しさを/ },
   { path: '/research', heading: /現場の声を、/ },
-  { path: '/collaboration', heading: /ものづくりの力で、/ },
+  { path: '/collaboration', heading: /ものづくりの力で/ },
   { path: '/creators', heading: /その「少し」を/ },
   { path: '/news', heading: 'お知らせ' },
   { path: '/faq', heading: 'よくある質問' },

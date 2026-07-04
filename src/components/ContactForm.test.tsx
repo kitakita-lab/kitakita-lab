@@ -1,8 +1,28 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { renderWithProviders, screen, userEvent } from '@/test/test-utils'
 import { ContactForm } from './ContactForm'
 
 describe('ContactForm', () => {
+  // 送信は mailto: への遷移で行う。jsdom は実ナビゲーションを実装しないため、
+  // window.location を書き込み可能なスタブに差し替えて href を検証する。
+  // （テストは MemoryRouter を使うため window.location には依存しない）
+  let originalLocation: Location
+  beforeEach(() => {
+    originalLocation = window.location
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: { href: '' } as Location,
+    })
+  })
+  afterEach(() => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: originalLocation,
+    })
+  })
+
   it('すべての入力項目と送信ボタンが表示される', () => {
     renderWithProviders(<ContactForm />)
 
@@ -43,8 +63,9 @@ describe('ContactForm', () => {
     expect(
       screen.getByText('メールアドレスの形式が正しくありません。'),
     ).toBeInTheDocument()
-    // 送信は行われない（成功画面に遷移しない）
-    expect(screen.queryByText('送信ありがとうございます')).not.toBeInTheDocument()
+    // 送信は行われない（確認画面に遷移せず、メールソフトも開かない）
+    expect(screen.queryByText('メールソフトを開きました')).not.toBeInTheDocument()
+    expect(window.location.href).toBe('')
   })
 
   it('入力し直すとエラーが解消される', async () => {
@@ -67,7 +88,7 @@ describe('ContactForm', () => {
     expect(select).toHaveValue('取材・メディア')
   })
 
-  it('正常入力で送信すると完了画面（モック）が表示される', async () => {
+  it('正常入力で送信するとメールソフトが開き、確認画面が表示される', async () => {
     const user = userEvent.setup()
     renderWithProviders(<ContactForm />)
 
@@ -76,8 +97,11 @@ describe('ContactForm', () => {
     await user.type(screen.getByLabelText(/お問い合わせ内容/), 'よろしくお願いします。')
     await user.click(screen.getByRole('button', { name: /送信する/ }))
 
-    // 完了メッセージが status ロールで通知される（スクリーンリーダー対応）
-    expect(screen.getByRole('status')).toHaveTextContent('送信ありがとうございます')
+    // 入力内容を宛先メールアドレス向けの mailto: に組み立てて開く
+    expect(window.location.href).toMatch(/^mailto:hello@kitakita-lab\.com\?/)
+    expect(window.location.href).toContain(encodeURIComponent('よろしくお願いします。'))
+    // 確認メッセージが status ロールで通知される（スクリーンリーダー対応）
+    expect(screen.getByRole('status')).toHaveTextContent('メールソフトを開きました')
     // フォームは非表示になる
     expect(screen.queryByRole('button', { name: /送信する/ })).not.toBeInTheDocument()
   })

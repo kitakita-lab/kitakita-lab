@@ -14,9 +14,9 @@ export const site = {
     'KitaKita Lab（キタキタラボ）は、北海道の「少し進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。少し前へ、少し良く、少し豊かになる時間と出会いを届けます。',
   url: 'https://kitakita-lab.com',
   ogImage: '/ogp.svg',
-  // TODO: 正式なメールアドレス取得後にここへ設定する。
-  // 空文字の間は Footer / Contact ページのメール表示が自動で非表示になる。
-  email: '',
+  // 問い合わせ先メールアドレス。Footer / Contact ページのメール表示と、
+  // Contact フォームの送信先（mailto）に使われる。
+  email: 'hello@kitakita-lab.com',
   locale: 'ja_JP',
 } as const
 

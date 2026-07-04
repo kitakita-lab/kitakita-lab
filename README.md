@@ -188,13 +188,15 @@ npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート
 | `/creators` | 作家募集 |
 | `/news`, `/news/:slug` | お知らせ一覧・詳細 |
 | `/faq` | よくある質問 |
-| `/contact` | お問い合わせ（フォーム仮実装） |
+| `/contact` | お問い合わせ（フォーム／メール） |
 
 ## お問い合わせフォームについて
 
-`src/components/ContactForm.tsx` は **仮実装** です（送信はモック）。
-本番では `handleSubmit` 内の TODO 箇所を、フォームサービス（Formspree 等）や
-独自 API エンドポイントへの送信処理に置き換えてください。
+`src/components/ContactForm.tsx` は、サーバーを持たない構成のため、入力内容を
+`site.email` 宛の `mailto:` に組み立てて利用者のメールソフトを開きます
+（実際の送信は利用者がメールソフト上で行う）。独自の送信バックエンドを
+導入する場合は `handleSubmit` を、フォームサービス（Formspree 等）や
+API エンドポイントへの送信処理に置き換えてください。
 
 ## Vercel へのデプロイ
 
