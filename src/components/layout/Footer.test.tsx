@@ -14,14 +14,14 @@ describe('Footer', () => {
     expect(screen.getByText(site.tagline)).toBeInTheDocument()
   })
 
-  it('メールアドレス未設定の間は mailto リンクを表示しない', () => {
+  it('問い合わせ先メールアドレスの mailto リンクが表示される', () => {
     renderWithProviders(<Footer />)
 
-    // TODO: 正式なメールアドレス設定後は「mailto リンクが表示される」テストに戻す
     const mailto = screen
       .queryAllByRole('link')
       .filter((l) => (l.getAttribute('href') ?? '').startsWith('mailto:'))
-    expect(mailto).toHaveLength(0)
+    expect(mailto).toHaveLength(1)
+    expect(mailto[0]).toHaveAttribute('href', `mailto:${site.email}`)
   })
 
   it('全リンクグループ（About / Programs / Information）が表示される', () => {

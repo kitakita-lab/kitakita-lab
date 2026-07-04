@@ -17,7 +17,7 @@ export function Activities() {
         eyebrow="Activities"
         title={
           <>
-            私たちが、
+            私たちが
             <span className="whitespace-nowrap">つくっている流れ</span>
           </>
         }
