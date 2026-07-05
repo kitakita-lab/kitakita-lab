@@ -37,7 +37,7 @@ export function NewsTeaser() {
                 className="group flex flex-col gap-2 py-6 sm:flex-row sm:items-center sm:gap-6"
               >
                 <time className="w-28 shrink-0 text-sm tabular-nums text-ink-soft">
-                  {formatDate(item.date)}
+                  {item.dateLabel ?? formatDate(item.date)}
                 </time>
                 <Badge tone="clay" className="w-fit">
                   {item.category}

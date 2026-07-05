@@ -33,7 +33,7 @@ export function NewsPage() {
                   className="group grid gap-3 py-7 sm:grid-cols-[auto_auto_1fr] sm:items-baseline sm:gap-6"
                 >
                   <time className="text-sm tabular-nums text-ink-soft">
-                    {formatDate(item.date)}
+                    {item.dateLabel ?? formatDate(item.date)}
                   </time>
                   <Badge tone="clay" className="w-fit">
                     {item.category}
@@ -55,17 +55,6 @@ export function NewsPage() {
             </li>
           ))}
         </ul>
-
-        <Reveal delay={120}>
-          <p className="mt-12 rounded-xl2 border border-dashed border-line bg-paper-50 px-6 py-5 text-sm leading-relaxed text-ink-muted">
-            ※ お知らせは将来的なCMS化を想定したデータ構造で管理しています。
-            現在は
-            <code className="mx-1 rounded bg-paper-200 px-1.5 py-0.5 text-[13px] text-ink">
-              src/data/news.ts
-            </code>
-            を編集することで追加・更新できます。
-          </p>
-        </Reveal>
       </Section>
     </>
   )

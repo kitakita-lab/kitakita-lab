@@ -11,23 +11,26 @@ export function CreatorsCallout() {
   return (
     <Section id="creators" tone="paper" spacing="lg">
       <Reveal>
-        <div className="relative overflow-hidden rounded-[2rem] border border-line bg-paper-200 px-7 py-14 sm:px-12 sm:py-20">
+        <div className="relative overflow-hidden rounded-[2rem] border border-line bg-paper-200 px-6 py-14 sm:px-12 sm:py-20">
           <div
             className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-sage-100/70 blur-3xl"
             aria-hidden="true"
           />
           <div className="relative mx-auto max-w-2xl text-center">
             <span className="eyebrow">Creators</span>
-            {/* スマホでは意味のまとまり2行に固定。カード内の見出し幅が狭く
-                （320pxで約214px）「一緒に進めませんか。」は3行になり「んか。」が
-                孤立するため、重複する「一緒に」（下のボタンが担う）を外して
-                「その「少し」、／進めませんか。」に。極小トラッキングで320pxでも
-                2行に収める（sm以上は通常字間・本文の text-pretty は自動調整）。 */}
-            <h2 className="mt-4 text-3xl leading-tight sm:text-4xl lg:text-[2.5rem]">
+            {/* ブランドの核となる「一緒に」を残す。スマホではカード内の見出し幅が
+                狭い（px-6で約222px）ため、「一緒に「少し」／進めてみませんか。」の
+                意味のまとまりで2行に固定。2行目が幅を数px超えるので、スマホのみ
+                フォントを1段階（text-2xl）＋極小トラッキングで収める。sm以上は
+                通常サイズ・通常字間で1〜2行に自然に組む。 */}
+            <h2 className="mt-4 text-2xl leading-tight sm:text-4xl lg:text-[2.5rem]">
               <span className="tracking-[-0.02em] sm:tracking-normal">
-                その「少し」、
+                {/* 各まとまりを nowrap で固定し、h2 の text-wrap:balance が
+                    CJK 途中で3行目に割るのを防ぐ。sm 以上は br が消え、
+                    2つのまとまりの境目でのみ自然に折り返す。 */}
+                <span className="whitespace-nowrap">一緒に「少し」</span>
                 <br className="sm:hidden" />
-                進めませんか。
+                <span className="whitespace-nowrap">進めてみませんか。</span>
               </span>
             </h2>
             <p className="mt-6 text-pretty text-base leading-loose text-ink-muted sm:text-lg">
