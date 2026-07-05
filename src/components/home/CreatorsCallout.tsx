@@ -18,11 +18,17 @@ export function CreatorsCallout() {
           />
           <div className="relative mx-auto max-w-2xl text-center">
             <span className="eyebrow">Creators</span>
-            {/* text-balance / text-pretty: 手動の<br>だと幅によって「か。」だけの
-                孤立行や「十分」が割れる改行が発生するため、行の折り返しをブラウザの
-                自動バランス調整に委ねる（実機幅 320/375/390/430px で確認済み）。 */}
-            <h2 className="mt-4 text-balance text-3xl leading-tight sm:text-4xl lg:text-[2.5rem]">
-              その「少し」、一緒に進めませんか。
+            {/* スマホでは意味のまとまり2行に固定。カード内の見出し幅が狭く
+                （320pxで約214px）「一緒に進めませんか。」は3行になり「んか。」が
+                孤立するため、重複する「一緒に」（下のボタンが担う）を外して
+                「その「少し」、／進めませんか。」に。極小トラッキングで320pxでも
+                2行に収める（sm以上は通常字間・本文の text-pretty は自動調整）。 */}
+            <h2 className="mt-4 text-3xl leading-tight sm:text-4xl lg:text-[2.5rem]">
+              <span className="tracking-[-0.02em] sm:tracking-normal">
+                その「少し」、
+                <br className="sm:hidden" />
+                進めませんか。
+              </span>
             </h2>
             <p className="mt-6 text-pretty text-base leading-loose text-ink-muted sm:text-lg">
               大きな一歩じゃなくていい。進めてみたいことがあれば、それで十分です。

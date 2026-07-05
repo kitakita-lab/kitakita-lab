@@ -13,7 +13,13 @@ type CtaBandProps = {
 
 /** Reusable closing call-to-action band (dark). */
 export function CtaBand({
-  title = '話すことから、始めませんか。',
+  title = (
+    <>
+      話すことから
+      <br className="sm:hidden" />
+      始めませんか。
+    </>
+  ),
   description = '相談でも、雑談でも。進めてみたいことがあれば、聞かせてください。',
   primary = { label: 'お問い合わせ', to: '/contact' },
   // NOTE: Creators への導線は、CreatorsCallout / FaqPage も含めて
