@@ -53,9 +53,9 @@ export function FaqPage() {
       <CtaBand
         title={
           <>
-            疑問は、解消
+            疑問は
             <br className="sm:hidden" />
-            できましたか？
+            解消できましたか？
           </>
         }
         description="ここに載っていないご質問も、お気軽にお問い合わせください。"

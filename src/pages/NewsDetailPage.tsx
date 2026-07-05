@@ -37,7 +37,7 @@ export function NewsDetailPage() {
               </Link>
               <div className="mt-6 flex items-center gap-3">
                 <time className="text-sm tabular-nums text-ink-soft">
-                  {formatDate(item.date)}
+                  {item.dateLabel ?? formatDate(item.date)}
                 </time>
                 <Badge tone="clay">{item.category}</Badge>
               </div>
