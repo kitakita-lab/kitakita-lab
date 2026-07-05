@@ -88,19 +88,30 @@ export function CollaborationPage() {
         />
         <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {flow.map((f, i) => (
-            <Reveal key={f.step} delay={i * 80}>
-              <li className="flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6">
-                <span className="font-serif text-4xl text-clay-200">{f.step}</span>
-                <h3 className="mt-4 text-base text-ink">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.body}</p>
-              </li>
+            <Reveal
+              key={f.step}
+              as="li"
+              delay={i * 80}
+              className="flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6"
+            >
+              <span className="font-serif text-4xl text-clay-200">{f.step}</span>
+              <h3 className="mt-4 text-base text-ink">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.body}</p>
             </Reveal>
           ))}
         </ol>
       </Section>
 
       <CtaBand
-        title="連携のご相談を、お待ちしています。"
+        title={
+          // 320pxで「お待ちしています。」が幅を約3px超えて「す。」が孤立するため、
+          // 極小トラッキングで2行に収める（sm以上は通常字間）。
+          <span className="tracking-[-0.02em] sm:tracking-normal">
+            連携のご相談を、
+            <br className="sm:hidden" />
+            お待ちしています。
+          </span>
+        }
         description="「こんなことできる？」という段階でも大丈夫です。まずはお気軽にお問い合わせください。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         secondary={{ label: 'ワークショップ実績', to: '/workshop' }}

@@ -31,7 +31,11 @@ export function ContactPage() {
         <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           <Reveal>
             <div className="lg:sticky lg:top-24">
-              <h2 className="text-2xl text-ink">こんなご連絡をお待ちしています</h2>
+              <h2 className="text-2xl text-ink">
+                こんなご連絡を
+                <br className="sm:hidden" />
+                お待ちしています
+              </h2>
               <ul className="mt-6 space-y-3">
                 {points.map((p) => (
                   <li key={p} className="flex items-start gap-3 text-[15px] text-ink-muted">

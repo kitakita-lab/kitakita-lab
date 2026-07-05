@@ -120,7 +120,7 @@ export function WorkshopPage() {
           <p className="mt-6 text-base leading-loose text-ink-muted sm:text-lg">
             ワークショップは、何かを教わる時間である以上に、自分の手で少し進めてみる時間だと考えています。
             うまくできるかどうかより、手を動かしてみたかどうか。この場を開いたのは、作家 ikyu。
-            KitaKita Lab は、企業とのご縁と企画で、その最初の一歩をいっしょに形にしました。
+            KitaKita Lab は、企業とのご縁と企画で、その最初の一歩を<span className="whitespace-nowrap">いっしょに</span>形にしました。
           </p>
         </Reveal>
       </Section>
@@ -130,7 +130,9 @@ export function WorkshopPage() {
           eyebrow="Experience"
           title={
             <>
-              参加すると、<span className="whitespace-nowrap">少し</span>変わること
+              参加すると
+              <br className="sm:hidden" />
+              少し変わること
             </>
           }
           description="大げさな変化ではなく、こんな手ざわりを届けたいと思っています。"
@@ -153,7 +155,13 @@ export function WorkshopPage() {
       <Section tone="paper" spacing="lg">
         <SectionHeading
           eyebrow="Gallery"
-          title="現場の空気を、少しだけ。"
+          title={
+            <>
+              現場の空気を
+              <br className="sm:hidden" />
+              少しだけ。
+            </>
+          }
           description={
             <>
               説明より、写真で伝わることが<span className="whitespace-nowrap">あります</span>。
@@ -210,7 +218,9 @@ export function WorkshopPage() {
           eyebrow="Scenes"
           title={
             <>
-              こんな場で<span className="whitespace-nowrap">生まれています</span>
+              こんな場で
+              <br className="sm:hidden" />
+              生まれています
             </>
           }
           description="目的や場に合わせて、ワークショップのかたちを少しずつ変えています。"
