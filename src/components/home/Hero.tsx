@@ -33,14 +33,23 @@ export function Hero() {
             className="mt-12 animate-fade-up font-serif text-4xl font-medium leading-snug tracking-normal text-ink sm:mt-14 sm:text-5xl sm:tracking-[0.08em] lg:text-[3.4rem]"
             style={{ animationDelay: '150ms' }}
           >
-            少し進めてみる
+            {/* 9文字の一行は約400px未満で収まらない（375pxでは「ちょっと進／
+                めてみる」と語中で割れ、390pxでは余白ゼロまで詰まる）ため、
+                400px未満は意味のまとまりで2行に折る（フォントは不変）。 */}
+            ちょっと
+            <br className="min-[400px]:hidden" />
+            進めてみる
           </h1>
 
           <p
             className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.03em] text-ink-muted sm:mt-14 sm:text-lg sm:tracking-[0.14em]"
             style={{ animationDelay: '400ms' }}
           >
-            少し前へ。少し良く。少し豊かに。
+            {/* 22文字の一行は約420px未満で収まらないため、その幅までは
+                意味のまとまりで2行にする。 */}
+            ちょっと前へ。ちょっと良く。
+            <br className="min-[420px]:hidden" />
+            ちょっと豊かに。
           </p>
 
           <p

@@ -7,11 +7,11 @@
 export const site = {
   name: 'KitaKita Lab',
   nameJa: 'キタキタラボ',
-  tagline: '少し進めてみる',
+  tagline: 'ちょっと進めてみる',
   /** ブランドフィロソフィー（docs/BRAND.md 参照）。要所でのみ掲げる。 */
-  philosophy: '少し進めてみる',
+  philosophy: 'ちょっと進めてみる',
   description:
-    'KitaKita Lab（キタキタラボ）は、北海道の「少し進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。少し前へ、少し良く、少し豊かになる時間と出会いを届けます。',
+    'KitaKita Lab（キタキタラボ）は、北海道の「ちょっと進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。ちょっと前へ、ちょっと良く、ちょっと豊かになる時間と出会いを届けます。',
   url: 'https://kitakita-lab.com',
   // og:image は PNG 必須（SVG は SNS 各社が描画しない）。scripts/generate-og.mjs で再生成。
   ogImage: '/ogp.png',
