@@ -8,4 +8,8 @@
   <url><loc>https://kitakita-lab.com/news</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://kitakita-lab.com/faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://kitakita-lab.com/contact</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kitakita-lab.com/news/brand-story-renewal</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://kitakita-lab.com/news/kitakita-lab-launch</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://kitakita-lab.com/news/creators-recruitment-open</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://kitakita-lab.com/news/research-coming-soon</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
 </urlset>

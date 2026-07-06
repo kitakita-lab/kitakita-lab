@@ -6,8 +6,10 @@
   "description": "KitaKita Lab official website",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-sitemap.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "assets:og": "node scripts/generate-og.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",

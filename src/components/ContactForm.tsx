@@ -160,18 +160,28 @@ export function ContactForm() {
         <label htmlFor="inquiry" className="mb-2 block text-sm font-medium text-ink">
           お問い合わせ種別
         </label>
-        <select
-          id="inquiry"
-          value={form.inquiry}
-          onChange={(e) => update('inquiry', e.target.value as Inquiry)}
-          className={cn(fieldClass, 'appearance-none bg-[length:1.25rem] pr-10')}
-        >
-          {inquiryTypes.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        {/* appearance-none はネイティブ矢印も消すため、カスタム矢印を重ねて
+            「開ける項目」であることを視覚的に保つ（矢印はクリックを妨げない）。 */}
+        <div className="relative">
+          <select
+            id="inquiry"
+            value={form.inquiry}
+            onChange={(e) => update('inquiry', e.target.value as Inquiry)}
+            className={cn(fieldClass, 'appearance-none pr-10')}
+          >
+            {inquiryTypes.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <Icon
+            name="arrow"
+            size={16}
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-ink-soft"
+            aria-hidden="true"
+          />
+        </div>
       </div>
 
       <div>
