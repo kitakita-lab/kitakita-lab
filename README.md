@@ -1,8 +1,8 @@
 # KitaKita Lab — 公式サイト
 
-「ハンドメイド作家が、もっと挑戦できる世界をつくる」プロジェクト **KitaKita Lab** の公式サイトです。
+北海道の「**少し進めてみる**」ための場所、**KitaKita Lab** の公式サイトです。
 
-会社紹介ではなく、**なぜ始めたのか・どんな未来を目指すのか・一緒に作る仲間を募集している**ことが自然と伝わる、ストーリー重視の構成にしています。
+会社紹介ではなく、**なぜ始めたのか・どんな未来を目指すのか・一緒に「少し進めてみる」仲間を探している**ことが自然と伝わる、ストーリー重視の構成にしています。ブランドの言葉づかい・価値観は `docs/BRAND.md` を参照してください（「挑戦」ではなく「少し進めてみる」の語彙で書く、大きな約束をしない、等）。
 
 ## 技術スタック
 
@@ -40,7 +40,7 @@ src/
 │  ├─ home/              # トップページの各セクション
 │  ├─ Seo.tsx            # ページ単位のメタタグ
 │  ├─ CtaBand.tsx        # 共通CTAバンド
-│  └─ ContactForm.tsx    # お問い合わせフォーム（仮実装）
+│  └─ ContactForm.tsx    # お問い合わせフォーム（mailto: 方式で正式運用）
 ├─ pages/                # 各ページ
 ├─ data/                 # ★ コンテンツ（CMS化を見据えたデータ層）
 ├─ hooks/                # カスタムフック
@@ -165,7 +165,7 @@ npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート
 | サイト名・連絡先・ナビ | `src/data/site.ts` |
 | 活動内容（Activities） | `src/data/activities.ts` |
 | Workshop 実績カード | `src/data/workshops.ts` |
-| Research 調査結果（現在ダミー） | `src/data/research.ts` |
+| Research 調査活動（公開準備中） | `src/data/research.ts` |
 | News（お知らせ／プレスリリース） | `src/data/news.ts` |
 | FAQ | `src/data/faq.ts` |
 | 作家募集（Creators） | `src/data/creators.ts` |
@@ -183,7 +183,7 @@ npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート
 | --- | --- |
 | `/` | Hero / KitaKita Labとは / Mission / Vision / Activities / 作家募集 / News |
 | `/workshop` | ワークショップ・活動実績 |
-| `/research` | 調査活動（ダミーデータ） |
+| `/research` | 調査活動（実施中・結果は公開準備中） |
 | `/collaboration` | 企業・自治体・商業施設・教育機関連携 |
 | `/creators` | 作家募集 |
 | `/news`, `/news/:slug` | お知らせ一覧・詳細 |
@@ -198,9 +198,39 @@ npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート
 導入する場合は `handleSubmit` を、フォームサービス（Formspree 等）や
 API エンドポイントへの送信処理に置き換えてください。
 
+## OGP 画像・アイコンの再生成
+
+`public/ogp.png`（1200×630）・`public/apple-touch-icon.png`・`public/icon-512.png` は
+`scripts/generate-og.mjs` で生成しています（サイト実書体のサブセットを
+`scripts/og-assets/` に同梱、ネットワーク不要）。
+
+```bash
+npm run assets:og   # 要 playwright（未導入なら npm i -D playwright && npx playwright install chromium）
+```
+
+**og:image に SVG は使えません**（X / Facebook / LINE 等が描画しないため）。
+キャッチコピーを変えたときはスクリプト内の文言を更新して再生成してください。
+サブセットに無いグリフが必要になったら、スクリプト冒頭のコメントの手順で
+`og-assets/` のフォントを取り直します。
+
+## sitemap.xml（自動生成）
+
+`public/sitemap.xml` は `npm run build` 時に `prebuild` フックで
+`scripts/generate-sitemap.mjs` が自動生成します。固定ページ一覧はスクリプト内、
+News 詳細 URL は `src/data/news.ts` の slug から自動で組み立てるため、
+**News を追加しても sitemap の手動更新は不要**です。
+
 ## Vercel へのデプロイ
 
 このリポジトリを Vercel にインポートするだけでデプロイできます
 （フレームワークは Vite として自動検出されます）。
-独自ドメイン設定後は、`index.html` / `src/data/site.ts` / `public/sitemap.xml` /
-`public/robots.txt` の URL を実ドメインに更新してください。
+独自ドメインを変更する場合は、`index.html` / `src/data/site.ts` /
+`scripts/generate-sitemap.mjs`（ORIGIN）/ `public/robots.txt` の URL を
+実ドメインに更新してください。
+
+## 公開後の運用チェックリスト
+
+- [ ] [X Card Validator](https://cards-dev.twitter.com/validator) / [Facebook シェアデバッガー](https://developers.facebook.com/tools/debug/) で OGP カードの表示を確認
+- [ ] Google Search Console にサイトを登録し、`sitemap.xml` を送信
+- [ ] `hello@kitakita-lab.com` の受信確認（Contact フォームは mailto: 方式）
+- [ ] アクセス解析の要否を判断（現在は未導入。導入する場合はプライバシーポリシーの整備もセットで）

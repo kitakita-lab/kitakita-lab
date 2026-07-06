@@ -43,6 +43,10 @@ export function Seo({
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={imageUrl} />
+      {/* 既定の ogp.png は 1200×630（scripts/generate-og.mjs で生成）。 */}
+      {image === site.ogImage && <meta property="og:image:width" content="1200" />}
+      {image === site.ogImage && <meta property="og:image:height" content="630" />}
+      <meta property="og:image:alt" content={`${site.name} — ${site.tagline}`} />
       <meta property="og:locale" content={site.locale} />
 
       <meta name="twitter:card" content="summary_large_image" />

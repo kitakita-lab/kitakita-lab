@@ -1,5 +1,7 @@
 import { useParams, Navigate, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { Seo } from '@/components/Seo'
+import { site } from '@/data/site'
 import { Section } from '@/components/ui/Section'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
@@ -15,6 +17,24 @@ export function NewsDetailPage() {
     return <Navigate to="/news" replace />
   }
 
+  // NewsArticle 構造化データ。公開日が確定している記事（dateLabel なし）のみ
+  // datePublished を含める — 未確定の日付を検索エンジンに事実として渡さない。
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: item.title,
+    description: item.excerpt,
+    mainEntityOfPage: `${site.url}/news/${item.slug}`,
+    image: `${site.url}${site.ogImage}`,
+    ...(item.dateLabel ? {} : { datePublished: item.date }),
+    author: { '@type': 'Organization', name: site.name, url: site.url },
+    publisher: {
+      '@type': 'Organization',
+      name: site.name,
+      logo: { '@type': 'ImageObject', url: `${site.url}/icon-512.png` },
+    },
+  }
+
   return (
     <>
       <Seo
@@ -23,6 +43,9 @@ export function NewsDetailPage() {
         description={item.excerpt}
         type="article"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
 
       <article>
         <header className="border-b border-line bg-paper-200">
