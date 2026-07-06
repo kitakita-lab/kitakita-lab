@@ -82,8 +82,8 @@ const ogpHtml = `<!doctype html><html><head><meta charset="utf-8"><style>
       <div class="mark">K</div>
       <div class="name">KitaKita Lab</div>
     </div>
-    <h1>少し進めてみ<span class="accent">る</span></h1>
-    <p class="tagline">少し前へ。少し良く。少し豊かに。</p>
+    <h1>ちょっと進めてみ<span class="accent">る</span></h1>
+    <p class="tagline">ちょっと前へ。ちょっと良く。ちょっと豊かに。</p>
     <p class="place">北海道から</p>
   </div>
 </body></html>`

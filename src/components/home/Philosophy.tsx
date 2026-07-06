@@ -14,7 +14,7 @@ export function Philosophy() {
           <br className="sm:hidden" />
           できません。
           <br />
-          <span className="text-clay-200">でも、少しなら。</span>
+          <span className="text-clay-200">でも、ちょっとなら。</span>
         </p>
       </Reveal>
     </Section>

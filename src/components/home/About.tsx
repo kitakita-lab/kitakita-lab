@@ -23,14 +23,14 @@ export function About() {
           <p>
             でも、人と人がつながること。
             <br />
-            何かを少し進めてみること。
+            何かをちょっと進めてみること。
             <br />
             そのきっかけを一緒につくること。
           </p>
           <p className="font-serif text-xl leading-relaxed text-ink sm:text-2xl">
             そんなことなら、
             <br className="sm:hidden" />
-            少しだけ力になれるかもしれません。
+            ちょっとだけ力になれるかもしれません。
           </p>
         </Reveal>
       </div>

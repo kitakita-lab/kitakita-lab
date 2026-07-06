@@ -49,7 +49,7 @@ export const workshopPhotos: WorkshopPhoto[] = [
     id: 'craft-detail-03',
     image: '/workshops/craft-detail-03.jpg',
     alt: 'はさみでドライフラワーのバラを整えている手元の様子。',
-    title: '少しずつ、かたちに',
+    title: 'ちょっとずつ、かたちに',
     summary: '急がず、手元の作業に集中する時間。',
   },
   {

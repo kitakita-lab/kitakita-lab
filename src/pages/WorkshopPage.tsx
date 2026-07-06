@@ -29,7 +29,7 @@ const takeaways = [
   {
     icon: 'check',
     title: '持ち帰れるもの',
-    body: '完成した作品と、「少し進めてみた」という実感を持ち帰れます。',
+    body: '完成した作品と、「ちょっと進めてみた」という実感を持ち帰れます。',
   },
 ] as const
 
@@ -42,7 +42,7 @@ const scenes = [
   {
     icon: 'event',
     title: '商業施設',
-    body: '買い物のついでに、少しつくってみる。賑わいと、思いがけない出会いが生まれる場に。',
+    body: '買い物のついでに、ちょっとつくってみる。賑わいと、思いがけない出会いが生まれる場に。',
   },
   {
     icon: 'market',
@@ -74,7 +74,7 @@ const flow = [
   },
   {
     step: '04',
-    title: 'その後も、少しずつ',
+    title: 'その後も、ちょっとずつ',
     body: '実施後の声を踏まえて、次の機会や新しい企画につなげていきます。',
   },
 ]
@@ -108,7 +108,7 @@ export function WorkshopPage() {
             体験として<span className="whitespace-nowrap">届ける。</span>
           </>
         }
-        description="少人数レッスンから企業コラボ、商業施設イベントまで。手を動かすと、少し進む。参加者には「つくる喜び」を、作家には「はじめての舞台」を。"
+        description="少人数レッスンから企業コラボ、商業施設イベントまで。手を動かすと、ちょっと進む。参加者には「つくる喜び」を、作家には「はじめての舞台」を。"
       />
 
       <Section tone="paper" spacing="md">
@@ -118,7 +118,7 @@ export function WorkshopPage() {
             説明よりも、体験を。
           </h2>
           <p className="mt-6 text-base leading-loose text-ink-muted sm:text-lg">
-            ワークショップは、何かを教わる時間である以上に、自分の手で少し進めてみる時間だと考えています。
+            ワークショップは、何かを教わる時間である以上に、自分の手でちょっと進めてみる時間だと考えています。
             うまくできるかどうかより、手を動かしてみたかどうか。この場を開いたのは、作家 ikyu。
             KitaKita Lab は、企業とのご縁と企画で、その最初の一歩を<span className="whitespace-nowrap">いっしょに</span>形にしました。
           </p>
@@ -132,7 +132,7 @@ export function WorkshopPage() {
             <>
               参加すると
               <br className="sm:hidden" />
-              少し変わること
+              ちょっと変わること
             </>
           }
           description="大げさな変化ではなく、こんな手ざわりを届けたいと思っています。"
@@ -159,7 +159,7 @@ export function WorkshopPage() {
             <>
               現場の空気を
               <br className="sm:hidden" />
-              少しだけ。
+              ちょっとだけ。
             </>
           }
           description={
@@ -223,7 +223,7 @@ export function WorkshopPage() {
               生まれています
             </>
           }
-          description="目的や場に合わせて、ワークショップのかたちを少しずつ変えています。"
+          description="目的や場に合わせて、ワークショップのかたちをちょっとずつ変えています。"
         />
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
           {scenes.map((s, i) => (
@@ -284,7 +284,14 @@ export function WorkshopPage() {
       <CtaBand
         title={
           <>
-            その<span className="whitespace-nowrap">ワークショップ</span>、<span className="whitespace-nowrap">少し</span>形にしてみませんか。
+            {/* 語中分割（形にし／てみませんか 等）を防ぐため、文節ごとに
+                nowrap で固定し、幅に応じて文節の境目でのみ折れるようにする。
+                「形にしてみませんか。」をひと塊にすると320px幅(272px)を
+                約10px超えるため、「形に｜してみませんか。」で分ける。 */}
+            その<span className="whitespace-nowrap">ワークショップ</span>、
+            <span className="whitespace-nowrap">ちょっと</span>
+            <span className="whitespace-nowrap">形に</span>
+            <span className="whitespace-nowrap">してみませんか。</span>
           </>
         }
         description="内容が固まっていなくても大丈夫です。まずは、思っていることを聞かせてください。"

@@ -2,7 +2,7 @@
  * Activities（私たちがつくる流れ）データ。
  *
  * 事業一覧ではなく「どんな流れをつくる会社か」を表す。
- * 流れはすべて「〜てみる」——哲学（少し進めてみる）の動詞が
+ * 流れはすべて「〜てみる」——哲学（ちょっと進めてみる）の動詞が
  * そのまま会社の動きになっている。
  * ワークショップ・AI・EC などの活動は、この流れの中の実例として置く。
  * 実例は examples に追加するだけで掲載されます。
@@ -31,7 +31,7 @@ export const flowSteps: FlowStep[] = [
   {
     id: 'talk',
     verb: '話してみる',
-    summary: '進めてみたいことを、言葉にしてみる。それだけで、少し進みます。',
+    summary: '進めてみたいことを、言葉にしてみる。それだけで、ちょっと進みます。',
     examples: [
       { label: 'ご相談', href: '/contact' },
       { label: '企業・地域との企画', href: '/collaboration' },
@@ -58,7 +58,7 @@ export const flowSteps: FlowStep[] = [
   {
     id: 'continue',
     verb: 'つづけてみる',
-    summary: 'ふりかえって、また少し。声を数字にして、次に進む人の地図に。',
+    summary: 'ふりかえって、またちょっと。声を数字にして、次に進む人の地図に。',
     examples: [
       { label: '調査', href: '/research' },
       { label: '次の企画へ' },

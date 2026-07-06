@@ -5,7 +5,7 @@ import { Reveal } from '@/components/ui/Reveal'
 const futures = [
   {
     step: '01',
-    title: '「少し」に、勇気がいらなくなる',
+    title: '「ちょっと」に、勇気がいらなくなる',
     body: '進めてみるのに、覚悟も宣言もいらない。散歩くらいの気軽さで。',
   },
   {

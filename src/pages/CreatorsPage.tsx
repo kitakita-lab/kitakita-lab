@@ -14,12 +14,21 @@ export function CreatorsPage() {
       <Seo
         title="Creators"
         path="/creators"
-        description="KitaKita Labは、一緒に「少し進めてみる」仲間を探しています。ワークショップ講師、イベント出店、はじめての企業案件まで。実績より、進めてみたい気持ちを大切にします。"
+        description="KitaKita Labは、一緒に「ちょっと進めてみる」仲間を探しています。ワークショップ講師、イベント出店、はじめての企業案件まで。実績より、進めてみたい気持ちを大切にします。"
       />
 
       <PageHeader
         eyebrow="Creators"
-        title={<>その「少し」を<br />ここから。</>}
+        title={
+          // 「その「ちょっと」を」(約275px)は320px幅(272px)を数px超え、
+          // 「ちょ／っと」と語中で割れるため、極小トラッキングで1行に収める
+          // （フォントサイズ不変・sm以上は通常字間）。
+          <span className="tracking-[-0.02em] sm:tracking-normal">
+            その<span className="whitespace-nowrap">「ちょっと」</span>を
+            <br />
+            ここから。
+          </span>
+        }
         description={
           <>
             探しているのは、スキルの高い人<span className="whitespace-nowrap">ではありません</span>。
