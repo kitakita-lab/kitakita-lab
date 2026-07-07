@@ -23,14 +23,22 @@ export function About() {
           <p>
             でも、人と人がつながること。
             <br />
-            何かをちょっと進めてみること。
+            {/* ここだけ意図的に「少し」。締めの「ちょっとだけ〜」と役割を分け、
+                連続による単調さを避ける（思想・行動=少し／姿勢=ちょっと）。
+                「ちょっと」統一の一括置換で戻さないこと（docs/BRAND.md 参照）。 */}
+            何かを少し進めてみること。
             <br />
-            そのきっかけを一緒につくること。
+            {/* 320px幅では行が収まらず「…つくるこ／と。」と割れるため、
+                文節 nowrap で「…一緒に／つくること。」の切れ目に固定。 */}
+            そのきっかけを一緒に<span className="whitespace-nowrap">つくること。</span>
           </p>
           <p className="font-serif text-xl leading-relaxed text-ink sm:text-2xl">
             そんなことなら、
             <br className="sm:hidden" />
-            ちょっとだけ力になれるかもしれません。
+            {/* 狭幅で「かもしれ／ません」と割れないよう文節で固定
+                （320/375pxでは「力になれる／かもしれません。」で折れる）。 */}
+            ちょっとだけ力になれる
+            <span className="whitespace-nowrap">かもしれません。</span>
           </p>
         </Reveal>
       </div>
