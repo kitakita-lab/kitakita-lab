@@ -7,7 +7,6 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Icon } from '@/components/ui/Icon'
 import { AccordionItem } from '@/components/ui/Accordion'
 import { CtaBand } from '@/components/CtaBand'
-import { cn } from '@/lib/cn'
 import { workshopPhotos } from '@/data/workshops'
 
 const takeaways = [
@@ -125,34 +124,9 @@ export function WorkshopPage() {
         </Reveal>
       </Section>
 
+      {/* 体験紹介ページとして、言葉（Experience）より先に現場の空気（写真）を
+          見せる。About の宣言 → 写真で空気 → ことばで手ざわり、の順。 */}
       <Section tone="tint" spacing="lg">
-        <SectionHeading
-          eyebrow="Experience"
-          title={
-            <>
-              参加すると
-              <br className="sm:hidden" />
-              ちょっと変わること
-            </>
-          }
-          description="大げさな変化ではなく、こんな手ざわりを届けたいと思っています。"
-        />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {takeaways.map((item, i) => (
-            <Reveal key={item.title} delay={(i % 4) * 70}>
-              <div className="flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sage-100 text-sage-700">
-                  <Icon name={item.icon} size={20} />
-                </span>
-                <h3 className="mt-5 text-base text-ink">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
-
-      <Section tone="paper" spacing="lg">
         <SectionHeading
           eyebrow="Gallery"
           title={
@@ -169,24 +143,19 @@ export function WorkshopPage() {
           }
         />
 
+        {/* 全写真 4:5・object-cover で統一。1枚目を特別扱いしないことで、
+            data/workshops.ts に写真を追加するだけでレイアウトが完成する。
+            トリミングの見せ場は写真ごとの focus（object-position）で調整。 */}
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {workshopPhotos.map((photo, i) => (
-            <Reveal
-              key={photo.id}
-              delay={(i % 3) * 80}
-              className={cn(i === 0 && 'sm:col-span-2')}
-            >
+            <Reveal key={photo.id} delay={(i % 3) * 80}>
               <figure className="group">
-                <div
-                  className={cn(
-                    'overflow-hidden rounded-xl2 bg-paper-200',
-                    i === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]',
-                  )}
-                >
+                <div className="aspect-[4/5] overflow-hidden rounded-xl2 bg-paper-200">
                   <img
                     src={photo.image}
                     alt={photo.alt}
                     loading="lazy"
+                    style={photo.focus ? { objectPosition: photo.focus } : undefined}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
@@ -208,6 +177,33 @@ export function WorkshopPage() {
                   </figcaption>
                 )}
               </figure>
+            </Reveal>
+          ))}
+        </div>
+      </Section>
+
+      <Section tone="paper" spacing="lg">
+        <SectionHeading
+          eyebrow="Experience"
+          title={
+            <>
+              参加すると
+              <br className="sm:hidden" />
+              ちょっと変わること
+            </>
+          }
+          description="大げさな変化ではなく、こんな手ざわりを届けたいと思っています。"
+        />
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {takeaways.map((item, i) => (
+            <Reveal key={item.title} delay={(i % 4) * 70}>
+              <div className="flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sage-100 text-sage-700">
+                  <Icon name={item.icon} size={20} />
+                </span>
+                <h3 className="mt-5 text-base text-ink">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+              </div>
             </Reveal>
           ))}
         </div>
