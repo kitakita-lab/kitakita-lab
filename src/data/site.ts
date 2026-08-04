@@ -26,6 +26,7 @@ export const navItems = [
   { label: 'KitaKita Labとは', href: '/#about' },
   { label: 'Activities', href: '/#activities' },
   { label: 'Workshop', href: '/workshop' },
+  { label: 'Events', href: '/events' },
   { label: 'Research', href: '/research' },
   { label: 'Collaboration', href: '/collaboration' },
   { label: 'Creators', href: '/creators' },
@@ -48,6 +49,7 @@ export const footerGroups = [
     title: 'Programs',
     links: [
       { label: 'Workshop', href: '/workshop' },
+      { label: 'Events', href: '/events' },
       { label: 'Research', href: '/research' },
       { label: 'Collaboration', href: '/collaboration' },
       { label: 'Creators', href: '/creators' },
