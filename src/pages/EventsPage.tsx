@@ -89,15 +89,6 @@ export function EventsPage() {
           ))}
         </div>
 
-        <Reveal delay={120}>
-          <p className="mt-12 rounded-xl2 border border-dashed border-line bg-paper-50 px-6 py-5 text-sm leading-relaxed text-ink-muted">
-            ※ イベント実績は開催のたびに追加していきます。実績レポートは
-            <code className="mx-1 rounded bg-paper-200 px-1.5 py-0.5 text-[13px] text-ink">
-              src/data/events.ts
-            </code>
-            に項目を追加するだけで、一覧カードと詳細ページが生成される設計です。
-          </p>
-        </Reveal>
       </Section>
 
       <CtaBand
