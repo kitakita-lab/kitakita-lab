@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Seo } from '@/components/Seo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { NavLink } from '@/components/layout/NavLink'
@@ -180,6 +181,30 @@ export function WorkshopPage() {
             </Reveal>
           ))}
         </div>
+        {/* 開催レポートへの導線。ギャラリーで空気が伝わったあとに、
+            もっと詳しく知りたい人だけが進めばいい静かな置き方にする。 */}
+        <Reveal delay={120}>
+          <Link
+            to="/events"
+            className="group mt-12 flex flex-col gap-4 rounded-xl2 border border-line bg-paper p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft sm:flex-row sm:items-center sm:justify-between sm:p-8"
+          >
+            <div>
+              <span className="eyebrow">Events</span>
+              <h3 className="mt-2 text-xl text-ink">イベント開催レポート</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                商業施設や企業と一緒に開いたイベントの様子は、実績レポートで詳しくご紹介しています。
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-clay-600">
+              実績を見る
+              <Icon
+                name="arrow"
+                size={16}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </span>
+          </Link>
+        </Reveal>
       </Section>
 
       <Section tone="paper" spacing="lg">

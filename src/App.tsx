@@ -10,6 +10,12 @@ import { lazyWithRetry } from '@/lib/lazyWithRetry'
 const WorkshopPage = lazyWithRetry(() =>
   import('@/pages/WorkshopPage').then((m) => ({ default: m.WorkshopPage })),
 )
+const EventsPage = lazyWithRetry(() =>
+  import('@/pages/EventsPage').then((m) => ({ default: m.EventsPage })),
+)
+const EventDetailPage = lazyWithRetry(() =>
+  import('@/pages/EventDetailPage').then((m) => ({ default: m.EventDetailPage })),
+)
 const ResearchPage = lazyWithRetry(() =>
   import('@/pages/ResearchPage').then((m) => ({ default: m.ResearchPage })),
 )
@@ -56,6 +62,22 @@ export function App() {
           element={
             <Suspense fallback={<RouteFallback />}>
               <WorkshopPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="events"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <EventsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="events/:slug"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <EventDetailPage />
             </Suspense>
           }
         />
