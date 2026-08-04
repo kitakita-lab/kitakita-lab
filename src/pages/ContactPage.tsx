@@ -47,7 +47,6 @@ export function ContactPage() {
                 ))}
               </ul>
 
-              {/* TODO: 正式なメールアドレス取得後、site.email に設定すると表示される */}
               {site.email ? (
                 <div className="mt-10 rounded-xl2 border border-line bg-paper-50 p-6">
                   <span className="flex h-11 w-11 items-center justify-center rounded-full bg-clay-50 text-clay-600">
