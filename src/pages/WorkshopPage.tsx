@@ -192,7 +192,7 @@ export function WorkshopPage() {
               <span className="eyebrow">Events</span>
               <h3 className="mt-2 text-xl text-ink">イベント開催レポート</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                商業施設や企業と一緒に開いたイベントの様子は、実績レポートで詳しくご紹介しています。
+                商業施設や公共空間で開いたイベントの様子は、実績レポートで詳しくご紹介しています。
               </p>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-clay-600">
