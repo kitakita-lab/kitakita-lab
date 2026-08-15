@@ -20,7 +20,7 @@ export function EventsPage() {
       <PageHeader
         eyebrow="Events"
         title={<>イベント実績</>}
-        description="商業施設・企業・自治体の皆さまと連携して開催した、ワークショップイベントの実績をご紹介します。企画から会場づくり、当日の運営まで、KitaKita Labが一貫して担当しています。"
+        description="商業施設や公共空間、企業・自治体との連携など、さまざまな場で開催したワークショップイベントの実績をご紹介します。企画から会場づくり、当日の運営まで、KitaKita Labが一貫して担当しています。"
       />
 
       <Section tone="paper" spacing="lg">
