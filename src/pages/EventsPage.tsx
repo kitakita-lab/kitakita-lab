@@ -6,7 +6,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { CtaBand } from '@/components/CtaBand'
-import { sortedEvents } from '@/data/events'
+import { sortedEvents, brandJourney } from '@/data/events'
 
 export function EventsPage() {
   return (
@@ -22,6 +22,63 @@ export function EventsPage() {
         title={<>イベント実績</>}
         description="商業施設や公共空間、企業・自治体との連携など、さまざまな場で開催したワークショップイベントの実績をご紹介します。企画から会場づくり、当日の運営まで、KitaKita Labが一貫して担当しています。"
       />
+
+      {/* ひとつのブランドの、歩み — 実績を「可能性の広がり」としてつなぐ。
+          主語は ikyu。規模の成長物語にはしない（データ側のコメント参照）。 */}
+      <Section tone="tint" spacing="md">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-20">
+          <Reveal>
+            <span className="eyebrow">Story</span>
+            <h2 className="mt-3 text-2xl leading-snug sm:text-3xl">
+              ひとつのブランドの、
+              <br />
+              歩み
+            </h2>
+            <p className="mt-5 text-sm leading-loose text-ink-muted sm:text-base">
+              ここに並ぶ実績は、ハンドメイドアクセサリーブランド ikyu
+              の歩みでもあります。いま持っているものを起点に、少し違う可能性を試してみる。KitaKita
+              Labは、その一歩を一緒に考え、かたちにしてきました。
+            </p>
+          </Reveal>
+
+          <ol className="border-l border-line pl-6 sm:pl-8">
+            {brandJourney.map((step, i) => (
+              <Reveal
+                key={step.title}
+                as="li"
+                delay={i * 70}
+                className="relative pb-9 last:pb-0"
+              >
+                <span
+                  aria-hidden="true"
+                  className={
+                    step.upcoming
+                      ? 'absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full border border-clay-400 bg-paper sm:-left-[37px]'
+                      : 'absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-clay-400 sm:-left-[37px]'
+                  }
+                />
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs tracking-wider2 text-ink-soft">{step.period}</span>
+                  {step.upcoming && <Badge tone="clay">次の挑戦</Badge>}
+                </div>
+                <h3 className="mt-1.5 text-base text-ink sm:text-lg">{step.title}</h3>
+                <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted">
+                  {step.body}
+                </p>
+                {step.slug && (
+                  <Link
+                    to={`/events/${step.slug}`}
+                    className="mt-2 inline-flex items-center gap-1 text-sm text-clay-600 transition-colors hover:text-clay-500"
+                  >
+                    レポートを見る
+                    <Icon name="arrow" size={14} />
+                  </Link>
+                )}
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </Section>
 
       <Section tone="paper" spacing="lg">
         <div className="grid gap-8 sm:grid-cols-2">
