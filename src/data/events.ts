@@ -121,7 +121,7 @@ export const events: EventReport[] = [
       { value: '216組', label: '総参加組数' },
       { value: '477名', label: '総参加人数' },
       { value: '380本', label: 'フラワーボトル制作数' },
-      { value: '平日5日間', label: '開催期間' },
+      { value: '5日間', label: '平日開催' },
     ],
     sections: [
       {
@@ -226,9 +226,9 @@ export const events: EventReport[] = [
     ],
   },
   {
-    // 写真は Workshop ページのギャラリー（public/workshops/）と共用。
-    // 実施報告書がないイベントのため、日別レポート・参加者の声は省略し、
-    // 記録が残っている制作数と、写真・当日の空気を中心に構成している。
+    // ヒーロー写真は Workshop ページのギャラリー（public/workshops/）と共用。
+    // このイベントの実写はヒーローの1枚のみのため、フォトギャラリーは
+    // 置かず、記録が残っている制作数と当日の空気を中心に構成している。
     slug: 'chikaho-kita3jo-workshop-2026',
     title: 'チカホ北三条広場 ワークショップ体験会',
     category: '公共空間',
@@ -271,18 +271,6 @@ export const events: EventReport[] = [
           '人の流れを活かした、公共空間に開かれたブースづくり',
           '併設のikyuハンドメイドアクセサリー展示で、ブランドの世界観も体感',
         ],
-      },
-    ],
-    photos: [
-      {
-        src: '/workshops/craft-detail-02.jpg',
-        alt: '仕分けされたドライフラワーの花材から、ピンセットで一輪を選んでいる様子',
-        caption: '気に入った一輪を、ゆっくり選ぶところから',
-      },
-      {
-        src: '/workshops/booth-wide-02.jpg',
-        alt: 'ドライフラワーが並ぶブースで、作家が笑顔で参加者と話している様子',
-        caption: 'つくったあとも、作家との会話がゆるやかに続く時間',
       },
     ],
     commitments: [
