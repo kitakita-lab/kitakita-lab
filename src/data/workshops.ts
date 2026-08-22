@@ -46,39 +46,44 @@ export const workshopPhotos: WorkshopPhoto[] = [
     focus: '60% 50%',
   },
   // 2. 選ぶ・始める — 体験の入り口
+  // （画像はイベント実績ページ public/events/ と共用）
   {
-    id: 'craft-detail-02',
-    image: '/workshops/craft-detail-02.jpg',
-    alt: '参加者がピンセットで、仕分けされたドライフラワーの花材を選んでいる様子。',
+    id: 'materials-ario',
+    image: '/events/ario-sapporo-harvest-court-2026/materials.jpg',
+    alt: 'かごに盛られたドライフラワーと、木の実やシナモンが入ったガラス瓶が並ぶ花材テーブル。',
     title: '花材を選ぶ時間',
+    venue: 'アリオ札幌',
     summary: '気に入った一輪を、ゆっくり選ぶところから。',
+    focus: '40% 50%',
   },
   // 3. 制作中 — 手を動かす時間
   {
-    id: 'craft-detail-01',
-    image: '/workshops/craft-detail-01.jpg',
-    alt: '白い手袋をした手が、ピンセットでドライフラワーを小さな瓶の中へ入れている様子。',
+    id: 'hands-ario',
+    image: '/events/ario-sapporo-harvest-court-2026/hands.jpg',
+    alt: 'ピンセットで小さなガラスボトルへ花材を入れていく、制作中の手元。',
     title: 'ひとつずつ、瓶の中へ',
+    venue: 'アリオ札幌',
     summary: '急がなくていい、手元に集中する時間。',
-    focus: '60% 50%',
+    focus: '45% 50%',
   },
   // 4. 交流 — 隣の人と、作家と
   {
-    id: 'craft-detail-03',
-    image: '/workshops/craft-detail-03.jpg',
-    alt: '参加者たちがテーブルを囲み、ドライフラワーを手に取りながらそれぞれの作業を進めている手元。',
+    id: 'workshop-ario',
+    image: '/events/ario-sapporo-flower-bottle-2026/workshop.jpg',
+    alt: 'テーブルを囲んで花材を選びながら、フラワーボトルを制作する参加者たち。',
     title: '隣の人と、同じ時間を',
+    venue: 'アリオ札幌',
     summary: '手を動かしていると、自然に会話が生まれます。',
-    focus: '65% 50%',
+    focus: '50% 50%',
   },
-  // 5. 笑顔・空気感 — 締め
+  // 5. 完成 — 締め
   {
-    id: 'booth-wide-02',
-    image: '/workshops/booth-wide-02.jpg',
-    alt: 'ドライフラワーが並ぶブースで、作家が笑顔で参加者と話している様子。',
-    title: '作家と、話しながら',
-    venue: 'チカホ北三条広場',
-    summary: 'つくったあとも、ゆるやかに続く時間。',
-    focus: '65% 40%',
+    id: 'bottles-ario',
+    image: '/events/ario-sapporo-harvest-court-2026/bottles.jpg',
+    alt: 'コルク栓の小瓶に季節の花が詰められた、完成したフラワーボトル。',
+    title: '自分だけの一本が完成',
+    venue: 'アリオ札幌',
+    summary: '季節の花を選んで、世界にひとつの一本に。',
+    focus: '68% 50%',
   },
 ]
