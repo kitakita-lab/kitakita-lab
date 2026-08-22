@@ -29,7 +29,11 @@ const staticPages = [
 // 形式が変わって抽出できなくなった場合はビルドを止めて気付けるようにする。
 const extractSlugs = async (relPath) => {
   const source = await readFile(join(root, relPath), 'utf8')
-  const slugs = [...source.matchAll(/^\s*slug:\s*'([^']+)'/gm)].map((m) => m[1])
+  // 同じ slug が別データ（例: events.ts の brandJourney からの参照）にも
+  // 現れることがあるため、重複は除いて抽出する。
+  const slugs = [
+    ...new Set([...source.matchAll(/^\s*slug:\s*'([^']+)'/gm)].map((m) => m[1])),
+  ]
   if (slugs.length === 0) {
     console.error(`generate-sitemap: ${relPath} から slug を抽出できませんでした。`)
     process.exit(1)
