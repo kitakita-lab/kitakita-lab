@@ -191,8 +191,8 @@ export const events: EventReport[] = [
     photos: [
       {
         src: '/events/ario-sapporo-harvest-court-2026/venue.jpg',
-        alt: '2階から見たハーベストコート会場。ikyuのワークショップブースと制作テーブルを囲む参加者たち',
-        caption: '2階から見た会場全景。ワークショップとパーソナルカラー診断がひとつの場に並ぶ',
+        alt: '2階から見たikyuのワークショップエリア。ブースと制作テーブルを囲む参加者たち',
+        caption: '2階から見たikyuのワークショップエリア。会場の中に、花を選び、つくる時間が広がる',
       },
       {
         src: '/events/ario-sapporo-harvest-court-2026/materials.jpg',
