@@ -65,7 +65,11 @@
       />
     </noscript>
 
-    <!-- Structured data (Organization) for search engines -->
+    <!-- Structured data (Organization / WebSite) for search engines.
+         address / location は運営者情報の公開方針が決まるまで載せない。
+         sameAs は公式アカウントと確認できる URL が確定してから追加する。
+         email・areaServed はサイト上で公開済みの事実（Footer / Contact の
+         連絡先、「北海道の〜場所」という自己紹介と道内での開催実績）のみ。 -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -75,7 +79,18 @@
         "url": "https://kitakita-lab.com/",
         "logo": "https://kitakita-lab.com/icon-512.png",
         "image": "https://kitakita-lab.com/ogp.png",
+        "email": "hello@kitakita-lab.com",
+        "areaServed": "北海道",
         "description": "北海道の「ちょっと進めてみる」ための場所。ワークショップ、AIやシステムづくり、地域や企業との企画を通じて、ちょっと前へ、ちょっと良く、ちょっと豊かになる時間と出会いを届けます。"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "KitaKita Lab",
+        "alternateName": "キタキタラボ",
+        "url": "https://kitakita-lab.com/"
       }
     </script>
   </head>

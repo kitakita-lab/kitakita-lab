@@ -12,7 +12,7 @@ export function EventsPage() {
   return (
     <>
       <Seo
-        title="Events"
+        title="イベント実績"
         path="/events"
         description="KitaKita Labのイベント実績。商業施設・企業・自治体と連携したワークショップイベントの開催レポートをご紹介します。"
       />

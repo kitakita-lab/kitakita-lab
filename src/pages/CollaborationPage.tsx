@@ -43,7 +43,7 @@ export function CollaborationPage() {
       <Seo
         title="Collaboration"
         path="/collaboration"
-        description="企業・商業施設・自治体・教育機関との連携。ハンドメイドの力で、賑わいづくりやブランド体験、地域・教育の企画を実現します。"
+        description="札幌を拠点に、商業施設や企業イベント、自治体の会場へ出向いてワークショップを企画・運営します。ハンドメイドの力で、賑わいづくりやブランド体験、地域・教育の企画を実現します。"
       />
 
       <PageHeader

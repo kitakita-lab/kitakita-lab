@@ -106,6 +106,32 @@ describe('ContactForm', () => {
     expect(screen.queryByRole('button', { name: /送信する/ })).not.toBeInTheDocument()
   })
 
+  it('「知ったきっかけ」は任意で、選択したときだけメール本文に含まれる', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<ContactForm />)
+
+    // 未選択のまま送信 → 本文に「知ったきっかけ」は含まれない
+    await user.type(screen.getByLabelText(/お名前/), 'テスト太郎')
+    await user.type(screen.getByLabelText(/メールアドレス/), 'test@example.com')
+    await user.type(screen.getByLabelText(/お問い合わせ内容/), 'テストです。')
+    await user.click(screen.getByRole('button', { name: /送信する/ }))
+    expect(window.location.href).not.toContain(encodeURIComponent('知ったきっかけ'))
+
+    // 選択して送信 → 本文に含まれる
+    await user.click(screen.getByRole('button', { name: '別の内容を送る' }))
+    await user.type(screen.getByLabelText(/お名前/), 'テスト太郎')
+    await user.type(screen.getByLabelText(/メールアドレス/), 'test@example.com')
+    await user.selectOptions(
+      screen.getByLabelText(/知ったきっかけ/),
+      'Googleなどで検索して',
+    )
+    await user.type(screen.getByLabelText(/お問い合わせ内容/), 'テストです。')
+    await user.click(screen.getByRole('button', { name: /送信する/ }))
+    expect(window.location.href).toContain(
+      encodeURIComponent('知ったきっかけ: Googleなどで検索して'),
+    )
+  })
+
   it('完了画面から「別の内容を送る」で空のフォームに戻る', async () => {
     const user = userEvent.setup()
     renderWithProviders(<ContactForm />)
