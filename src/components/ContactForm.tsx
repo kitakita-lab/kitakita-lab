@@ -13,10 +13,23 @@ const inquiryTypes: Inquiry[] = [
   'その他',
 ]
 
+/** 「知ったきっかけ」の選択肢。任意項目のため未選択（空文字）を許容する。 */
+const howFoundOptions = [
+  'Googleなどで検索して',
+  'ご紹介',
+  'イベント会場で',
+  'SNS',
+  'その他',
+] as const
+
+type HowFound = (typeof howFoundOptions)[number] | ''
+
 type FormState = {
   name: string
   email: string
   inquiry: Inquiry
+  /** KitaKita Labを知ったきっかけ（任意・未選択は空文字） */
+  howFound: HowFound
   message: string
 }
 
@@ -24,6 +37,7 @@ const initialState: FormState = {
   name: '',
   email: '',
   inquiry: '作家として参加したい',
+  howFound: '',
   message: '',
 }
 
@@ -37,6 +51,8 @@ function buildMailtoHref(form: FormState): string {
     `お名前: ${form.name}`,
     `メールアドレス: ${form.email}`,
     `お問い合わせ種別: ${form.inquiry}`,
+    // 任意項目のため、選択されたときだけ本文に含める
+    ...(form.howFound ? [`知ったきっかけ: ${form.howFound}`] : []),
     '',
     form.message,
   ].join('\n')
@@ -185,6 +201,34 @@ export function ContactForm() {
       </div>
 
       <div>
+        <label htmlFor="how-found" className="mb-2 block text-sm font-medium text-ink">
+          KitaKita Labを知ったきっかけ
+          <span className="ml-1.5 text-xs font-normal text-ink-soft">任意</span>
+        </label>
+        <div className="relative">
+          <select
+            id="how-found"
+            value={form.howFound}
+            onChange={(e) => update('howFound', e.target.value as HowFound)}
+            className={cn(fieldClass, 'appearance-none pr-10')}
+          >
+            <option value="">選択しない</option>
+            {howFoundOptions.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <Icon
+            name="arrow"
+            size={16}
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-ink-soft"
+            aria-hidden="true"
+          />
+        </div>
+      </div>
+
+      <div>
         <label htmlFor="message" className="mb-2 block text-sm font-medium text-ink">
           お問い合わせ内容 <span className="text-clay-600">*</span>
         </label>
@@ -196,7 +240,11 @@ export function ContactForm() {
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? 'message-error' : undefined}
           className={cn(fieldClass, 'resize-y', errors.message && 'border-red-400')}
-          placeholder="ご相談内容や、進めてみたいことをお聞かせください。"
+          placeholder={
+            form.inquiry === '企業・自治体・施設の連携'
+              ? 'ご相談内容をお聞かせください。開催してみたい時期・場所・目的・想定人数など、わかる範囲で添えていただけるとスムーズです（未定のままで大丈夫です）。'
+              : 'ご相談内容や、進めてみたいことをお聞かせください。'
+          }
         />
         {errors.message && (
           <p id="message-error" className="mt-1.5 text-sm text-red-600">
