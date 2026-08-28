@@ -1,5 +1,7 @@
 import { useParams, Navigate, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { Seo } from '@/components/Seo'
+import { site } from '@/data/site'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 import { Badge } from '@/components/ui/Badge'
@@ -20,14 +22,53 @@ export function EventDetailPage() {
     return <Navigate to="/events" replace />
   }
 
+  const pageUrl = `${site.url}/events/${event.slug}`
+
+  // 開催済みイベントの「実施実績レポート」なので Article を使う
+  // （開催告知ではないため Event schema は適用しない）。
+  // 記事としての公開日は管理していないため datePublished は載せない
+  // （存在しない日付を推測で生成しない方針）。
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: event.title,
+    description: event.excerpt,
+    mainEntityOfPage: pageUrl,
+    ...(event.heroImage ? { image: `${site.url}${event.heroImage.src}` } : {}),
+    author: { '@type': 'Organization', name: site.name, url: site.url },
+    publisher: {
+      '@type': 'Organization',
+      name: site.name,
+      logo: { '@type': 'ImageObject', url: `${site.url}/icon-512.png` },
+    },
+  }
+
+  // 実際のサイト構造（ホーム → イベント実績 → 本ページ）と一致するパンくず。
+  // 視覚的なパンくずは新設せず、構造化データのみ（既存の「一覧へ」リンクが
+  // 同じ階層を担っている）。
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'イベント実績', item: `${site.url}/events` },
+      { '@type': 'ListItem', position: 3, name: event.title, item: pageUrl },
+    ],
+  }
+
   return (
     <>
       <Seo
         title={event.title}
         path={`/events/${event.slug}`}
         description={event.excerpt}
+        image={event.heroImage?.src}
         type="article"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+      </Helmet>
 
       <article>
         {/* ── ヘッダー ─────────────────────────── */}

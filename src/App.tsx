@@ -7,6 +7,10 @@ import { lazyWithRetry } from '@/lib/lazyWithRetry'
 // Home is eager (landing page → best LCP). Secondary pages are code-split so
 // the initial bundle stays small; each route loads on demand. lazyWithRetry
 // self-heals stale-chunk errors that can occur right after a redeploy.
+//
+// SSG（scripts/prerender.mjs）はこの App をそのままサーバー描画するため、
+// ルート追加時は src/entry-server.tsx の prerenderPages（URL一覧）にも
+// 追加すること。忘れると prerender の検証がビルドを失敗させる。
 const WorkshopPage = lazyWithRetry(() =>
   import('@/pages/WorkshopPage').then((m) => ({ default: m.WorkshopPage })),
 )

@@ -15,6 +15,11 @@ export function lazyWithRetry<T extends ComponentType<Record<string, never>>>(
   factory: () => Promise<{ default: T }>,
 ): LazyExoticComponent<T> {
   return lazy(async () => {
+    // SSG（プリレンダリング）ではリロードによる復旧は不要かつ window も
+    // 存在しないため、素の dynamic import として振る舞う。
+    if (typeof window === 'undefined') {
+      return factory()
+    }
     try {
       const mod = await factory()
       window.sessionStorage.removeItem(RELOAD_FLAG)
