@@ -7,6 +7,10 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F7F8F6" />
 
+    <!-- ssg:head:start
+         この区間は scripts/prerender.mjs がページ固有の
+         title / meta / canonical / OG / JSON-LD に置き換える。
+         開発サーバー（vite dev）ではこのまま既定値として使われる。 -->
     <title>KitaKita Lab｜ちょっと進めてみる</title>
     <meta
       name="description"
@@ -25,10 +29,10 @@
       property="og:description"
       content="ちょっと前へ。ちょっと良く。ちょっと豊かに。北海道の「ちょっと進めてみる」ための場所です。"
     />
-    <meta property="og:url" content="https://kitakita-lab.com/" />
+    <meta property="og:url" content="https://www.kitakita-lab.com/" />
     <!-- og:image は PNG 必須（SVG は X / Facebook / LINE 等で描画されない）。
          再生成は scripts/generate-og.mjs を参照。 -->
-    <meta property="og:image" content="https://kitakita-lab.com/ogp.png" />
+    <meta property="og:image" content="https://www.kitakita-lab.com/ogp.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="KitaKita Lab — ちょっと進めてみる" />
@@ -41,7 +45,8 @@
       name="twitter:description"
       content="ちょっと前へ。ちょっと良く。ちょっと豊かに。北海道から。"
     />
-    <meta name="twitter:image" content="https://kitakita-lab.com/ogp.png" />
+    <meta name="twitter:image" content="https://www.kitakita-lab.com/ogp.png" />
+    <!-- ssg:head:end -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -76,9 +81,9 @@
         "@type": "Organization",
         "name": "KitaKita Lab",
         "alternateName": "キタキタラボ",
-        "url": "https://kitakita-lab.com/",
-        "logo": "https://kitakita-lab.com/icon-512.png",
-        "image": "https://kitakita-lab.com/ogp.png",
+        "url": "https://www.kitakita-lab.com/",
+        "logo": "https://www.kitakita-lab.com/icon-512.png",
+        "image": "https://www.kitakita-lab.com/ogp.png",
         "email": "hello@kitakita-lab.com",
         "areaServed": "北海道",
         "description": "北海道の「ちょっと進めてみる」ための場所。ワークショップ、AIやシステムづくり、地域や企業との企画を通じて、ちょっと前へ、ちょっと良く、ちょっと豊かになる時間と出会いを届けます。"
@@ -90,7 +95,7 @@
         "@type": "WebSite",
         "name": "KitaKita Lab",
         "alternateName": "キタキタラボ",
-        "url": "https://kitakita-lab.com/"
+        "url": "https://www.kitakita-lab.com/"
       }
     </script>
   </head>

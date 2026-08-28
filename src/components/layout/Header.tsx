@@ -11,7 +11,15 @@ import { Icon } from '@/components/ui/Icon'
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  // モバイルメニューの Portal は document を参照するため、SSG
+  // （プリレンダリング）時には描画せず、クライアントでのマウント後に
+  // 描画する。メニューは操作して初めて開くものなので挙動は変わらない。
+  const [mounted, setMounted] = useState(false)
   const location = useLocation()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -90,7 +98,8 @@ export function Header() {
         Rendering it at <body> keeps its containing block as the viewport
         regardless of any style the header carries, so this cannot recur.
       */}
-      {createPortal(
+      {mounted &&
+        createPortal(
         <div
           id="mobile-menu"
           className={cn(

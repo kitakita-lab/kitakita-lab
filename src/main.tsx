@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { Analytics } from '@vercel/analytics/react'
@@ -11,7 +11,7 @@ if (!rootEl) {
   throw new Error('Root element #root not found')
 }
 
-createRoot(rootEl).render(
+const app = (
   <StrictMode>
     <HelmetProvider>
       <BrowserRouter>
@@ -22,5 +22,15 @@ createRoot(rootEl).render(
         <Analytics />
       </BrowserRouter>
     </HelmetProvider>
-  </StrictMode>,
+  </StrictMode>
 )
+
+// 本番はビルド時プリレンダリング（scripts/prerender.mjs）済みのHTMLを
+// hydrate する。開発サーバー（root が空）ではこれまで通り CSR で描画。
+// lazy なルートは Suspense 境界ごとに、チャンク読み込み完了まで
+// サーバーHTMLがそのまま表示され続ける（React 18 の選択的hydration）。
+if (rootEl.hasChildNodes()) {
+  hydrateRoot(rootEl, app)
+} else {
+  createRoot(rootEl).render(app)
+}
