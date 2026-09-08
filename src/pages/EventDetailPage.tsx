@@ -111,7 +111,7 @@ export function EventDetailPage() {
                       <img
                         src={event.heroImage.src}
                         alt={event.heroImage.alt}
-                        className="aspect-[4/5] w-full object-cover sm:aspect-[3/2]"
+                        className="aspect-square w-full object-cover sm:aspect-[3/2]"
                       />
                     </picture>
                   ) : (

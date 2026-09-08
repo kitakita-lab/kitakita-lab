@@ -82,6 +82,12 @@ export type EventReport = {
    * イベントは従来どおり 16:9 のまま）。
    */
   heroImageMobile?: { src: string }
+  /**
+   * 一覧カード用に、タイトルを意味の単位（1行目＝企画名/会場名、
+   * 2行目＝実施内容）で明示的に2行に分けたもの。未指定なら title を
+   * そのまま表示する。title 自体（詳細ページの h1・SEO）は変更しない。
+   */
+  titleLines?: [string, string]
   /** 開催概要（表形式で表示） */
   overview: { label: string; value: string }[]
   /** 参加実績などの数字ハイライト */
@@ -102,6 +108,7 @@ export const events: EventReport[] = [
   {
     slug: 'mitsui-outlet-elfin-court-2026',
     title: '「私を楽しむ4日間」フラワーボトルワークショップ',
+    titleLines: ['「私を楽しむ4日間」', 'フラワーボトルワークショップ'],
     category: '商業施設',
     dateISO: '2026-09-04',
     dateLabel: '2026年9月4日（金）〜9月7日（月）',
@@ -214,6 +221,7 @@ export const events: EventReport[] = [
   {
     slug: 'ario-sapporo-harvest-court-2026',
     title: '「私を楽しむ5日間」フラワーボトルワークショップ',
+    titleLines: ['「私を楽しむ5日間」', 'フラワーボトルワークショップ'],
     category: '商業施設',
     dateISO: '2026-08-17',
     dateLabel: '2026年8月17日（月）〜8月21日（金）',
@@ -364,6 +372,7 @@ export const events: EventReport[] = [
     // 置かず、記録が残っている制作数と当日の空気を中心に構成している。
     slug: 'chikaho-kita3jo-workshop-2026',
     title: 'チカホ北三条広場 ワークショップ体験会',
+    titleLines: ['チカホ北三条広場', 'ワークショップ体験会'],
     category: '公共空間',
     dateISO: '2026-06-19',
     dateLabel: '2026年6月19日（金）〜6月21日（日）',
@@ -424,6 +433,7 @@ export const events: EventReport[] = [
   {
     slug: 'ario-sapporo-flower-bottle-2026',
     title: 'アリオ札幌 フラワーボトルワークショップ',
+    titleLines: ['アリオ札幌', 'フラワーボトルワークショップ'],
     category: '商業施設',
     dateISO: '2026-08-01',
     dateLabel: '2026年8月1日（土）〜8月3日（月）',

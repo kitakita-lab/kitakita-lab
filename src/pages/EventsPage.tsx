@@ -115,8 +115,17 @@ export function EventsPage() {
                     <span aria-hidden="true">・</span>
                     <span>{event.venue}</span>
                   </div>
-                  <h2 className="mt-3 text-xl leading-snug text-ink transition-colors group-hover:text-clay-600">
-                    {event.title}
+                  {/* hover 色はホバー可能な環境に限定する。タッチ端末ではタップした
+                      カードに :hover が残り、最新カードだけ色が違って見えたため。
+                      タイトルは titleLines があれば意味の単位で2行に分けて表示。 */}
+                  <h2 className="mt-3 text-xl leading-snug text-ink transition-colors [@media(hover:hover)]:group-hover:text-clay-600">
+                    {event.titleLines
+                      ? event.titleLines.map((line) => (
+                          <span key={line} className="block">
+                            {line}
+                          </span>
+                        ))
+                      : event.title}
                   </h2>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted">
                     {event.excerpt}
