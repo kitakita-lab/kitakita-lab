@@ -69,5 +69,9 @@ vi.stubGlobal(
 
 // --- スクロール関連 ---------------------------------------------------------
 // jsdom では no-op にする（ScrollToTop / アンカースクロールで使用）。
-Object.defineProperty(window, 'scrollTo', { value: vi.fn(), writable: true })
-Element.prototype.scrollIntoView = vi.fn()
+// `// @vitest-environment node` を指定したテスト（SSR 契約テスト等）では
+// window / Element が存在しないため、ブラウザ環境のときだけ設定する。
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'scrollTo', { value: vi.fn(), writable: true })
+  Element.prototype.scrollIntoView = vi.fn()
+}
