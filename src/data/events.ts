@@ -88,6 +88,12 @@ export type EventReport = {
    * そのまま表示する。title 自体（詳細ページの h1・SEO）は変更しない。
    */
   titleLines?: [string, string]
+  /**
+   * 一覧カードのサムネイル（16:10・object-cover）で heroImage のどこを
+   * 見せるかの object-position。未指定なら中央。詳細ページの Hero には
+   * 影響しない。例: 'center 80%'
+   */
+  cardImagePosition?: string
   /** 開催概要（表形式で表示） */
   overview: { label: string; value: string }[]
   /** 参加実績などの数字ハイライト */
@@ -121,6 +127,9 @@ export const events: EventReport[] = [
     },
     // 元写真が縦位置のため、スマホでは展示全体が見える縦寄りの切り出しを使う
     heroImageMobile: { src: '/events/mitsui-outlet-elfin-court-2026/hero-mobile.jpg' },
+    // 一覧カード（16:10）では下端基準にして、ロゴを保ったままテーブル面を
+    // できるだけ見せる（16:10 ではロゴとラグ前縁の両方は収まらない）
+    cardImagePosition: 'center bottom',
     overview: [
       {
         label: 'イベント名',

@@ -94,6 +94,11 @@ export function EventsPage() {
                       src={event.heroImage.src}
                       alt={event.heroImage.alt}
                       loading="lazy"
+                      style={
+                        event.cardImagePosition
+                          ? { objectPosition: event.cardImagePosition }
+                          : undefined
+                      }
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (

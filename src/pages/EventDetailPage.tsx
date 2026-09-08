@@ -86,8 +86,24 @@ export function EventDetailPage() {
                 <Badge tone="clay">{event.category}</Badge>
                 <span className="text-sm text-ink-soft">{event.dateLabel}</span>
               </div>
-              <h1 className="mt-4 text-3xl leading-[1.2] sm:text-4xl lg:text-[2.75rem]">
-                {event.title}
+              {/* 画面上の h1 は titleLines があれば意味の単位で2行に分ける。
+                  <title>・OG・JSON-LD は従来どおり title 文字列を使う。 */}
+              <h1
+                className={
+                  event.titleLines
+                    ? // 2行目（最長14文字）が390px幅で折り返さないよう、スマホのみ
+                      // 23.2px（14文字×23.2px ≒ 325px）。sm 以上は従来どおり。
+                      'mt-4 text-[1.45rem] leading-[1.2] sm:text-4xl lg:text-[2.75rem]'
+                    : 'mt-4 text-3xl leading-[1.2] sm:text-4xl lg:text-[2.75rem]'
+                }
+              >
+                {event.titleLines
+                  ? event.titleLines.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))
+                  : event.title}
               </h1>
               <p className="mt-4 flex items-center gap-2 text-sm text-ink-muted">
                 <Icon name="event" size={16} className="shrink-0 text-clay-500" />
