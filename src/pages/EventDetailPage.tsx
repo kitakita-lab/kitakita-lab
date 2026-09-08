@@ -103,11 +103,24 @@ export function EventDetailPage() {
             <div className="container-content pb-14 sm:pb-16">
               <Reveal>
                 <figure className="overflow-hidden rounded-xl2 shadow-soft">
-                  <img
-                    src={event.heroImage.src}
-                    alt={event.heroImage.alt}
-                    className="aspect-[16/9] w-full object-cover"
-                  />
+                  {event.heroImageMobile ? (
+                    // 縦位置の元写真を持つイベントだけ、スマホは縦寄り・PC は 3:2 の
+                    // 別トリミングで出す。他のイベントの 16:9 表示には影響しない。
+                    <picture>
+                      <source media="(max-width: 639px)" srcSet={event.heroImageMobile.src} />
+                      <img
+                        src={event.heroImage.src}
+                        alt={event.heroImage.alt}
+                        className="aspect-[4/5] w-full object-cover sm:aspect-[3/2]"
+                      />
+                    </picture>
+                  ) : (
+                    <img
+                      src={event.heroImage.src}
+                      alt={event.heroImage.alt}
+                      className="aspect-[16/9] w-full object-cover"
+                    />
+                  )}
                 </figure>
               </Reveal>
             </div>
