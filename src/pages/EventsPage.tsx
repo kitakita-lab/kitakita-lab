@@ -18,6 +18,25 @@ import { sortedEvents } from '@/data/events'
  * 主人公が ikyu に切り替わって見えたため外した。空いた分を埋める新しい
  * セクション（学び・数字・ケース分析など）は足さない。
  */
+/**
+ * titleLines の1行を描画する。半角スペースで区切られた語（例: 'アリオ札幌 ハーベストコート'）は
+ * 語ごとに nowrap にし、折り返しはスペースの位置だけに限る。
+ * h2 にはグローバルの text-wrap: balance が効いており、既定の禁則では「ー」が行頭に
+ * 立てるため、320px 幅で「ハ／ーベストコート」と語中で均等割りされていた。
+ * スペースを含まない行はそのまま返す（長い語を nowrap にして横スクロールを起こさない）。
+ */
+function renderTitleLine(line: string) {
+  if (!line.includes(' ')) return line
+  // スペースは nowrap の span の「外」に置く。span の内側に入れると nowrap が
+  // スペースでの折り返しも禁じてしまい、行全体が折れずに横スクロールを起こす。
+  return line.split(' ').flatMap((word, i) => [
+    i > 0 ? ' ' : null,
+    <span key={`${word}-${i}`} className="whitespace-nowrap">
+      {word}
+    </span>,
+  ])
+}
+
 export function EventsPage() {
   return (
     <>
@@ -80,7 +99,7 @@ export function EventsPage() {
                     {event.titleLines
                       ? event.titleLines.map((line) => (
                           <span key={line} className="block">
-                            {line}
+                            {renderTitleLine(line)}
                           </span>
                         ))
                       : event.title}
@@ -116,7 +135,16 @@ export function EventsPage() {
       </Section>
 
       <CtaBand
-        title="次のイベント、一緒につくりませんか。"
+        title={
+          // 320px 幅では h2 の text-wrap: balance により「次のイベン／ト、一緒につく／りませんか。」と
+          // 語中で折れるため、文節ごとに nowrap で固定し、折り返しを文節の境目に限る
+          // （Workshop の CTA と同じ手法。CtaBand 本体は変更しない）。
+          <>
+            <span className="whitespace-nowrap">次のイベント、</span>
+            <span className="whitespace-nowrap">一緒に</span>
+            <span className="whitespace-nowrap">つくりませんか。</span>
+          </>
+        }
         description="商業施設の賑わい創出、企業の顧客体験づくり、自治体の地域企画など、目的に合わせたワークショップイベントを企画・運営します。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         secondary={{ label: '連携について見る', to: '/collaboration' }}
