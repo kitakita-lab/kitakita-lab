@@ -3,7 +3,9 @@ import { Reveal } from '@/components/ui/Reveal'
 
 /**
  * 「私たちのこと」— 会社紹介ではなく、人格の自己紹介。
- * 等身大で、背伸びをしない。できることを小さく言う（docs/BRAND.md）。
+ * 等身大で、背伸びをしない。ただし自分の仕事を小さく言わない。
+ * 企業・施設と組む現場と、持っているものを新しい場所へ広げる人との
+ * 関わりの両方が、業務範囲の説明にならない長さで見える状態を保つ。
  */
 export function About() {
   return (
@@ -18,27 +20,20 @@ export function About() {
 
         <Reveal delay={80} className="max-w-prose space-y-8 text-lg leading-loose text-ink/85">
           <p>
-            私たちは、特別なことができる会社ではありません。
+            私たちは、体験の場を一緒につくっています。
           </p>
           <p>
-            でも、人と人がつながること。
+            {/* JSX の行またぎは半角スペースになるため、一文は1行に書く。 */}
+            商業施設や企業のイベントで、ワークショップや体験の企画をかたちにし、当日の現場にも<span className="whitespace-nowrap">立つこと。</span>
             <br />
-            {/* ここだけ意図的に「少し」。締めの「ちょっとだけ〜」と役割を分け、
-                連続による単調さを避ける（思想・行動=少し／姿勢=ちょっと）。
-                「ちょっと」統一の一括置換で戻さないこと（docs/BRAND.md 参照）。 */}
-            何かを少し進めてみること。
-            <br />
-            {/* 320px幅では行が収まらず「…つくるこ／と。」と割れるため、
-                文節 nowrap で「…一緒に／つくること。」の切れ目に固定。 */}
-            そのきっかけを一緒に<span className="whitespace-nowrap">つくること。</span>
+            作品や技術、得意なことを持っている人が、それを新しい場所へ広げていくことに、
+            <span className="whitespace-nowrap">力を貸すこと。</span>
           </p>
           <p className="font-serif text-xl leading-relaxed text-ink sm:text-2xl">
-            そんなことなら、
+            どちらも、
             <br className="sm:hidden" />
-            {/* 狭幅で「かもしれ／ません」と割れないよう文節で固定
-                （320/375pxでは「力になれる／かもしれません。」で折れる）。 */}
-            ちょっとだけ力になれる
-            <span className="whitespace-nowrap">かもしれません。</span>
+            {/* 狭幅で「ひとつ／ずつ。」と割れないよう文節で固定。 */}
+            話すところから、<span className="whitespace-nowrap">ひとつずつ。</span>
           </p>
         </Reveal>
       </div>

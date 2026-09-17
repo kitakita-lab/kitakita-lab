@@ -11,7 +11,7 @@ export const site = {
   /** ブランドフィロソフィー（docs/BRAND.md 参照）。要所でのみ掲げる。 */
   philosophy: 'ちょっと進めてみる',
   description:
-    'KitaKita Lab（キタキタラボ）は、北海道の「ちょっと進めてみる」ための場所です。ワークショップ、AIやシステムづくり、地域や企業との企画——大きな約束はしません。ちょっと前へ、ちょっと良く、ちょっと豊かになる時間と出会いを届けます。',
+    'KitaKita Lab（キタキタラボ）は、札幌を拠点に、商業施設や企業イベントでのワークショップや体験企画を、企業・施設、作家やつくり手と一緒に企画・運営しています。北海道の「ちょっと進めてみる」ための場所です。',
   url: 'https://www.kitakita-lab.com',
   // og:image は PNG 必須（SVG は SNS 各社が描画しない）。scripts/generate-og.mjs で再生成。
   ogImage: '/ogp.png',

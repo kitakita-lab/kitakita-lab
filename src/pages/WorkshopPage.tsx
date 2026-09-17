@@ -74,7 +74,7 @@ const flow = [
   },
   {
     step: '04',
-    title: 'その後も、ちょっとずつ',
+    title: 'その後も、次の企画へ',
     body: '実施後の声を踏まえて、次の機会や新しい企画につなげていきます。',
   },
 ]
@@ -212,9 +212,9 @@ export function WorkshopPage() {
           eyebrow="Experience"
           title={
             <>
-              参加すると
+              体験のあとに、
               <br className="sm:hidden" />
-              ちょっと変わること
+              残るもの
             </>
           }
           description="大げさな変化ではなく、こんな手ざわりを届けたいと思っています。"
@@ -244,7 +244,7 @@ export function WorkshopPage() {
               生まれています
             </>
           }
-          description="目的や場に合わせて、ワークショップのかたちをちょっとずつ変えています。"
+          description="目的や場に合わせて、ワークショップのかたちを変えています。"
         />
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
           {scenes.map((s, i) => (
@@ -305,14 +305,13 @@ export function WorkshopPage() {
       <CtaBand
         title={
           <>
-            {/* 語中分割（形にし／てみませんか 等）を防ぐため、文節ごとに
+            {/* 語中分割（かたちにし／ませんか 等）を防ぐため、文節ごとに
                 nowrap で固定し、幅に応じて文節の境目でのみ折れるようにする。
-                「形にしてみませんか。」をひと塊にすると320px幅(272px)を
-                約10px超えるため、「形に｜してみませんか。」で分ける。 */}
+                「かたちにしませんか。」をひと塊にすると320px幅(272px)を
+                超えるため、「かたちに｜しませんか。」で分ける。 */}
             その<span className="whitespace-nowrap">ワークショップ</span>、
-            <span className="whitespace-nowrap">ちょっと</span>
-            <span className="whitespace-nowrap">形に</span>
-            <span className="whitespace-nowrap">してみませんか。</span>
+            <span className="whitespace-nowrap">かたちに</span>
+            <span className="whitespace-nowrap">しませんか。</span>
           </>
         }
         description="内容が固まっていなくても大丈夫です。まずは、思っていることを聞かせてください。"
