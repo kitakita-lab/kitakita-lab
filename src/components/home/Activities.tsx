@@ -6,9 +6,10 @@ import { NavLink } from '@/components/layout/NavLink'
 import { flowSteps } from '@/data/activities'
 
 /**
- * Activities — 「何をやる会社か」ではなく「どんな流れをつくる会社か」。
- * 〜てみる、の連なりを罫線の目録で見せ、ワークショップ・AI・EC などは
- * 流れの中の実例として置く（docs/BRAND.md）。
+ * Activities — 依頼できるサービス一覧ではなく、「KitaKita Lab が、いま実際に
+ * 手を動かしていること」を流れで見せる。〜てみる、の連なりを罫線の目録で見せ、
+ * 実例は data/activities.ts の基準（実物があること、AI は制作方法として書くこと、
+ * 未来の計画は書かないこと）に従って置く（docs/BRAND.md）。
  */
 export function Activities() {
   return (
@@ -21,7 +22,7 @@ export function Activities() {
             <span className="whitespace-nowrap">つくっている流れ</span>
           </>
         }
-        description="ワークショップも、AIも、ECも。ぜんぶ、この流れのどこかにあります。"
+        description="いま、実際に手を動かしていることを、流れで並べています。"
       />
 
       <ol className="mt-14 border-t border-line">
