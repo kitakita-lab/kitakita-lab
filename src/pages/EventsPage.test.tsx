@@ -8,13 +8,6 @@ import { sortedEvents, brandJourney } from '@/data/events'
  * 実データ（src/data/events.ts）を使い、「データを追加するだけで一覧が完成する」
  * データ駆動の前提が崩れていないことを保証する。
  */
-/**
- * 歩みのタイトルは読点ごとに <span> に分かれて描画される。jsdom の
- * アクセシブルネーム計算は inline 要素の境界に空白を挟むため、
- * 空白を無視して比較する。
- */
-const journeyTitle = (title: string) => (name: string) => name.replace(/\s+/g, '') === title
-
 describe('EventsPage（/events）', () => {
   it('h1 と、実データのイベント数ぶんのカードが描画される', async () => {
     renderWithProviders(<App />, { route: '/events' })
@@ -74,33 +67,29 @@ describe('EventsPage（/events）', () => {
     }
   })
 
-  it('「ひとつのブランドの、歩み」が全ステップ描画され、slug 付きはレポートへリンクする', async () => {
+  it('「ひとつのブランドの、歩み」（brandJourney）は一覧に表示しない。主人公は KitaKita Lab', async () => {
     renderWithProviders(<App />, { route: '/events' })
     await screen.findByRole('heading', { level: 1 })
 
-    expect(screen.getByRole('heading', { level: 2, name: /ひとつのブランドの、\s*歩み/ })).toBeInTheDocument()
+    // データは将来の再利用のために残っているが、Events 一覧には描画しない
+    expect(brandJourney.length).toBeGreaterThan(0)
+    expect(screen.queryByRole('heading', { level: 2, name: /ひとつのブランドの/ })).toBeNull()
     for (const step of brandJourney) {
-      expect(screen.getByRole('heading', { level: 3, name: journeyTitle(step.title) })).toBeInTheDocument()
+      expect(screen.queryByRole('heading', { level: 3, name: step.title })).toBeNull()
     }
-    const journeyLinks = screen
-      .getAllByRole('link', { name: /^レポートを見る$/ })
-      .filter((a) => !a.querySelector('h2'))
-    expect(journeyLinks).toHaveLength(brandJourney.filter((s) => s.slug).length)
+    // 「レポートを見る」はカード（h2 を含むリンク）だけ。タイムライン由来のリンクはない
+    const reportLinks = screen.getAllByRole('link', { name: /レポートを見る/ })
+    expect(reportLinks.every((a) => a.querySelector('h2'))).toBe(true)
+    expect(reportLinks).toHaveLength(sortedEvents.length)
   })
 
-  it('歩みのタイトルは読点の直後でだけ折り返せる（文節ごとに nowrap）', async () => {
+  it('構成は PageHeader → 実績カード → CTA だけ（h2 見出しはカードのタイトルのみ）', async () => {
     renderWithProviders(<App />, { route: '/events' })
     await screen.findByRole('heading', { level: 1 })
 
-    for (const step of brandJourney) {
-      const h3 = screen.getByRole('heading', { level: 3, name: journeyTitle(step.title) })
-      const segments = Array.from(h3.querySelectorAll('span.whitespace-nowrap')).map(
-        (s) => s.textContent,
-      )
-      // 文節を連結すると元のタイトルに戻り、読点は各文節の末尾にだけ現れる
-      expect(segments.join('')).toBe(step.title)
-      expect(segments.length).toBe(step.title.split('、').filter(Boolean).length)
-      for (const seg of segments.slice(0, -1)) expect(seg?.endsWith('、')).toBe(true)
-    }
+    const h2s = screen.getAllByRole('heading', { level: 2 })
+    // カードのタイトル（イベント数）＋ CtaBand の見出し 1 つ
+    expect(h2s).toHaveLength(sortedEvents.length + 1)
+    expect(h2s[h2s.length - 1]).toHaveTextContent('次のイベント、一緒につくりませんか。')
   })
 })
