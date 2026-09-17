@@ -48,6 +48,18 @@ describe('EventsPage（/events）', () => {
         .getByRole('heading', { level: 2 })
         .querySelectorAll('span.block')
       expect(Array.from(lines).map((s) => s.textContent)).toEqual(event.titleLines)
+      // 半角スペースで区切られた行（例: 'アリオ札幌 ハーベストコート'）は語ごとに nowrap になり、
+      // 折り返しはスペースの位置に限られる。スペースのない行は nowrap を付けない
+      // （長い語を固定して横スクロールを起こさないため）。
+      lines.forEach((block, i) => {
+        const line = event.titleLines![i]
+        const words = block.querySelectorAll('span.whitespace-nowrap')
+        if (line.includes(' ')) {
+          expect(Array.from(words).map((w) => w.textContent?.trim())).toEqual(line.split(' '))
+        } else {
+          expect(words).toHaveLength(0)
+        }
+      })
     }
   })
 

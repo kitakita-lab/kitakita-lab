@@ -321,7 +321,15 @@ export function EventDetailPage() {
         )}
 
         <CtaBand
-          title="次のイベント、一緒につくりませんか。"
+          title={
+            // 一覧（EventsPage）の CTA と同じ文言・同じ理由。320px 幅で「イベン／ト」と
+            // 語中で折れないよう、文節ごとに nowrap で固定する。
+            <>
+              <span className="whitespace-nowrap">次のイベント、</span>
+              <span className="whitespace-nowrap">一緒に</span>
+              <span className="whitespace-nowrap">つくりませんか。</span>
+            </>
+          }
           description="商業施設の賑わい創出、企業の顧客体験づくり、自治体の地域企画など、目的に合わせたワークショップイベントを企画・運営します。"
           primary={{ label: 'お問い合わせ', to: '/contact' }}
           secondary={{ label: '他の実績を見る', to: '/events' }}
