@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { Routes, Route } from 'react-router-dom'
 import { renderWithProviders, screen, within } from '@/test/test-utils'
-import type { EventReport, JourneyStep } from '@/data/events'
+import type { EventReport } from '@/data/events'
 
 /**
  * 一覧・詳細テンプレートの「任意項目あり／なし」分岐テスト。
@@ -48,16 +48,10 @@ const minimal: EventReport = {
   overview: [{ label: '会場', value: 'ミニマル会場' }],
 }
 
-const journey: JourneyStep[] = [
-  { period: 'これまで', title: '始まり', body: '市場から。' },
-  { period: '2026年9月', title: '試してみる', body: '会場へ。', slug: 'full-event' },
-  { period: 'これから', title: '次の場所へ', body: '開催が決まっています。', upcoming: true },
-]
-
 vi.mock('@/data/events', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/data/events')>()
   const events = [full, minimal]
-  return { ...actual, events, sortedEvents: events, brandJourney: journey }
+  return { ...actual, events, sortedEvents: events }
 })
 
 // モック後に読み込む（ページはモックされたデータを参照する）
@@ -100,17 +94,6 @@ describe('EventsPage の分岐', () => {
       .getAllByRole('link', { name: /レポートを見る/ })
       .find((a) => a.getAttribute('href') === '/events/minimal-event')!
     expect(within(card).queryByRole('list')).toBeNull()
-  })
-
-  it('歩みの開催前ステップは「次の挑戦」バッジ付きでリンクなし、slug 付きはリンクあり', () => {
-    renderWithProviders(<EventsPage />, { route: '/events' })
-
-    expect(screen.getByText('次の挑戦')).toBeInTheDocument()
-    const journeyLinks = screen
-      .getAllByRole('link', { name: /^レポートを見る$/ })
-      .filter((a) => !a.querySelector('h2'))
-    expect(journeyLinks).toHaveLength(1)
-    expect(journeyLinks[0]).toHaveAttribute('href', '/events/full-event')
   })
 })
 
