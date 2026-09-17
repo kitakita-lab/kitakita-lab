@@ -12,7 +12,7 @@ export function ResearchPage() {
       <Seo
         title="Research"
         path="/research"
-        description="ハンドメイド作家・市場・生活者ニーズに関する調査活動。今後プレスリリースで調査結果を順次公開していきます。"
+        description="商業施設でのワークショップ・体験イベントの需要について、北海道在住の20〜50代1,000人を対象とした調査を進めています。現場で感じてきたことを、数字でも確かめるために。"
       />
 
       <PageHeader
@@ -26,14 +26,13 @@ export function ResearchPage() {
             <span className="whitespace-nowrap">数字とことば</span>にする。
           </>
         }
-        description="つくり手と市場の声を、数字にして残しています。次に進む人の地図になるように。調査結果は、今後プレスリリースとして順次公開予定です。"
+        description="現場で感じてきたことを、感覚だけで終わらせないために。商業施設でのワークショップ・体験イベントについて、北海道在住の20〜50代1,000人を対象とした調査を進めています。"
       />
 
       <Section tone="paper" spacing="lg">
         <Reveal>
           <div className="rounded-xl2 border border-clay-100 bg-clay-50/50 px-6 py-4 text-sm leading-relaxed text-clay-800">
-            現在、以下の調査を実施しています。結果がまとまり次第、
-            プレスリリースとしてこのページに順次掲載していきます。
+            現在、次の調査を進めています。結果がまとまり次第、このページでお知らせします。
           </div>
         </Reveal>
 
@@ -46,8 +45,16 @@ export function ResearchPage() {
                     <Badge tone="sage">{report.tag}</Badge>
                     <span className="text-sm text-ink-soft">{report.status}</span>
                   </div>
+                  {/* titleSegments があれば文節ごとに nowrap にし、語中で折れないようにする
+                      （h2 の text-wrap: balance 対策。EventsPage のカードタイトルと同じ手法）。 */}
                   <h2 className="mt-3 text-xl leading-snug text-ink sm:text-2xl">
-                    {report.title}
+                    {report.titleSegments
+                      ? report.titleSegments.map((seg, j) => (
+                          <span key={j} className="whitespace-nowrap">
+                            {seg}
+                          </span>
+                        ))
+                      : report.title}
                   </h2>
                   <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
                     {report.summary}
@@ -80,8 +87,10 @@ export function ResearchPage() {
       </Section>
 
       <CtaBand
-        title="調査の知見を、企画に活かす。"
-        description="調査データを踏まえた企画提案や、共同調査のご相談も承っています。お気軽にご連絡ください。"
+        // 共同調査の受託や調査サービスは提供していないので CTA にしない。
+        // Research から先は、通常の企画・連携の相談へつなぐ。
+        title="イベントや企画のご相談は、こちらから。"
+        description="商業施設や企業イベントでのワークショップ・体験企画のご相談をお受けしています。調査の結果は、まとまり次第このページでお知らせします。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         secondary={{ label: '連携について見る', to: '/collaboration' }}
       />

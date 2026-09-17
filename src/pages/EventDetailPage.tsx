@@ -330,7 +330,7 @@ export function EventDetailPage() {
               <span className="whitespace-nowrap">つくりませんか。</span>
             </>
           }
-          description="商業施設の賑わい創出、企業の顧客体験づくり、自治体の地域企画など、目的に合わせたワークショップイベントを企画・運営します。"
+          description="商業施設や企業イベントで、目的や場所に合わせたワークショップや体験企画をかたちにしています。"
           primary={{ label: 'お問い合わせ', to: '/contact' }}
           secondary={{ label: '他の実績を見る', to: '/events' }}
         />
