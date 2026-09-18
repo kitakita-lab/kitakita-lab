@@ -23,14 +23,17 @@ const futures = [
 /** Vision — 目指す景色。大きな未来ではなく、確かな景色を。 */
 export function Vision() {
   return (
-    <Section id="vision" tone="paper" spacing="lg">
+    // 章1の最後の節。見出しは節の大きさ（md）。
+    // 01〜03 の大きな薄い番号は「景色」の目印で、Activities の手順番号とは役割が違う。
+    <Section id="vision" tone="paper" spacing="node">
       <SectionHeading
         eyebrow="Vision"
+        size="md"
         title={<>目指している景色</>}
         description="劇的な変化ではなく、こんな景色を思い描いています。"
       />
 
-      <div className="mt-14 grid gap-6 sm:gap-8 lg:grid-cols-3">
+      <div className="mt-10 grid gap-6 sm:mt-12 sm:gap-8 lg:grid-cols-3">
         {futures.map((item, i) => (
           <Reveal key={item.step} delay={i * 90}>
             <div className="flex h-full flex-col">

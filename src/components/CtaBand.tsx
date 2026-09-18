@@ -9,6 +9,8 @@ type CtaBandProps = {
   description?: string
   primary?: { label: string; to: string }
   secondary?: { label: string; to: string }
+  /** 上下の余白。Home では章3の締めとして md、下層ページでは既定の lg。 */
+  spacing?: 'md' | 'lg'
 }
 
 /**
@@ -32,9 +34,10 @@ export function CtaBand({
   // 最後だけ作家側へ重心が戻るため外した。ページ固有の副導線が必要な場合だけ
   // 呼び出し側で secondary を渡す（Events / Workshop / Research → Collaboration など）。
   secondary,
+  spacing = 'lg',
 }: CtaBandProps) {
   return (
-    <Section tone="paper" spacing="lg">
+    <Section tone="paper" spacing={spacing}>
       <Reveal className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl leading-tight text-ink sm:text-4xl lg:text-[2.75rem]">
           {title}

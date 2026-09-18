@@ -10,8 +10,10 @@ export function Footer() {
     // ごく薄いブルーグレー（paper-200）の上に墨色の文字で組む。
     <footer className="bg-paper-200 text-ink">
       <div className="container-content py-16 sm:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div className="max-w-sm">
+        {/* スマホ・タブレットではリンク3グループを2列に組んで高さを抑える
+            （ブランド欄は全幅）。PC は従来どおり4列。 */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-12">
+          <div className="col-span-2 max-w-sm lg:col-span-1">
             <Logo />
             <p className="mt-5 text-sm leading-relaxed text-ink-muted">
               {site.tagline}

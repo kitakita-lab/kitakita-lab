@@ -9,7 +9,8 @@ import { Reveal } from '@/components/ui/Reveal'
  */
 export function About() {
   return (
-    <Section id="about" tone="paper" spacing="lg">
+    // 章1「私たちのこと」の頭（About → Philosophy → Promise → Vision）
+    <Section id="about" tone="paper" spacing="chapter">
       <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         <Reveal>
           <span className="eyebrow">About</span>

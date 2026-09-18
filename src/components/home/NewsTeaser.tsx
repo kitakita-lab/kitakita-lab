@@ -11,7 +11,8 @@ export function NewsTeaser() {
   const latest = sortedNews.slice(0, 3)
 
   return (
-    <Section id="news" tone="tint" spacing="lg">
+    // 章3の中の節。一覧として「読む」面なので tint
+    <Section id="news" tone="tint" spacing="node">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <Reveal>
           <span className="eyebrow">News</span>

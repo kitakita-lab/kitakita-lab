@@ -13,7 +13,8 @@ import { flowSteps } from '@/data/activities'
  */
 export function Activities() {
   return (
-    <Section id="activities" tone="tint" spacing="lg">
+    // 章2「やっていること」の頭。一覧として「読む」面なので tint
+    <Section id="activities" tone="tint" spacing="chapter">
       <SectionHeading
         eyebrow="Activities"
         title={
@@ -33,15 +34,25 @@ export function Activities() {
             delay={Math.min(i, 4) * 60}
             className="border-b border-line"
           >
-            <div className="grid gap-3 py-9 sm:grid-cols-[5rem_1fr] sm:gap-8">
+            {/* 手順番号は、スマホでは見出しと同じ行の小さな印にする（Vision の大きな
+                番号のあとに「番号＋見出し」のブロックが続いて見えないように）。
+                PC は左の細い列に置く。 */}
+            <div className="grid gap-3 py-7 sm:grid-cols-[5rem_1fr] sm:gap-8 sm:py-9">
               <span
-                className="font-serif text-sm tracking-[0.2em] text-clay-400"
+                className="hidden font-serif text-sm tracking-[0.2em] text-clay-400 sm:block"
                 aria-hidden="true"
               >
                 {String(i + 1).padStart(2, '0')}
               </span>
               <div>
-                <h3 className="font-serif text-2xl tracking-[0.08em] text-ink sm:text-[1.75rem]">
+                {/* 項目見出しは章の見出し（30px〜）より一段小さく（20px / PC 24px） */}
+                <h3 className="font-serif text-xl tracking-[0.08em] text-ink sm:text-2xl">
+                  <span
+                    className="mr-3 align-middle text-xs tracking-[0.2em] text-clay-400 sm:hidden"
+                    aria-hidden="true"
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
                   {step.verb}
                 </h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
