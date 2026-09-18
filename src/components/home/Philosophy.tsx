@@ -10,9 +10,10 @@ import { Reveal } from '@/components/ui/Reveal'
  */
 export function Philosophy() {
   return (
-    <Section tone="paper" spacing="lg">
-      <Reveal className="mx-auto max-w-4xl py-14 text-center sm:py-24">
-        <p className="font-serif text-2xl leading-[2] tracking-[0.12em] text-ink sm:text-3xl lg:text-[2.75rem] lg:leading-[1.9]">
+    // 章1の中の節。About の直後に、一続きの話として読ませる
+    <Section tone="paper" spacing="node">
+      <Reveal className="mx-auto max-w-4xl py-6 text-center sm:py-10">
+        <p className="font-serif text-2xl leading-[2] tracking-[0.12em] text-ink sm:text-3xl lg:text-4xl lg:leading-[1.9]">
           考えるところから、
           <br className="sm:hidden" />
           一緒に。

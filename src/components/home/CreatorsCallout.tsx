@@ -18,7 +18,8 @@ import { Button } from '@/components/ui/Button'
  */
 export function CreatorsCallout() {
   return (
-    <Section id="entry" tone="paper" spacing="lg">
+    // 章3「入口」の頭（Entry → News → CTA）
+    <Section id="entry" tone="paper" spacing="chapter">
       <Reveal>
         <div className="relative overflow-hidden rounded-[2rem] border border-line bg-paper-200 px-6 py-14 sm:px-12 sm:py-20">
           <div

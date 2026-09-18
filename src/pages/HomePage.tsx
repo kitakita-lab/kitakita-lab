@@ -27,7 +27,7 @@ export function HomePage() {
       <Activities />
       <CreatorsCallout />
       <NewsTeaser />
-      <CtaBand />
+      <CtaBand spacing="md" />
     </>
   )
 }

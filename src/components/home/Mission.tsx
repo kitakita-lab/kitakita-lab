@@ -4,13 +4,14 @@ import { Reveal } from '@/components/ui/Reveal'
 /** 約束 — 受け取ったものを、次の誰かへ（恩送り）。 */
 export function Mission() {
   return (
-    <Section id="mission" tone="tint" spacing="lg">
+    // 章1の中の節。面の色は変えず（paper）、章1をひとつの空気として読ませる
+    <Section id="mission" tone="paper" spacing="node">
       <div className="mx-auto max-w-4xl text-center">
         <Reveal>
           <span className="eyebrow">Promise</span>
         </Reveal>
         <Reveal delay={80}>
-          <p className="mt-6 font-serif text-2xl leading-relaxed text-ink sm:text-3xl lg:text-[2.5rem] lg:leading-[1.6]">
+          <p className="mt-6 font-serif text-2xl leading-relaxed text-ink sm:text-3xl">
             受け取ったものを、
             <br />
             <span className="text-clay-600">次の誰かへ。</span>
