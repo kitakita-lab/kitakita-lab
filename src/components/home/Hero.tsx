@@ -33,7 +33,7 @@ export function Hero() {
       </picture>
       {/* 半透明レイヤー — 写真ではなく中心の言葉を主役に保つ。
           薄くしすぎると曇天に見え、濃くしすぎると晴天の明るさが消えるので 60%。
-          色はページの生成り（paper）ではなく、写真の色味を決めたときの白
+          色はページの地色（paper）ではなく、写真の色味を決めたときの白
           （#F7F8F6）に固定する。ページ側の配色を変えても Hero の見え方が動かないため。
           文字の読みやすさは、レイヤーを重ねるのではなく文字色（ink）で確保する。 */}
       <div className="pointer-events-none absolute inset-0 bg-[#F7F8F6]/60" aria-hidden="true" />

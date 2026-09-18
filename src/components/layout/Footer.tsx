@@ -7,7 +7,7 @@ export function Footer() {
 
   return (
     // 以前は暗い面（bg-ink）で締めていたが、Hero の軽さに対して最後だけ重くなるため、
-    // ごく薄いサンド（paper-200）の上に墨色の文字で組む。
+    // ごく薄いブルーグレー（paper-200）の上に墨色の文字で組む。
     <footer className="bg-paper-200 text-ink">
       <div className="container-content py-16 sm:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
