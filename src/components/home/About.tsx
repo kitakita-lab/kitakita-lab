@@ -31,12 +31,13 @@ export function About() {
             作品や技術、得意なことを持っている人が、それを新しい場所へ広げていくことに、
             <span className="whitespace-nowrap">力を貸すこと。</span>
           </p>
-          {/* About の締めの一文。独立した思想コピー（次の Philosophy）ではなく本文の結びなので、
-              本文と同じ左揃え・同じ段組みのまま、明朝と一段だけ大きい文字（18/20px）で
-              締めくくる。本文との間は段落間（32px）より少しだけ広い 40px。
-              以前は 20/24px で、狭幅で「どちらも、／話すところから、」と2行に折っていたが、
-              次の Philosophy（24/30px・中央揃え）と同格に見えていたため、1文として続ける。 */}
-          <p className="!mt-10 font-serif text-lg leading-relaxed text-ink sm:text-xl">
+          {/* About の締めの一文。独立した思想コピー（次の Philosophy）ではなく本文の結論なので、
+              本文と同じゴシック・同じ 18px / 行送り 36px・同じ左揃えのまま、
+              ウェイト 500 と ink（本文は ink/85）でごくわずかに強めるだけにする。
+              本文との間は段落間（32px）より少しだけ広い 40px。
+              明朝にすると「小さな思想コピー → 大きな思想コピー（Philosophy）」の二段に見えるため、
+              書体は変えない。 */}
+          <p className="!mt-10 font-medium text-ink">
             {/* 狭幅で「ひとつ／ずつ。」と割れないよう文節で固定。 */}
             どちらも、話すところから、<span className="whitespace-nowrap">ひとつずつ。</span>
           </p>
