@@ -8,13 +8,43 @@
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-paper">
-      {/* 雪原の空気 — わずかな朝の光 */}
+      {/* 背景 — 晴れた空と草原のイメージ（生成画像。実在の撮影地ではない）。
+          装飾として扱い、alt は空にする。読み込み前は bg-paper のまま、
+          absolute 配置なのでレイアウトは動かない。
+          スマホは道の入らない左寄りの正方形トリミングを使い、空・草原・山を優先する。 */}
+      <picture>
+        <source
+          media="(max-width: 639px)"
+          type="image/webp"
+          srcSet="/hero/hokkaido-field-sp-880.webp"
+        />
+        <source
+          type="image/webp"
+          srcSet="/hero/hokkaido-field-1024.webp 1024w, /hero/hokkaido-field-1536.webp 1536w"
+          sizes="100vw"
+        />
+        <img
+          src="/hero/hokkaido-field-1536.jpg"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          decoding="async"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[50%_42%]"
+        />
+      </picture>
+      {/* 生成りの半透明レイヤー — 写真ではなく中心の言葉を主役に保つ。
+          薄くしすぎると曇天に見え、濃くしすぎると晴天の明るさが消えるので 60%。 */}
+      <div className="pointer-events-none absolute inset-0 bg-paper/60" aria-hidden="true" />
+      {/* コピー群の帯（見出し〜三連コピー、高さの約 45〜70%）だけ、もう一段 +45% の
+          生成りを足し、上下は 0 へ戻す。空と草原の明るさは残しつつ、山や木立の暗い部分に
+          三連コピーが重なっても読みやすさを保つため。 */}
       <div
-        className="pointer-events-none absolute -left-40 top-0 h-[30rem] w-[30rem] rounded-full bg-sage-100/50 blur-3xl"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(247,248,246,0)_25%,rgba(247,248,246,0.45)_45%,rgba(247,248,246,0.45)_70%,rgba(247,248,246,0)_88%)]"
         aria-hidden="true"
       />
+      {/* 下端をページ背景（About と同じ bg-paper）へなじませる */}
       <div
-        className="pointer-events-none absolute -right-32 bottom-10 h-96 w-96 rounded-full bg-clay-50/60 blur-3xl"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-paper/0 to-paper sm:h-40"
         aria-hidden="true"
       />
 
@@ -24,7 +54,9 @@ export function Hero() {
           About の見出しが初期表示の下端に少し見え、それが次へ進む合図になる。 */}
       <div className="container-content relative flex min-h-[70vh] flex-col justify-center py-16">
         <div className="mx-auto w-full max-w-3xl text-center">
-          <p className="animate-fade-up text-[11px] font-medium uppercase tracking-[0.4em] text-ink-soft">
+          {/* ラベルは ink-soft ではなく ink-muted。ink-soft は無地の bg-paper 上で
+              ぎりぎり AA（4.67:1）の値で、背景に空が透けると 4.5 を割るため一段濃くする。 */}
+          <p className="animate-fade-up text-[11px] font-medium uppercase tracking-[0.4em] text-ink-muted">
             KitaKita Lab
           </p>
 
