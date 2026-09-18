@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Reveal } from '@/components/ui/Reveal'
+import { typeset } from '@/lib/typo'
 
 type PageHeaderProps = {
   eyebrow: string
@@ -24,7 +25,7 @@ export function PageHeader({ eyebrow, title, description, children }: PageHeader
           </h1>
           {description && (
             <p className="mt-6 text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
-              {description}
+              {typeof description === 'string' ? typeset(description) : description}
             </p>
           )}
           {children && <div className="mt-8">{children}</div>}

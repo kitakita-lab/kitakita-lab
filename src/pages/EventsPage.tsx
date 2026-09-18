@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Seo } from '@/components/Seo'
+import { typeset } from '@/lib/typo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
@@ -92,7 +93,7 @@ export function EventsPage() {
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-soft">
                     <span>{event.dateLabel}</span>
                     <span aria-hidden="true">・</span>
-                    <span>{event.venue}</span>
+                    <span>{typeset(event.venue)}</span>
                   </div>
                   {/* hover 色はホバー可能な環境に限定する。タッチ端末ではタップした
                       カードに :hover が残り、最新カードだけ色が違って見えたため。
@@ -107,7 +108,7 @@ export function EventsPage() {
                       : event.title}
                   </h2>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted">
-                    {event.excerpt}
+                    {typeset(event.excerpt)}
                   </p>
                   {event.stats && event.stats.length > 0 && (
                     <ul className="mt-5 flex flex-wrap gap-2">

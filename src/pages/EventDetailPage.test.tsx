@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { renderWithProviders, screen, within } from '@/test/test-utils'
+import { byTextContent, renderWithProviders, screen, within } from '@/test/test-utils'
 import { App } from '@/App'
 import { events } from '@/data/events'
 
@@ -30,7 +30,7 @@ describe('EventDetailPage（/events/:slug）', () => {
       const overview = screen.getByRole('heading', { level: 2, name: '開催概要' }).parentElement!
       for (const row of event.overview) {
         expect(within(overview).getByText(row.label)).toBeInTheDocument()
-        expect(within(overview).getByText(row.value)).toBeInTheDocument()
+        expect(within(overview).getByText(byTextContent(row.value))).toBeInTheDocument()
       }
     },
   )
@@ -55,11 +55,11 @@ describe('EventDetailPage（/events/:slug）', () => {
     for (const section of event.sections!) {
       expect(screen.getByRole('heading', { level: 2, name: section.heading })).toBeInTheDocument()
       for (const para of section.body) {
-        expect(screen.getByText(para)).toBeInTheDocument()
+        expect(screen.getByText(byTextContent(para))).toBeInTheDocument()
       }
     }
     for (const day of event.dayReports!) {
-      expect(screen.getByText(day.body)).toBeInTheDocument()
+      expect(screen.getByText(byTextContent(day.body))).toBeInTheDocument()
     }
     for (const photo of event.photos!) {
       expect(screen.getByAltText(photo.alt)).toHaveAttribute('src', photo.src)

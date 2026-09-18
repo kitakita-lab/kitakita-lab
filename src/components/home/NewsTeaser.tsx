@@ -5,6 +5,7 @@ import { NavLink } from '@/components/layout/NavLink'
 import { Badge } from '@/components/ui/Badge'
 import { sortedNews } from '@/data/news'
 import { formatDate } from '@/lib/date'
+import { Segments } from '@/components/ui/Segments'
 
 /** Latest news preview on the home page (links to the full News page). */
 export function NewsTeaser() {
@@ -44,7 +45,11 @@ export function NewsTeaser() {
                   {item.category}
                 </Badge>
                 <span className="text-[15px] text-ink transition-colors group-hover:text-clay-600 sm:text-base">
-                  {item.title}
+                  {item.titleSegments ? (
+                    <Segments segments={item.titleSegments} relaxBelow360={false} />
+                  ) : (
+                    item.title
+                  )}
                 </span>
               </NavLink>
             </Reveal>

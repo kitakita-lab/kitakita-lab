@@ -4,6 +4,8 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Icon } from '@/components/ui/Icon'
 import { NavLink } from '@/components/layout/NavLink'
 import { flowSteps } from '@/data/activities'
+import { Segments } from '@/components/ui/Segments'
+import { typeset } from '@/lib/typo'
 
 /**
  * Activities — 依頼できるサービス一覧ではなく、「KitaKita Lab が、いま実際に
@@ -17,12 +19,7 @@ export function Activities() {
     <Section id="activities" tone="tint" spacing="chapter">
       <SectionHeading
         eyebrow="Activities"
-        title={
-          <>
-            私たちが
-            <span className="whitespace-nowrap">つくっている流れ</span>
-          </>
-        }
+        title={<Segments segments={['私たちが', 'つくっている流れ']} />}
         description="いま、実際に手を動かしていることを、流れで並べています。"
       />
 
@@ -56,7 +53,7 @@ export function Activities() {
                   {step.verb}
                 </h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
-                  {step.summary}
+                  {typeset(step.summary)}
                 </p>
                 <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
                   {step.examples.map((ex) => (
@@ -66,11 +63,11 @@ export function Activities() {
                           href={ex.href}
                           className="inline-flex items-center gap-1 text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
                         >
-                          {ex.label}
+                          {typeset(ex.label)}
                           <Icon name="arrow" size={13} />
                         </NavLink>
                       ) : (
-                        <span className="text-ink-soft">{ex.label}</span>
+                        <span className="text-ink-soft">{typeset(ex.label)}</span>
                       )}
                     </li>
                   ))}

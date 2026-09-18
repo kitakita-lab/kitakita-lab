@@ -1,4 +1,5 @@
 import { Seo } from '@/components/Seo'
+import { typeset } from '@/lib/typo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -75,7 +76,7 @@ export function CreatorsPage() {
                   “
                 </span>
                 <h3 className="mt-2 text-xl text-ink">{v.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{v.body}</p>
+                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{typeset(v.body)}</p>
               </div>
             </Reveal>
           ))}
@@ -99,7 +100,7 @@ export function CreatorsPage() {
                 <div>
                   <h3 className="text-lg text-ink">{role.title}</h3>
                   <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
-                    {role.description}
+                    {typeset(role.description)}
                   </p>
                 </div>
               </Card>

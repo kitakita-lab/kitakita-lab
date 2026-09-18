@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Seo } from '@/components/Seo'
+import { typeset } from '@/lib/typo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { NavLink } from '@/components/layout/NavLink'
 import { Section } from '@/components/ui/Section'
@@ -120,7 +121,8 @@ export function WorkshopPage() {
           <p className="mt-6 text-base leading-loose text-ink-muted sm:text-lg">
             ワークショップは、何かを教わる時間である以上に、自分の手でちょっと進めてみる時間だと考えています。
             うまくできるかどうかより、手を動かしてみたかどうか。この場を開いたのは、作家 ikyu。
-            KitaKita Lab は、企業とのご縁と企画で、その最初の一歩を<span className="whitespace-nowrap">いっしょに</span>形にしました。
+            <span className="whitespace-nowrap">KitaKita Lab</span> は、企業とのご縁と企画で、その最初の一歩を<span className="whitespace-nowrap">いっしょに</span>
+            <span className="whitespace-nowrap">形にしました。</span>
           </p>
         </Reveal>
       </Section>
@@ -166,13 +168,16 @@ export function WorkshopPage() {
                       <p className="text-base text-ink">
                         {photo.title}
                         {photo.venue && (
-                          <span className="ml-2 text-sm text-ink-soft">{photo.venue}</span>
+                          // 会場名（8 文字以内）は途中で折らず、題名の次の行へまとめて送る
+                          <span className="ml-2 whitespace-nowrap text-sm text-ink-soft">
+                            {photo.venue}
+                          </span>
                         )}
                       </p>
                     )}
                     {photo.summary && (
                       <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-                        {photo.summary}
+                        {typeset(photo.summary)}
                       </p>
                     )}
                   </figcaption>
@@ -192,7 +197,7 @@ export function WorkshopPage() {
               <span className="eyebrow">Events</span>
               <h3 className="mt-2 text-xl text-ink">イベント開催レポート</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                商業施設や公共空間で開いたイベントの様子は、実績レポートで詳しくご紹介しています。
+                {typeset('商業施設や公共空間で開いたイベントの様子は、実績レポートで詳しくご紹介しています。')}
               </p>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-clay-600">
@@ -227,7 +232,7 @@ export function WorkshopPage() {
                   <Icon name={item.icon} size={20} />
                 </span>
                 <h3 className="mt-5 text-base text-ink">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{typeset(item.body)}</p>
               </div>
             </Reveal>
           ))}
@@ -254,7 +259,7 @@ export function WorkshopPage() {
                   <Icon name={s.icon} size={24} />
                 </span>
                 <h3 className="mt-5 text-xl text-ink">{s.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{s.body}</p>
+                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{typeset(s.body)}</p>
               </div>
             </Reveal>
           ))}
@@ -277,7 +282,7 @@ export function WorkshopPage() {
             >
               <span className="font-serif text-4xl text-clay-200">{f.step}</span>
               <h3 className="mt-4 text-base text-ink">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{typeset(f.body)}</p>
             </Reveal>
           ))}
         </ol>

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { Reveal } from './Reveal'
+import { typeset } from '@/lib/typo'
 
 type SectionHeadingProps = {
   eyebrow?: string
@@ -57,7 +58,7 @@ export function SectionHeading({
             invert ? 'text-paper/70' : 'text-ink-muted',
           )}
         >
-          {description}
+          {typeof description === 'string' ? typeset(description) : description}
         </p>
       )}
     </Reveal>

@@ -37,7 +37,9 @@ export function About() {
               本文との間は段落間（32px）より少しだけ広い 40px。
               明朝にすると「小さな思想コピー → 大きな思想コピー（Philosophy）」の二段に見えるため、
               書体は変えない。 */}
-          <p className="!mt-10 font-medium text-ink">
+          {/* スマホでは中央に置き、About 全体を受ける着地点にする。PC は本文が右カラムに
+              あるため、カラム内で中央に浮かないよう左揃えのまま。 */}
+          <p className="!mt-10 text-center font-medium text-ink lg:text-left">
             {/* 狭幅で「ひとつ／ずつ。」と割れないよう文節で固定。 */}
             どちらも、話すところから、<span className="whitespace-nowrap">ひとつずつ。</span>
           </p>

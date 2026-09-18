@@ -3,6 +3,7 @@ import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { typeset } from '@/lib/typo'
 
 type CtaBandProps = {
   title?: ReactNode
@@ -43,7 +44,7 @@ export function CtaBand({
           {title}
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
-          {description}
+          {typeset(description)}
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button to={primary.to} size="lg" variant="primary">

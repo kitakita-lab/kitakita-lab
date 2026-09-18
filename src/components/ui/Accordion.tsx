@@ -1,3 +1,4 @@
+import { typeset } from '@/lib/typo'
 import type { ReactNode } from 'react'
 import { useId, useState } from 'react'
 import { Icon } from './Icon'
@@ -36,7 +37,7 @@ export function AccordionItem({ question, answer, defaultOpen = false }: Accordi
         hidden={!open}
         className="pb-6 pr-8 text-[15px] leading-relaxed text-ink-muted"
       >
-        {answer}
+        {typeset(answer)}
       </div>
     </div>
   )
