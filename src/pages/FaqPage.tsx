@@ -60,7 +60,6 @@ export function FaqPage() {
         }
         description="ここに載っていないご質問も、お気軽にお問い合わせください。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
-        secondary={{ label: '一緒に進めてみる', to: '/creators' }}
       />
     </>
   )
