@@ -22,10 +22,12 @@ export function CtaBand({
   ),
   description = '相談でも、雑談でも。進めてみたいことがあれば、聞かせてください。',
   primary = { label: 'お問い合わせ', to: '/contact' },
-  // NOTE: Creators への導線は、CreatorsCallout / FaqPage も含めて
-  // 「一緒に進めてみる」に統一している。同じ役割のCTAが違う文言で
-  // 複数存在すると迷わせるため（docs/BRAND.md）。
-  secondary = { label: '一緒に進めてみる', to: '/creators' },
+  // NOTE: 副導線は既定では付けない。この帯の役割は「KitaKita Lab と話す」ことで、
+  // 入口を選ぶ役割は Home の自分事化 Callout（場所や企画のこと／作品や活動のこと）が担う。
+  // 以前は既定で「一緒に進めてみる」→ /creators を付けていたが、Callout と重複し、
+  // 最後だけ作家側へ重心が戻るため外した。ページ固有の副導線が必要な場合だけ
+  // 呼び出し側で secondary を渡す（Events / Workshop / Research → Collaboration など）。
+  secondary,
 }: CtaBandProps) {
   return (
     <Section tone="ink" spacing="lg">
