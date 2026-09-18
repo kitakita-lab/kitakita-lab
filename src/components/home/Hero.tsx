@@ -2,7 +2,9 @@
  * Hero — ブランドの人格が最初に話す場所。
  * 名前の説明をしない。約束もしない。哲学を、静かに置くだけ。
  * 意味の解釈は読む人に委ねる（docs/BRAND.md）。
- * 中心の言葉と三連コピーで締め、そのまま About へ続く。
+ * 写真と中心の言葉だけで成立させ、そのまま About へ続く。
+ * 三連コピー（ちょっと前へ。ちょっと良く。ちょっと豊かに。）は 2026-09 に外した。
+ * 見出しの直下で同じ語を繰り返し、中心の言葉を薄めていたため。移設先は未定。
  * スクロール案内やボタンは置かない（About へのリンクはヘッダーのナビが担う）。
  */
 export function Hero() {
@@ -48,7 +50,10 @@ export function Hero() {
       {/* 高さは 70vh を下限にし、コピー群を上下中央に置く。一般的な端末では
           About の見出しが初期表示の下端に少し見え、それが次へ進む合図になる。 */}
       <div className="container-content relative flex min-h-[70vh] flex-col justify-center py-16">
-        <div className="mx-auto w-full max-w-3xl text-center">
+        {/* 下の空き（pb）は、見出しを空の中の同じ位置に保つためのもの。
+            中身が見出しだけになっても中央寄せで稜線まで下がらないよう、
+            以前そこにあった副コピー1行ぶんの高さを残している。 */}
+        <div className="mx-auto w-full max-w-3xl pb-28 text-center sm:pb-24">
           {/* ラベルは ink-soft ではなく ink-muted。ink-soft は無地の bg-paper 上で
               ぎりぎり AA（4.67:1）の値で、背景に空が透けると 4.5 を割るため一段濃くする。 */}
           <p className="animate-fade-up text-[11px] font-medium uppercase tracking-[0.4em] text-ink-muted">
@@ -70,18 +75,6 @@ export function Hero() {
             進めてみる
           </h1>
 
-          {/* 三連コピーは見出しと同じ ink。ink-muted だと稜線や木立の上で埋もれる
-              （強弱は色ではなく大きさで付ける）。 */}
-          <p
-            className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.03em] text-ink sm:mt-14 sm:text-lg sm:tracking-[0.14em]"
-            style={{ animationDelay: '400ms' }}
-          >
-            {/* 22文字の一行は約420px未満で収まらないため、その幅までは
-                意味のまとまりで2行にする。 */}
-            ちょっと前へ。ちょっと良く。
-            <br className="min-[420px]:hidden" />
-            ちょっと豊かに。
-          </p>
           {/* 拠点（北海道）は Hero に添えず、About の1文目で伝える。 */}
         </div>
       </div>
