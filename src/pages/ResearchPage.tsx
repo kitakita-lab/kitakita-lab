@@ -42,7 +42,7 @@ export function ResearchPage() {
               <article className="rounded-xl2 border border-line bg-paper-50 p-6 sm:p-8">
                 <div className="max-w-2xl">
                   <div className="flex items-center gap-3">
-                    <Badge tone="sage">{report.tag}</Badge>
+                    <Badge tone="neutral">{report.tag}</Badge>
                     <span className="text-sm text-ink-soft">{report.status}</span>
                   </div>
                   {/* titleSegments があれば文節ごとに nowrap にし、語中で折れないようにする

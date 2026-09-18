@@ -6,21 +6,23 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-ink text-paper">
+    // 以前は暗い面（bg-ink）で締めていたが、Hero の軽さに対して最後だけ重くなるため、
+    // ごく薄いサンド（paper-200）の上に墨色の文字で組む。
+    <footer className="bg-paper-200 text-ink">
       <div className="container-content py-16 sm:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="max-w-sm">
-            <Logo invert />
-            <p className="mt-5 text-sm leading-relaxed text-paper/65">
+            <Logo />
+            <p className="mt-5 text-sm leading-relaxed text-ink-muted">
               {site.tagline}
             </p>
             {/* メールアドレスは正式取得後に site.email へ設定すると表示される */}
             {site.email && (
-              <p className="mt-4 text-sm text-paper/65">
+              <p className="mt-4 text-sm text-ink-muted">
                 お問い合わせ：
                 <a
                   href={`mailto:${site.email}`}
-                  className="break-all underline decoration-paper/30 underline-offset-4 transition-colors hover:text-clay-200"
+                  className="break-all underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
                 >
                   {site.email}
                 </a>
@@ -30,7 +32,7 @@ export function Footer() {
 
           {footerGroups.map((group) => (
             <div key={group.title}>
-              <h3 className="font-sans text-xs font-semibold uppercase tracking-wider2 text-paper/50">
+              <h3 className="font-sans text-xs font-semibold uppercase tracking-wider2 text-ink-soft">
                 {group.title}
               </h3>
               <ul className="mt-4 space-y-3">
@@ -38,7 +40,7 @@ export function Footer() {
                   <li key={link.href}>
                     <NavLink
                       href={link.href}
-                      className="text-sm text-paper/75 transition-colors hover:text-paper"
+                      className="text-sm text-ink-muted transition-colors hover:text-ink"
                     >
                       {link.label}
                     </NavLink>
@@ -49,11 +51,11 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col gap-3 border-t border-paper/15 pt-6 text-xs text-paper/50 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-soft sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} {site.name}. All rights reserved.
           </p>
-          <p className="font-serif tracking-wide text-paper/60">{site.nameJa}</p>
+          <p className="font-serif tracking-wide text-ink-muted">{site.nameJa}</p>
         </div>
       </div>
     </footer>

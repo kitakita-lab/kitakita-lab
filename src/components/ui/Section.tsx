@@ -6,19 +6,17 @@ type SectionProps = {
   id?: string
   className?: string
   /** Tone of the section background. */
-  tone?: 'paper' | 'tint' | 'sage' | 'ink'
+  tone?: 'paper' | 'tint' | 'ink'
   /** Vertical padding scale. */
   spacing?: 'md' | 'lg'
 }
 
+// 面の色は「生成り（paper）」と「ごく薄いサンド（tint）」の2つで組む。
+// 区切りは色ではなく余白とタイポグラフィで付けるのが基本。
+// ink（暗い面）は大面積では使わない方針だが、型としては残している。
 const tones: Record<NonNullable<SectionProps['tone']>, string> = {
   paper: 'bg-paper text-ink',
   tint: 'bg-paper-200 text-ink',
-  // 淡いセージ。Hero の草原と地続きの、明るいまま一段だけ色の変わる面。
-  // sage-100 (#E2E9E5) だと隣の tint (#EDF0EE) と見分けがつきにくく、
-  // sage-300 (#A7BAB0) だと重いため、その中間の値をこの面だけに使う
-  // （共通パレットには足さない）。
-  sage: 'bg-[#CFDBD4] text-ink',
   ink: 'bg-ink text-paper',
 }
 

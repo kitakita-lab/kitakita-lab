@@ -53,7 +53,7 @@ export function Activities() {
                       {ex.href ? (
                         <NavLink
                           href={ex.href}
-                          className="inline-flex items-center gap-1 text-sage-700 underline decoration-sage-300 underline-offset-4 transition-colors hover:text-sage-500"
+                          className="inline-flex items-center gap-1 text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
                         >
                           {ex.label}
                           <Icon name="arrow" size={13} />

@@ -77,7 +77,7 @@ export function EventsPage() {
                     />
                   ) : (
                     <div
-                      className="flex h-full w-full items-center justify-center bg-gradient-to-br from-clay-50 to-sage-100"
+                      className="flex h-full w-full items-center justify-center bg-gradient-to-br from-clay-50 to-paper-200"
                       aria-hidden="true"
                     >
                       <Icon name="event" size={40} className="text-clay-300" />

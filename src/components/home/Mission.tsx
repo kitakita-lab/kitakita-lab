@@ -13,7 +13,7 @@ export function Mission() {
           <p className="mt-6 font-serif text-2xl leading-relaxed text-ink sm:text-3xl lg:text-[2.5rem] lg:leading-[1.6]">
             受け取ったものを、
             <br />
-            <span className="text-sage-700">次の誰かへ。</span>
+            <span className="text-clay-600">次の誰かへ。</span>
           </p>
         </Reveal>
         <Reveal delay={160}>

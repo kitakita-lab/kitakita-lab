@@ -11,7 +11,11 @@ type CtaBandProps = {
   secondary?: { label: string; to: string }
 }
 
-/** Reusable closing call-to-action band (dark). */
+/**
+ * Reusable closing call-to-action band.
+ * 以前は暗い面（tone="ink"）で締めていたが、Hero の空と草原の軽さに対して
+ * ページの最後だけ重くなるため、本文と同じ生成りの上に置く。
+ */
 export function CtaBand({
   title = (
     <>
@@ -30,21 +34,21 @@ export function CtaBand({
   secondary,
 }: CtaBandProps) {
   return (
-    <Section tone="ink" spacing="lg">
+    <Section tone="paper" spacing="lg">
       <Reveal className="mx-auto max-w-3xl text-center">
-        <h2 className="text-3xl leading-tight text-paper sm:text-4xl lg:text-[2.75rem]">
+        <h2 className="text-3xl leading-tight text-ink sm:text-4xl lg:text-[2.75rem]">
           {title}
         </h2>
-        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-paper/70 sm:text-lg">
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg">
           {description}
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button to={primary.to} size="lg" variant="invert">
+          <Button to={primary.to} size="lg" variant="primary">
             {primary.label}
             <Icon name="arrow" size={18} />
           </Button>
           {secondary && (
-            <Button to={secondary.to} size="lg" variant="invertOutline">
+            <Button to={secondary.to} size="lg" variant="secondary">
               {secondary.label}
             </Button>
           )}

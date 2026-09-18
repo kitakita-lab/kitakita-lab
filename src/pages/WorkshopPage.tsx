@@ -223,7 +223,7 @@ export function WorkshopPage() {
           {takeaways.map((item, i) => (
             <Reveal key={item.title} delay={(i % 4) * 70}>
               <div className="flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sage-100 text-sage-700">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-clay-50 text-clay-700">
                   <Icon name={item.icon} size={20} />
                 </span>
                 <h3 className="mt-5 text-base text-ink">{item.title}</h3>
@@ -294,7 +294,7 @@ export function WorkshopPage() {
           </div>
           <NavLink
             href="/faq"
-            className="mt-6 inline-flex items-center gap-1 text-sm text-sage-700 underline decoration-sage-300 underline-offset-4 transition-colors hover:text-sage-500"
+            className="mt-6 inline-flex items-center gap-1 text-sm text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
           >
             すべての質問を見る
             <Icon name="arrow" size={14} />
