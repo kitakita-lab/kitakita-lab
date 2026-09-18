@@ -8,7 +8,7 @@
  *   - apple-touch-icon.png  180×180  … iOS「ホーム画面に追加」
  *   - icon-512.png          512×512  … Organization JSON-LD の logo など
  *
- * デザインは docs/BRAND.md のトークン（paper / ink / sage / clay）に従い、
+ * デザインはサイトの配色トークン（tailwind.config.js の paper / ink / clay）に従い、
  * サイト実書体（Shippori Mincho / Zen Kaku Gothic New）のサブセットを
  * scripts/og-assets/ に同梱しているため、ネットワーク不要で再現できます。
  * 文言を変えるときは、含まれないグリフが出たら Google Fonts の
@@ -29,11 +29,16 @@ let chromium
 try {
   ;({ chromium } = await import('playwright'))
 } catch {
-  console.error(
-    'playwright が見つかりません。次を実行してください:\n' +
-      '  npm i -D playwright && npx playwright install chromium',
-  )
-  process.exit(1)
+  try {
+    // playwright-core + CHROME_PATH（既存の Chromium を使う）でも動く
+    ;({ chromium } = await import('playwright-core'))
+  } catch {
+    console.error(
+      'playwright が見つかりません。次を実行してください:\n' +
+        '  npm i -D playwright && npx playwright install chromium',
+    )
+    process.exit(1)
+  }
 }
 
 const b64 = async (p) => (await readFile(p)).toString('base64')
@@ -53,38 +58,37 @@ const fontCss = `
   }
 `
 
-/** 1200×630 OGP。public/ogp.svg と同じ構図をサイト実書体で組む。 */
+/**
+ * 1200×630 OGP。中心は「KitaKita Lab」と「ちょっと進めてみる」だけ。
+ * 配色はサイトの v2 トークン（paper #F7F8F8 / ink #22272B / slate #4B6479）に合わせ、
+ * 地は空の明るさに寄せた淡いブルーグレーから紙色へのグラデーション。
+ * 旧タグライン（三連コピー）と「北海道から」は 2026-09 に外した（Hero と同じ）。
+ */
 const ogpHtml = `<!doctype html><html><head><meta charset="utf-8"><style>
   ${fontCss}
   * { margin: 0; padding: 0; }
   body { width: 1200px; height: 630px; overflow: hidden; position: relative;
-         background: linear-gradient(180deg, #F2F5F3 0%, #F7F8F6 100%);
+         background: linear-gradient(180deg, #E6EDF3 0%, #F7F8F8 72%);
          font-family: 'Shippori Mincho', serif; }
-  .circle { position: absolute; border-radius: 9999px; }
-  .c1 { left: -90px; top: -120px; width: 480px; height: 480px; background: #E2E9E5; opacity: .5; }
-  .c2 { left: 860px; top: 340px; width: 400px; height: 400px; background: #F5F1E6; opacity: .6; }
-  .content { position: absolute; left: 96px; top: 96px; }
+  .light { position: absolute; border-radius: 9999px; background: #FFFFFF; opacity: .55;
+           filter: blur(60px); }
+  .l1 { left: 720px; top: -220px; width: 620px; height: 620px; }
+  .content { position: absolute; left: 96px; top: 96px; right: 96px; }
   .logo { display: flex; align-items: center; gap: 18px; }
-  .mark { width: 52px; height: 52px; border-radius: 12px; background: #1F2622;
+  .mark { width: 52px; height: 52px; border-radius: 12px; background: #22272B;
           display: flex; align-items: center; justify-content: center;
-          color: #F7F8F6; font-size: 30px; font-weight: 600; }
-  .name { font-size: 28px; font-weight: 600; color: #1F2622; letter-spacing: .02em; }
-  h1 { margin-top: 96px; font-size: 76px; font-weight: 600; letter-spacing: .09em; color: #1F2622; }
-  h1 .accent { color: #8F7433; }
-  .tagline { margin-top: 44px; font-size: 30px; font-weight: 600; letter-spacing: .14em; color: #57615B; }
-  .place { margin-top: 40px; font-family: 'Zen Kaku Gothic New', sans-serif;
-           font-size: 21px; font-weight: 500; letter-spacing: .3em; color: #66706A; }
+          color: #F7F8F8; font-size: 30px; font-weight: 600; }
+  .name { font-size: 28px; font-weight: 600; color: #22272B; letter-spacing: .02em; }
+  h1 { margin-top: 150px; font-size: 76px; font-weight: 600; letter-spacing: .09em; color: #22272B; }
+  h1 .accent { color: #4B6479; }
 </style></head><body>
-  <div class="circle c1"></div>
-  <div class="circle c2"></div>
+  <div class="light l1"></div>
   <div class="content">
     <div class="logo">
       <div class="mark">K</div>
       <div class="name">KitaKita Lab</div>
     </div>
     <h1>ちょっと進めてみ<span class="accent">る</span></h1>
-    <p class="tagline">ちょっと前へ。ちょっと良く。ちょっと豊かに。</p>
-    <p class="place">北海道から</p>
   </div>
 </body></html>`
 
