@@ -20,7 +20,10 @@ export function Hero() {
 
       {/* NOTE: 縦書きの装飾ラベルは、フォント未対応環境でグリフが崩れるため
           実機検証が済むまで見送り（docs/BRAND.md 世界観の将来課題）。 */}
-      <div className="container-content relative flex min-h-[84vh] flex-col justify-center pb-24 pt-16 sm:min-h-[88vh] sm:pb-32">
+      {/* 高さは 70vh を下限にし、中身が収まる高さで止める。以前は 84vh／88vh で、
+          コピー群と下端固定のスクロール案内の間、案内と About の間に同じくらいの
+          余白が生まれ、案内だけが宙に浮いて見えていた（縦長端末・PCで顕著）。 */}
+      <div className="container-content relative flex min-h-[70vh] flex-col justify-center pb-16 pt-16 sm:pb-24">
         <div className="mx-auto w-full max-w-3xl text-center">
           <p className="animate-fade-up text-[11px] font-medium uppercase tracking-[0.4em] text-ink-soft">
             KitaKita Lab
@@ -60,9 +63,11 @@ export function Hero() {
           </p>
         </div>
 
-        {/* 地平線へおりる、細い線 */}
+        {/* 地平線へおりる、細い線。
+            セクション下端への絶対配置ではなく、「北海道から」の下に流し込む。
+            コピー群→案内→About の順に、間隔が「詰まる／あく」の一段で読めるようにする。 */}
         <div
-          className="absolute inset-x-0 bottom-10 flex animate-fade-in justify-center"
+          className="mt-14 flex animate-fade-in justify-center sm:mt-16"
           style={{ animationDelay: '950ms' }}
         >
           <NavLink
