@@ -28,20 +28,13 @@ export function Hero() {
           alt=""
           aria-hidden="true"
           fetchPriority="high"
-          decoding="async"
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[50%_42%]"
         />
       </picture>
       {/* 生成りの半透明レイヤー — 写真ではなく中心の言葉を主役に保つ。
-          薄くしすぎると曇天に見え、濃くしすぎると晴天の明るさが消えるので 60%。 */}
+          薄くしすぎると曇天に見え、濃くしすぎると晴天の明るさが消えるので 60%。
+          文字の読みやすさは、レイヤーを重ねるのではなく文字色（ink）で確保する。 */}
       <div className="pointer-events-none absolute inset-0 bg-paper/60" aria-hidden="true" />
-      {/* コピー群の帯（見出し〜三連コピー、高さの約 45〜70%）だけ、もう一段 +45% の
-          生成りを足し、上下は 0 へ戻す。空と草原の明るさは残しつつ、山や木立の暗い部分に
-          三連コピーが重なっても読みやすさを保つため。 */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(247,248,246,0)_25%,rgba(247,248,246,0.45)_45%,rgba(247,248,246,0.45)_70%,rgba(247,248,246,0)_88%)]"
-        aria-hidden="true"
-      />
       {/* 下端をページ背景（About と同じ bg-paper）へなじませる */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-paper/0 to-paper sm:h-40"
@@ -75,8 +68,10 @@ export function Hero() {
             進めてみる
           </h1>
 
+          {/* 三連コピーは見出しと同じ ink。ink-muted だと稜線や木立の上で埋もれる
+              （強弱は色ではなく大きさで付ける）。 */}
           <p
-            className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.03em] text-ink-muted sm:mt-14 sm:text-lg sm:tracking-[0.14em]"
+            className="mt-12 animate-fade-up font-serif text-base leading-loose tracking-[0.03em] text-ink sm:mt-14 sm:text-lg sm:tracking-[0.14em]"
             style={{ animationDelay: '400ms' }}
           >
             {/* 22文字の一行は約420px未満で収まらないため、その幅までは
