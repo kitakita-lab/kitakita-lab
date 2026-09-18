@@ -54,17 +54,12 @@ export function Hero() {
             <br className="min-[420px]:hidden" />
             ちょっと豊かに。
           </p>
-
-          <p
-            className="mt-10 animate-fade-up text-xs tracking-[0.28em] text-ink-soft"
-            style={{ animationDelay: '620ms' }}
-          >
-            北海道から
-          </p>
+          {/* 拠点（北海道）は Hero に添えず、About の1文目で伝える。
+              Hero は三連コピーで締める。 */}
         </div>
 
         {/* 地平線へおりる、細い線。
-            セクション下端への絶対配置ではなく、「北海道から」の下に流し込む。
+            セクション下端への絶対配置ではなく、コピー群の下に流し込む。
             コピー群→案内→About の順に、間隔が「詰まる／あく」の一段で読めるようにする。 */}
         <div
           className="mt-14 flex animate-fade-in justify-center sm:mt-16"
