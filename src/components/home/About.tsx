@@ -20,7 +20,8 @@ export function About() {
 
         <Reveal delay={80} className="max-w-prose space-y-8 text-lg leading-loose text-ink/85">
           <p>
-            私たちは、体験の場を一緒につくっています。
+            {/* 390px 前後で「一緒につ／くっています。」と語中で割れないよう文節で固定。 */}
+            私たちは、北海道で体験の場を一緒に<span className="whitespace-nowrap">つくっています。</span>
           </p>
           <p>
             {/* JSX の行またぎは半角スペースになるため、一文は1行に書く。 */}
