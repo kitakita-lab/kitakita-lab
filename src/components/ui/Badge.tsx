@@ -4,12 +4,11 @@ import { cn } from '@/lib/cn'
 type BadgeProps = {
   children: ReactNode
   className?: string
-  tone?: 'clay' | 'sage' | 'neutral'
+  tone?: 'clay' | 'neutral'
 }
 
 const tones: Record<NonNullable<BadgeProps['tone']>, string> = {
   clay: 'bg-clay-50 text-clay-700',
-  sage: 'bg-sage-100 text-sage-700',
   neutral: 'bg-paper-200 text-ink-muted',
 }
 

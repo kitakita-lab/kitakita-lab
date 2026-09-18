@@ -1,12 +1,14 @@
 /**
- * KitaKita Lab デザイントークン — 「雪原の実験室」
- * 北海道の自然から採った配色（docs/BRAND.md 世界観の章を参照）。
+ * KitaKita Lab デザイントークン
  *
- * トークン名は歴史的経緯で paper / clay / sage のままだが、意味は:
- *   paper = 雪（青緑がかった冷たい白）
- *   ink   = 冬の森の影（緑を含む墨色）
- *   clay  = 真鍮（実験器具の金物。アクセントは控えめに）
- *   sage  = 針葉樹（エゾマツの深緑。主役色）
+ * 色数を絞る。ベースは温かみのある生成り〜オフホワイト、区切りにごく薄いサンド、
+ * 文字は濃茶寄りの墨色、アクセントは真鍮（clay）だけ。
+ * 自然や北海道らしさは Hero の写真が担うので、色面（緑・暗色の大面積）では表現しない。
+ *
+ * トークン名は歴史的経緯で paper / ink / clay のまま:
+ *   paper = 生成り（DEFAULT/100）、オフホワイト（50）、薄いサンド（200）
+ *   ink   = 墨色（濃茶寄り）。muted / soft は補助テキスト用（生成りの上で AA）
+ *   clay  = 真鍮（アクセント。600 は本文サイズの文字にも使える AA 対応値）
  *
  * @type {import('tailwindcss').Config}
  */
@@ -15,19 +17,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 雪 — base
+        // 生成り — base
         paper: {
-          DEFAULT: '#F7F8F6',
-          50: '#FCFCFB',
-          100: '#F7F8F6',
-          200: '#EDF0EE',
+          DEFAULT: '#F7F4EE',
+          50: '#FBF9F5',
+          100: '#F7F4EE',
+          200: '#EFEAE0',
         },
-        // 冬の森の影 — text
+        // 墨（濃茶寄り） — text
         ink: {
-          DEFAULT: '#1F2622',
-          muted: '#57615B',
-          // 小さな補助テキスト用。雪の上で WCAG AA (≥4.5:1)
-          soft: '#66706A',
+          DEFAULT: '#2B2622',
+          muted: '#5E564E',
+          // 小さな補助テキスト用。生成り（paper）の上で WCAG AA (≥4.5:1)
+          soft: '#6E665D',
         },
         // 真鍮 — accent (600 は本文サイズの文字にも使える AA 対応値)
         clay: {
@@ -42,14 +44,7 @@ export default {
           800: '#4A3918',
           900: '#332711',
         },
-        // 針葉樹 — primary deep green
-        sage: {
-          100: '#E2E9E5',
-          300: '#A7BAB0',
-          500: '#55705F',
-          700: '#2F4A3E',
-        },
-        line: '#E2E6E3',
+        line: '#E5DFD4',
       },
       fontFamily: {
         sans: [

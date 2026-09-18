@@ -22,7 +22,7 @@ export function CreatorsCallout() {
       <Reveal>
         <div className="relative overflow-hidden rounded-[2rem] border border-line bg-paper-200 px-6 py-14 sm:px-12 sm:py-20">
           <div
-            className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-sage-100/70 blur-3xl"
+            className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-clay-50/70 blur-3xl"
             aria-hidden="true"
           />
           <div className="relative mx-auto max-w-2xl text-center">

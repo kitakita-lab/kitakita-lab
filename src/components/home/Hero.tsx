@@ -31,10 +31,12 @@ export function Hero() {
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[50%_42%]"
         />
       </picture>
-      {/* 生成りの半透明レイヤー — 写真ではなく中心の言葉を主役に保つ。
+      {/* 半透明レイヤー — 写真ではなく中心の言葉を主役に保つ。
           薄くしすぎると曇天に見え、濃くしすぎると晴天の明るさが消えるので 60%。
+          色はページの生成り（paper）ではなく、写真の色味を決めたときの白
+          （#F7F8F6）に固定する。ページ側の配色を変えても Hero の見え方が動かないため。
           文字の読みやすさは、レイヤーを重ねるのではなく文字色（ink）で確保する。 */}
-      <div className="pointer-events-none absolute inset-0 bg-paper/60" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-[#F7F8F6]/60" aria-hidden="true" />
       {/* 下端をページ背景（About と同じ bg-paper）へなじませる */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-paper/0 to-paper sm:h-40"
