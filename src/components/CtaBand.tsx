@@ -14,7 +14,7 @@ type CtaBandProps = {
 /**
  * Reusable closing call-to-action band.
  * 以前は暗い面（tone="ink"）で締めていたが、Hero の空と草原の軽さに対して
- * ページの最後だけ重くなるため、本文と同じ生成りの上に置く。
+ * ページの最後だけ重くなるため、本文と同じ地色の上に置く。
  */
 export function CtaBand({
   title = (

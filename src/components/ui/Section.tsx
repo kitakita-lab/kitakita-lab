@@ -11,7 +11,7 @@ type SectionProps = {
   spacing?: 'md' | 'lg'
 }
 
-// 面の色は「生成り（paper）」と「ごく薄いサンド（tint）」の2つで組む。
+// 面の色は「オフホワイト（paper）」と「ごく薄いブルーグレー（tint）」の2つで組む。
 // 区切りは色ではなく余白とタイポグラフィで付けるのが基本。
 // ink（暗い面）は大面積では使わない方針だが、型としては残している。
 const tones: Record<NonNullable<SectionProps['tone']>, string> = {
