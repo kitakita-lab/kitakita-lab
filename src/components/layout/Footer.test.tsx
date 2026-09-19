@@ -46,4 +46,10 @@ describe('Footer', () => {
       screen.getByText(`© ${year} ${site.name}. All rights reserved.`),
     ).toBeInTheDocument()
   })
+
+  it('読みの「キタキタラボ」を単独では表示しない（可視表記は KitaKita Lab に統一）', () => {
+    renderWithProviders(<Footer />)
+
+    expect(screen.queryByText(site.nameJa)).toBeNull()
+  })
 })
