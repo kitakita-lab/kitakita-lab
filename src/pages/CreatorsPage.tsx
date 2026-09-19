@@ -1,4 +1,6 @@
 import { Seo } from '@/components/Seo'
+import { typeset } from '@/lib/typo'
+import { Segments } from '@/components/ui/Segments'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -75,7 +77,7 @@ export function CreatorsPage() {
                   “
                 </span>
                 <h3 className="mt-2 text-xl text-ink">{v.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{v.body}</p>
+                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{typeset(v.body)}</p>
               </div>
             </Reveal>
           ))}
@@ -86,7 +88,8 @@ export function CreatorsPage() {
       <Section tone="tint" spacing="lg">
         <SectionHeading
           eyebrow="Who we look for"
-          title="こんな方を募集しています"
+          // 意味の単位で折る（390px で「募／集」と割れないように）
+          title={<Segments segments={['こんな方を', '募集しています']} />}
           description="いまのステージは、さまざまでかまいません。進めてみたい気持ちがあれば、それで十分です。"
         />
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
@@ -99,7 +102,7 @@ export function CreatorsPage() {
                 <div>
                   <h3 className="text-lg text-ink">{role.title}</h3>
                   <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
-                    {role.description}
+                    {typeset(role.description)}
                   </p>
                 </div>
               </Card>
@@ -112,9 +115,11 @@ export function CreatorsPage() {
       <Section tone="paper" spacing="lg">
         <Reveal className="mx-auto max-w-prose text-center">
           <p className="font-serif text-2xl leading-relaxed text-ink sm:text-[1.75rem] sm:leading-relaxed">
-            うまくいくかは、わかりません。
+            {/* 文ごとに改行し、文の中は意味の単位でだけ折る（「わかりませ／ん。」
+                「きっ／といい。」のように割れないように）。単位が入る幅では同じ行に並ぶ。 */}
+            <Segments segments={['うまくいくかは、', 'わかりません。']} />
             <br />
-            でも、ひとりで進めるより、きっといい。
+            <Segments segments={['でも、ひとりで進めるより、', 'きっといい。']} />
           </p>
           <p className="mt-6 text-base leading-relaxed text-ink-muted">
             まずは話してみることから。進めてみたいことを、聞かせてください。

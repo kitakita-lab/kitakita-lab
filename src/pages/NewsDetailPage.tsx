@@ -8,6 +8,8 @@ import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { newsItems } from '@/data/news'
 import { formatDate } from '@/lib/date'
+import { Segments } from '@/components/ui/Segments'
+import { typeset } from '@/lib/typo'
 
 export function NewsDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -64,7 +66,9 @@ export function NewsDetailPage() {
                 </time>
                 <Badge tone="clay">{item.category}</Badge>
               </div>
-              <h1 className="mt-4 text-3xl leading-tight sm:text-4xl">{item.title}</h1>
+              <h1 className="mt-4 text-3xl leading-tight sm:text-4xl">
+                {item.titleSegments ? <Segments segments={item.titleSegments} /> : item.title}
+              </h1>
             </div>
           </div>
         </header>
@@ -72,7 +76,7 @@ export function NewsDetailPage() {
         <Section tone="paper" spacing="lg">
           <div className="mx-auto max-w-prose space-y-6 text-[17px] leading-loose text-ink/85">
             {item.body.map((para, i) => (
-              <p key={i}>{para}</p>
+              <p key={i}>{typeset(para)}</p>
             ))}
           </div>
 

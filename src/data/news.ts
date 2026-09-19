@@ -12,6 +12,12 @@ export type NewsItem = {
   /** URL スラッグ（/news/:slug） */
   slug: string
   title: string
+  /**
+   * タイトルを意味の単位で区切ったもの（表示専用）。各単位の内側では折り返さず、
+   * 単位の境目でだけ折り返す。狭幅で「フラワ／ーボトル」のように語中で割れないため。
+   * 各単位は 9 文字以内にする（詳細ページの見出し 30px が 320px 幅で 1 行に収まる長さ）。
+   */
+  titleSegments?: string[]
   /** ISO 形式の日付（YYYY-MM-DD）。並び順の基準に使う。 */
   date: string
   /**
@@ -29,6 +35,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'ario-sapporo-harvest-court-2026-09-report',
     title: 'アリオ札幌 ハーベストコートでフラワーボトルワークショップを開催しました',
+    titleSegments: ['アリオ札幌', 'ハーベストコートで', 'フラワーボトル', 'ワークショップを', '開催しました'],
     date: '2026-09-16',
     category: 'イベント',
     excerpt:
@@ -42,6 +49,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'the-big-atsubetsu-2026-report',
     title: 'ザ・ビッグ厚別店でフラワーボトルワークショップを開催しました',
+    titleSegments: ['ザ・ビッグ厚別店で', 'フラワーボトル', 'ワークショップを', '開催しました'],
     date: '2026-09-14',
     category: 'イベント',
     excerpt:
@@ -55,6 +63,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'mitsui-outlet-elfin-court-2026-report',
     title: '「私を楽しむ4日間」フラワーボトルワークショップを開催しました',
+    titleSegments: ['「私を楽しむ4日間」', 'フラワーボトル', 'ワークショップを', '開催しました'],
     date: '2026-09-08',
     category: 'イベント',
     excerpt:
@@ -68,6 +77,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'ario-sapporo-harvest-court-2026-report',
     title: '「私を楽しむ5日間」フラワーボトルワークショップを開催しました',
+    titleSegments: ['「私を楽しむ5日間」', 'フラワーボトル', 'ワークショップを', '開催しました'],
     date: '2026-08-22',
     category: 'イベント',
     excerpt:
@@ -81,6 +91,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'ario-sapporo-flower-bottle-2026-report',
     title: '「アリオ札幌 フラワーボトルワークショップ」を開催しました',
+    titleSegments: ['「アリオ札幌', 'フラワーボトル', 'ワークショップ」を', '開催しました'],
     date: '2026-08-04',
     category: 'イベント',
     excerpt:
@@ -94,6 +105,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'brand-story-renewal',
     title: 'ブランドストーリーを新しくしました',
+    titleSegments: ['ブランドストーリーを', '新しくしました'],
     date: '2026-07-02',
     category: 'お知らせ',
     excerpt:
@@ -109,6 +121,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'kitakita-lab-launch',
     title: 'KitaKita Lab を始動しました',
+    titleSegments: ['KitaKita Lab を', '始動しました'],
     date: '2025-04-01',
     dateLabel: '公開準備中',
     category: 'お知らせ',
@@ -123,6 +136,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'creators-recruitment-open',
     title: '一緒に活動する作家を募集しています',
+    titleSegments: ['一緒に活動する', '作家を', '募集しています'],
     date: '2025-04-15',
     dateLabel: '公開準備中',
     category: 'お知らせ',
@@ -137,6 +151,7 @@ export const newsItems: NewsItem[] = [
   {
     slug: 'research-coming-soon',
     title: '商業施設でのワークショップ需要について、調査を進めています',
+    titleSegments: ['商業施設での', 'ワークショップ', '需要について、', '調査を進めています'],
     date: '2025-05-01',
     dateLabel: '公開準備中',
     category: 'お知らせ',

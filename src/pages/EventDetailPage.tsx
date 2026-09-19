@@ -1,6 +1,8 @@
 import { useParams, Navigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Seo } from '@/components/Seo'
+import { typeset } from '@/lib/typo'
+import { Segments } from '@/components/ui/Segments'
 import { site } from '@/data/site'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
@@ -107,7 +109,7 @@ export function EventDetailPage() {
               </h1>
               <p className="mt-4 flex items-center gap-2 text-sm text-ink-muted">
                 <Icon name="event" size={16} className="shrink-0 text-clay-500" />
-                {event.venue}
+                <span>{typeset(event.venue)}</span>
               </p>
             </Reveal>
           </div>
@@ -149,10 +151,16 @@ export function EventDetailPage() {
             <div className="min-w-0 space-y-12">
               {event.sections?.map((section) => (
                 <Reveal key={section.heading}>
-                  <h2 className="text-2xl sm:text-3xl">{section.heading}</h2>
+                  <h2 className="text-2xl sm:text-3xl">
+                    {section.headingSegments ? (
+                      <Segments segments={section.headingSegments} />
+                    ) : (
+                      section.heading
+                    )}
+                  </h2>
                   <div className="mt-5 space-y-5 text-[16px] leading-loose text-ink/85">
                     {section.body.map((para, i) => (
-                      <p key={i}>{para}</p>
+                      <p key={i}>{typeset(para)}</p>
                     ))}
                   </div>
                   {section.points && section.points.length > 0 && (
@@ -164,7 +172,7 @@ export function EventDetailPage() {
                             size={18}
                             className="mt-0.5 shrink-0 text-clay-500"
                           />
-                          {point}
+                          {typeset(point)}
                         </li>
                       ))}
                     </ul>
@@ -181,7 +189,7 @@ export function EventDetailPage() {
                   {event.overview.map((row) => (
                     <div key={row.label}>
                       <dt className="text-xs font-medium text-ink-soft">{row.label}</dt>
-                      <dd className="mt-1 text-sm leading-relaxed text-ink">{row.value}</dd>
+                      <dd className="mt-1 text-sm leading-relaxed text-ink">{typeset(row.value)}</dd>
                     </div>
                   ))}
                 </dl>
@@ -232,7 +240,7 @@ export function EventDetailPage() {
                         <span className="eyebrow">{day.label}</span>
                         <span className="text-sm text-ink-soft">{day.date}</span>
                       </div>
-                      <p className="mt-4 text-sm leading-loose text-ink-muted">{day.body}</p>
+                      <p className="mt-4 text-sm leading-loose text-ink-muted">{typeset(day.body)}</p>
                     </div>
                   </Reveal>
                 ))}
@@ -254,7 +262,7 @@ export function EventDetailPage() {
                       </div>
                       {photo.caption && (
                         <figcaption className="mt-3 text-sm text-ink-soft">
-                          {photo.caption}
+                          {typeset(photo.caption)}
                         </figcaption>
                       )}
                     </figure>
@@ -283,10 +291,10 @@ export function EventDetailPage() {
                       “
                     </span>
                     <blockquote className="mt-2 flex-1 leading-relaxed text-ink">
-                      {voice.quote}
+                      {typeset(voice.quote)}
                     </blockquote>
                     <figcaption className="mt-5 text-xs text-ink-soft">
-                      {voice.context}
+                      {typeset(voice.context)}
                     </figcaption>
                   </figure>
                 </Reveal>
@@ -312,7 +320,7 @@ export function EventDetailPage() {
                       <Icon name="check" size={20} />
                     </div>
                     <h3 className="mt-4 text-lg leading-snug">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-loose text-ink-muted">{item.body}</p>
+                    <p className="mt-3 text-sm leading-loose text-ink-muted">{typeset(item.body)}</p>
                   </div>
                 </Reveal>
               ))}

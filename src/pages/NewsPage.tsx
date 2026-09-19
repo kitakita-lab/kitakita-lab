@@ -7,6 +7,8 @@ import { Icon } from '@/components/ui/Icon'
 import { NavLink } from '@/components/layout/NavLink'
 import { sortedNews } from '@/data/news'
 import { formatDate } from '@/lib/date'
+import { Segments } from '@/components/ui/Segments'
+import { typeset } from '@/lib/typo'
 
 export function NewsPage() {
   return (
@@ -40,10 +42,15 @@ export function NewsPage() {
                   </Badge>
                   <div>
                     <h2 className="text-base text-ink transition-colors group-hover:text-clay-600 sm:text-lg">
-                      {item.title}
+                      {item.titleSegments ? (
+                        // 一覧の題名は 16px なので、各単位（9 文字以下）は 320px でも 1 行に収まる
+                        <Segments segments={item.titleSegments} relaxBelow360={false} />
+                      ) : (
+                        item.title
+                      )}
                     </h2>
                     <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-                      {item.excerpt}
+                      {typeset(item.excerpt)}
                     </p>
                     <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-clay-600">
                       続きを読む

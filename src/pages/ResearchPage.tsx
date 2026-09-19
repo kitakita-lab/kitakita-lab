@@ -1,4 +1,6 @@
 import { Seo } from '@/components/Seo'
+import { Segments } from '@/components/ui/Segments'
+import { typeset } from '@/lib/typo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
@@ -19,11 +21,13 @@ export function ResearchPage() {
         eyebrow="Research"
         title={
           <>
-            現場の声を、
-            <br className="hidden sm:block" />
-            {/* 「数字とことば」は対（と で連なる）なので分割しない。狭幅では
-                「現場の声を、／数字とことば／にする。」と意味のまとまりで折る。 */}
-            <span className="whitespace-nowrap">数字とことば</span>にする。
+            {/* 意味の単位: 「現場の声を、／数字とことばにする。」。幅を問わず「声を、」で折る。
+                375〜390px では 36px の見出しに「数字とことばにする。」10 文字が入らないため、
+                「数字と／ことばにする。」で折れる（430px 以上は 2 行）。
+                「ことば／にする」のように助詞だけが落ちる形にはしない。PC は従来どおり2行。 */}
+            <Segments segments={['現場の声を、']} />
+            <br />
+            <Segments segments={['数字と', 'ことばにする。']} relaxBelow360={false} />
           </>
         }
         description="現場で感じてきたことを、感覚だけで終わらせないために。商業施設でのワークショップ・体験イベントについて、北海道在住の20〜50代1,000人を対象とした調査を進めています。"
@@ -75,7 +79,7 @@ export function ResearchPage() {
                         className="flex gap-2 text-sm leading-snug text-ink-muted"
                       >
                         <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-clay-300" />
-                        {topic}
+                        {typeset(topic)}
                       </li>
                     ))}
                   </ul>
@@ -89,7 +93,8 @@ export function ResearchPage() {
       <CtaBand
         // 共同調査の受託や調査サービスは提供していないので CTA にしない。
         // Research から先は、通常の企画・連携の相談へつなぐ。
-        title="イベントや企画のご相談は、こちらから。"
+        // 意味の単位で折る（「ご／相談」「ご相／談」と割れないように）
+        title={<Segments segments={['イベントや企画の', 'ご相談は、', 'こちらから。']} />}
         description="商業施設や企業イベントでのワークショップ・体験企画のご相談をお受けしています。調査の結果は、まとまり次第このページでお知らせします。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         secondary={{ label: '連携について見る', to: '/collaboration' }}

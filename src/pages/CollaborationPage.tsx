@@ -1,4 +1,6 @@
 import { Seo } from '@/components/Seo'
+import { Segments } from '@/components/ui/Segments'
+import { typeset } from '@/lib/typo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -55,10 +57,11 @@ export function CollaborationPage() {
         eyebrow="Collaboration"
         title={
           <>
-            ものづくりの力で
-            <br className="hidden sm:block" />
-            <span className="whitespace-nowrap">一緒に</span>
-            <span className="whitespace-nowrap">何か</span>を生み出す。
+            {/* 意味の単位: 「ものづくりの力で／一緒に何かを／生み出す。」。幅を問わず「力で」で折り、
+                スマホでは残りも単位の境目でだけ折れる（3 行）。PC は従来どおり2行。 */}
+            <Segments segments={['ものづくりの力で']} />
+            <br />
+            <Segments segments={['一緒に何かを', '生み出す。']} relaxBelow360={false} />
           </>
         }
         description="商業施設や企業イベントで、作家やつくり手の表現を活かしたワークショップ・体験企画を一緒につくっています。賑わいづくりやブランド体験のほか、自治体や教育機関との企画もご相談いただけます。"
@@ -78,7 +81,7 @@ export function CollaborationPage() {
                   <Icon name={p.icon} size={24} />
                 </span>
                 <h3 className="mt-5 text-xl text-ink">{p.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{p.body}</p>
+                <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{typeset(p.body)}</p>
               </Card>
             </Reveal>
           ))}
@@ -101,7 +104,7 @@ export function CollaborationPage() {
             >
               <span className="font-serif text-4xl text-clay-200">{f.step}</span>
               <h3 className="mt-4 text-base text-ink">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{typeset(f.body)}</p>
             </Reveal>
           ))}
         </ol>

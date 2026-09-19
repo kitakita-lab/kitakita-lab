@@ -18,10 +18,17 @@ export function Mission() {
           </p>
         </Reveal>
         <Reveal delay={160}>
+          {/* 3つの文を、それぞれ視覚的にもひとまとまりにする（文ごとに行ブロック）。
+              2文目だけ幅によっては1行に入らないため、文節の境目でだけ折れるようにする。
+              375/390: 4行、430以上: 3行。文字サイズは変えない。 */}
           <p className="mx-auto mt-8 max-w-xl text-base leading-loose text-ink-muted sm:text-lg">
-            応援も、つながりも、経験も。
-            私たちは、もらってばかりでここまで来ました。
-            これからは、渡していく側です。
+            <span className="block">応援も、つながりも、経験も。</span>
+            <span className="block">
+              <span className="whitespace-nowrap">私たちは、</span>
+              <span className="whitespace-nowrap">もらってばかりで</span>
+              <span className="whitespace-nowrap">ここまで来ました。</span>
+            </span>
+            <span className="block">これからは、渡していく側です。</span>
           </p>
         </Reveal>
       </div>

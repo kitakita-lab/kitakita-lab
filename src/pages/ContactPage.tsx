@@ -1,4 +1,5 @@
 import { Seo } from '@/components/Seo'
+import { typeset } from '@/lib/typo'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
@@ -42,7 +43,7 @@ export function ContactPage() {
                     <span className="mt-1 text-clay-500">
                       <Icon name="check" size={18} />
                     </span>
-                    {p}
+                    {typeset(p)}
                   </li>
                 ))}
               </ul>
