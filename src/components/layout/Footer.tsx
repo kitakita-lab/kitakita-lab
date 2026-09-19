@@ -54,10 +54,11 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-soft sm:flex-row sm:items-center sm:justify-between">
+          {/* 可視のブランド表記は「KitaKita Lab」に統一。読みの「キタキタラボ」は
+              meta description と JSON-LD の alternateName にだけ残す（site.nameJa）。 */}
           <p>
             © {year} {site.name}. All rights reserved.
           </p>
-          <p className="font-serif tracking-wide text-ink-muted">{site.nameJa}</p>
         </div>
       </div>
     </footer>
