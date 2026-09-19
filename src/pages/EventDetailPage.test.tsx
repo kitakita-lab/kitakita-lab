@@ -53,7 +53,13 @@ describe('EventDetailPage（/events/:slug）', () => {
     await screen.findByRole('heading', { level: 1 })
 
     for (const section of event.sections!) {
-      expect(screen.getByRole('heading', { level: 2, name: section.heading })).toBeInTheDocument()
+      // 見出しは意味の単位の span に分かれることがある。jsdom はその間に空白を補うので、空白を無視して比べる
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: (n) => n.replace(/\s+/g, '') === section.heading,
+        }),
+      ).toBeInTheDocument()
       for (const para of section.body) {
         expect(screen.getByText(byTextContent(para))).toBeInTheDocument()
       }

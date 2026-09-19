@@ -93,7 +93,8 @@ export function ResearchPage() {
       <CtaBand
         // 共同調査の受託や調査サービスは提供していないので CTA にしない。
         // Research から先は、通常の企画・連携の相談へつなぐ。
-        title="イベントや企画のご相談は、こちらから。"
+        // 意味の単位で折る（「ご／相談」「ご相／談」と割れないように）
+        title={<Segments segments={['イベントや企画の', 'ご相談は、', 'こちらから。']} />}
         description="商業施設や企業イベントでのワークショップ・体験企画のご相談をお受けしています。調査の結果は、まとまり次第このページでお知らせします。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         secondary={{ label: '連携について見る', to: '/collaboration' }}

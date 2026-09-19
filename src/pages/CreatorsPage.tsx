@@ -1,5 +1,6 @@
 import { Seo } from '@/components/Seo'
 import { typeset } from '@/lib/typo'
+import { Segments } from '@/components/ui/Segments'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -87,7 +88,8 @@ export function CreatorsPage() {
       <Section tone="tint" spacing="lg">
         <SectionHeading
           eyebrow="Who we look for"
-          title="こんな方を募集しています"
+          // 意味の単位で折る（390px で「募／集」と割れないように）
+          title={<Segments segments={['こんな方を', '募集しています']} />}
           description="いまのステージは、さまざまでかまいません。進めてみたい気持ちがあれば、それで十分です。"
         />
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
@@ -113,9 +115,11 @@ export function CreatorsPage() {
       <Section tone="paper" spacing="lg">
         <Reveal className="mx-auto max-w-prose text-center">
           <p className="font-serif text-2xl leading-relaxed text-ink sm:text-[1.75rem] sm:leading-relaxed">
-            うまくいくかは、わかりません。
+            {/* 文ごとに改行し、文の中は意味の単位でだけ折る（「わかりませ／ん。」
+                「きっ／といい。」のように割れないように）。単位が入る幅では同じ行に並ぶ。 */}
+            <Segments segments={['うまくいくかは、', 'わかりません。']} />
             <br />
-            でも、ひとりで進めるより、きっといい。
+            <Segments segments={['でも、ひとりで進めるより、', 'きっといい。']} />
           </p>
           <p className="mt-6 text-base leading-relaxed text-ink-muted">
             まずは話してみることから。進めてみたいことを、聞かせてください。

@@ -2,6 +2,7 @@ import { useParams, Navigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Seo } from '@/components/Seo'
 import { typeset } from '@/lib/typo'
+import { Segments } from '@/components/ui/Segments'
 import { site } from '@/data/site'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
@@ -150,7 +151,13 @@ export function EventDetailPage() {
             <div className="min-w-0 space-y-12">
               {event.sections?.map((section) => (
                 <Reveal key={section.heading}>
-                  <h2 className="text-2xl sm:text-3xl">{section.heading}</h2>
+                  <h2 className="text-2xl sm:text-3xl">
+                    {section.headingSegments ? (
+                      <Segments segments={section.headingSegments} />
+                    ) : (
+                      section.heading
+                    )}
+                  </h2>
                   <div className="mt-5 space-y-5 text-[16px] leading-loose text-ink/85">
                     {section.body.map((para, i) => (
                       <p key={i}>{typeset(para)}</p>
