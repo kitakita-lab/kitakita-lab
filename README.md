@@ -10,7 +10,7 @@
 - **Tailwind CSS**（デザイントークンは `tailwind.config.js` に集約）
 - **React Router**（マルチページ構成・CMS導入を見据えたルーティング）
 - **react-helmet-async**（ページ単位の SEO / OGP）
-- **Vercel** デプロイ前提（`vercel.json` で SPA リライト・キャッシュ設定）
+- **Cloudflare Pages** でホスティング（ヘッダー・キャッシュ設定は `public/_headers`）
 
 レスポンシブ（スマホ最優先）／ライトモードのみ／アクセシビリティ対応（スキップリンク・フォーカスリング・`prefers-reduced-motion` 尊重・セマンティックHTML）。
 
@@ -220,12 +220,26 @@ npm run assets:og   # 要 playwright（未導入なら npm i -D playwright && np
 News 詳細 URL は `src/data/news.ts` の slug から自動で組み立てるため、
 **News を追加しても sitemap の手動更新は不要**です。
 
-## Vercel へのデプロイ
+## デプロイ（Cloudflare Pages）
 
-このリポジトリを Vercel にインポートするだけでデプロイできます
-（フレームワークは Vite として自動検出されます）。
+Cloudflare Pages に GitHub 連携しており、`main` への push で本番に自動デプロイされます
+（PR ごとにプレビューURLも発行されます）。
+
+| 項目 | 設定値 |
+|---|---|
+| Framework preset | なし（None） |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| 環境変数 | `NODE_VERSION=22` |
+
+- 各ページは `dist/<path>.html` として書き出す（`/about` → `about.html`）。
+  `about/index.html` 形式にすると Cloudflare Pages が `/about/` へリダイレクトし、
+  canonical（末尾スラッシュなし）とずれるため。
+- 存在しないURLは `dist/404.html` が **404ステータス** で返る。
+- `vercel.json` は移行期間の互換用（Vercel 解約後に削除してよい）。
+
 独自ドメインを変更する場合は、`index.html` / `src/data/site.ts` /
-`scripts/generate-sitemap.mjs`（ORIGIN）/ `public/robots.txt` の URL を
+`scripts/prerender.mjs`（ORIGIN）/ `public/robots.txt` の URL を
 実ドメインに更新してください。
 
 ## 公開後の運用チェックリスト
