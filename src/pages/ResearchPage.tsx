@@ -53,7 +53,7 @@ export function ResearchPage() {
                     <div className="flex flex-wrap items-center gap-3">
                       <Badge tone="clay">{report.tag}</Badge>
                       <span className="text-sm text-ink-soft">
-                        <time dateTime={report.announced.iso}>{report.announced.label}</time> 発表
+                        <time dateTime={report.announced.iso}>{report.announced.label}</time> 公開
                       </span>
                     </div>
                     {/* titleSegments があれば文節ごとに nowrap にし、語中で折れないようにする

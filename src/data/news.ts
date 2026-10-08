@@ -43,8 +43,8 @@ export const newsItems: NewsItem[] = [
     slug: 'hokkaido-mall-workshop-demand-2026-results',
     title: '商業施設でのワークショップ需要について、調査結果をまとめました',
     titleSegments: ['商業施設での', 'ワークショップ', '需要について、', '調査結果を', 'まとめました'],
-    date: '2026-10-07',
-    datePublished: '2026-10-08',
+    date: '2026-10-09',
+    datePublished: '2026-10-09',
     category: 'お知らせ',
     excerpt:
       '北海道在住の20〜50代1,023名に、商業施設でのワークショップ・体験イベントについて尋ねた調査の結果を、Researchページにまとめました。',

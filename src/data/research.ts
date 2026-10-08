@@ -134,16 +134,11 @@ export type ResearchReport = {
   /** 元になった調査 */
   survey: ResearchSurvey
   /**
-   * 表示している日付。
-   * 【未解決・マージ直前に修正】現在は PR TIMES の配信日（2026-10-07）を表示している。
-   * 方針（A 案）: 画面・JSON-LD とも実際のサイト公開日に揃え、配信日は出さない。
-   * 公開日はマージ時に確定するため、そのときに sitePublished と合わせて直す。
+   * 画面に「… 公開」として表示する日付。KitaKita Lab のサイトで公開した日で、
+   * 調査期間や他媒体での配信日ではない。sitePublished と同じ日にする。
    */
   announced: { iso: string; label: string }
-  /**
-   * サイトに掲載した日（JSON-LD の datePublished）。
-   * 【未解決・マージ直前に修正】2026-10-08 は仮の値。マージした日に変える。
-   */
+  /** サイトで公開した日（JSON-LD の datePublished）。announced.iso と同じ日にする */
   sitePublished: string
   /** なぜこの調査をしたか */
   intro: string[]
@@ -198,9 +193,8 @@ export const researchReports: ResearchReport[] = [
       '北海道在住の20〜50代1,023名に、商業施設でのワークショップ・体験イベントについて尋ねた調査の結果。参加に前向きな人は41.7%、月1回以上来館する人では60.2%、参加の前後に買い物や飲食もしたい人は59.0%でした。',
     scope: 'overview',
     survey: hokkaidoMallSurvey2026,
-    // 【未解決・マージ直前に修正】日付の扱いは型定義のコメントを参照
-    announced: { iso: '2026-10-07', label: '2026年10月7日' },
-    sitePublished: '2026-10-08',
+    announced: { iso: '2026-10-09', label: '2026年10月9日' },
+    sitePublished: '2026-10-09',
     intro: [
       'KitaKita Labは、企業や施設、作家やつくり手と一緒に、体験の場を企画・運営しています。商業施設でのワークショップを重ねるなかで、どんな人が、どんな条件なら参加したいと思うのかが、現場の感覚として見えてきました。',
       'それを感覚だけで終わらせず、数字でも確かめるために行ったのがこの調査です。このページでは、商業施設でワークショップ・体験イベントを企画するときの判断材料になる結果を中心にまとめています。',

@@ -162,6 +162,18 @@ describe('researchReports', () => {
     }
   })
 
+  it('表示する公開日と構造化データの公開日が一致する', () => {
+    for (const r of researchReports) {
+      expect(r.sitePublished, r.slug).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(r.announced.iso, r.slug).toBe(r.sitePublished)
+      const [y, m, d] = r.sitePublished.split('-').map(Number)
+      expect(r.announced.label, r.slug).toBe(`${y}年${m}月${d}日`)
+    }
+    for (const n of newsItems) {
+      if (n.datePublished) expect(n.datePublished, n.slug).toBe(n.date)
+    }
+  })
+
   it('調査レポートへのリンクは実在するレポートを指す', () => {
     for (const n of newsItems) {
       for (const link of n.links ?? []) {

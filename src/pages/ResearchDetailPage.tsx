@@ -95,7 +95,7 @@ export function ResearchDetailPage() {
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Badge tone="clay">{report.tag}</Badge>
                 <span className="text-sm text-ink-soft">
-                  <time dateTime={report.announced.iso}>{report.announced.label}</time> 発表
+                  <time dateTime={report.announced.iso}>{report.announced.label}</time> 公開
                 </span>
               </div>
               <h1 className="mt-4 text-[1.6rem] leading-snug sm:text-4xl sm:leading-tight lg:text-[2.75rem]">
