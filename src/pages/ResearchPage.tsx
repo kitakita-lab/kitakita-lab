@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Seo } from '@/components/Seo'
 import { Segments } from '@/components/ui/Segments'
 import { typeset } from '@/lib/typo'
@@ -5,16 +6,22 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 import { Badge } from '@/components/ui/Badge'
+import { Icon } from '@/components/ui/Icon'
 import { CtaBand } from '@/components/CtaBand'
 import { researchReports } from '@/data/research'
+import { formatCount, formatPercent } from '@/lib/percent'
 
+/**
+ * 調査レポート一覧（/research）。Events 一覧と同じく、カードから詳細へ進む索引。
+ * 調査を追加するときは data/research.ts に 1 件足すだけでよい。
+ */
 export function ResearchPage() {
   return (
     <>
       <Seo
         title="Research"
         path="/research"
-        description="商業施設でのワークショップ・体験イベントの需要について、北海道在住の20〜50代1,000人を対象とした調査を進めています。現場で感じてきたことを、数字でも確かめるために。"
+        description="KitaKita Labが行った調査のレポート。北海道在住の20〜50代1,023名に、商業施設でのワークショップ・体験イベントへの参加意向や参加しやすい条件を尋ねた結果を公開しています。"
       />
 
       <PageHeader
@@ -30,61 +37,68 @@ export function ResearchPage() {
             <Segments segments={['数字と', 'ことばにする。']} relaxBelow360={false} />
           </>
         }
-        description="現場で感じてきたことを、感覚だけで終わらせないために。商業施設でのワークショップ・体験イベントについて、北海道在住の20〜50代1,000人を対象とした調査を進めています。"
+        description="現場で感じてきたことを、感覚だけで終わらせないために。商業施設でのワークショップを重ねるなかで生まれた問いを、調査で確かめています。"
       />
 
       <Section tone="paper" spacing="lg">
-        <Reveal>
-          <div className="rounded-xl2 border border-clay-100 bg-clay-50/50 px-6 py-4 text-sm leading-relaxed text-clay-800">
-            現在、次の調査を進めています。結果がまとまり次第、このページでお知らせします。
-          </div>
-        </Reveal>
-
-        <div className="mt-10 space-y-6">
+        <div className="space-y-6">
           {researchReports.map((report, i) => (
-            <Reveal key={report.id} delay={(i % 3) * 70}>
-              <article className="rounded-xl2 border border-line bg-paper-50 p-6 sm:p-8">
-                <div className="max-w-2xl">
-                  <div className="flex items-center gap-3">
-                    <Badge tone="neutral">{report.tag}</Badge>
-                    <span className="text-sm text-ink-soft">{report.status}</span>
-                  </div>
-                  {/* titleSegments があれば文節ごとに nowrap にし、語中で折れないようにする
-                      （h2 の text-wrap: balance 対策。EventsPage のカードタイトルと同じ手法）。 */}
-                  <h2 className="mt-3 text-xl leading-snug text-ink sm:text-2xl">
-                    {report.titleSegments
-                      ? report.titleSegments.map((seg, j) => (
-                          <span key={j} className="whitespace-nowrap">
-                            {seg}
-                          </span>
-                        ))
-                      : report.title}
-                  </h2>
-                  <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
-                    {report.summary}
-                  </p>
-                  {report.method && (
-                    <p className="mt-4 text-xs text-ink-soft">
-                      調査方法：{report.method}
+            <Reveal key={report.slug} delay={(i % 3) * 70}>
+              <Link
+                to={`/research/${report.slug}`}
+                className="group block rounded-xl2 border border-line bg-paper-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:p-8"
+              >
+                <div className="grid gap-8 lg:grid-cols-[1fr_20rem] lg:gap-12">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Badge tone="clay">{report.tag}</Badge>
+                      <span className="text-sm text-ink-soft">
+                        <time dateTime={report.announced.iso}>{report.announced.label}</time> 公開
+                      </span>
+                    </div>
+                    {/* titleSegments があれば文節ごとに nowrap にし、語中で折れないようにする
+                        （h2 の text-wrap: balance 対策。EventsPage のカードタイトルと同じ手法）。 */}
+                    <h2 className="mt-3 text-xl leading-snug text-ink transition-colors sm:text-2xl [@media(hover:hover)]:group-hover:text-clay-600">
+                      {report.titleSegments
+                        ? report.titleSegments.map((seg, j) => (
+                            <span key={j} className="whitespace-nowrap">
+                              {seg}
+                            </span>
+                          ))
+                        : report.title}
+                    </h2>
+                    <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+                      {typeset(report.summary)}
                     </p>
-                  )}
-                </div>
+                    <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-soft">
+                      {report.survey.facts.map((fact) => (
+                        <li key={fact}>{fact}</li>
+                      ))}
+                    </ul>
+                  </div>
 
-                <div className="mt-7 rounded-xl border border-line bg-paper px-5 py-5">
-                  <p className="text-sm font-medium text-clay-600">主な調査項目</p>
-                  <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-                    {report.topics.map((topic) => (
-                      <li
-                        key={topic}
-                        className="flex gap-2 text-sm leading-snug text-ink-muted"
-                      >
-                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-clay-300" />
-                        {typeset(topic)}
+                  {/* 要点の数字（詳細ページの「要点」と同じ値） */}
+                  <ul className="space-y-3 border-t border-line pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+                    {report.keyFindings.map((k) => (
+                      <li key={k.label} className="flex items-baseline justify-between gap-4">
+                        <span className="text-sm leading-snug text-ink-muted">{typeset(k.label)}</span>
+                        <span className="shrink-0 text-right">
+                          <span className="block font-serif text-2xl text-clay-600">
+                            {formatPercent(k.count, k.n)}
+                          </span>
+                          <span className="block text-[11px] tabular-nums text-ink-soft">
+                            {formatCount(k.count)}/{formatCount(k.n)}名
+                          </span>
+                        </span>
                       </li>
                     ))}
                   </ul>
                 </div>
-              </article>
+                <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-clay-600">
+                  レポートを見る
+                  <Icon name="arrow" size={16} className="transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -95,7 +109,7 @@ export function ResearchPage() {
         // Research から先は、通常の企画・連携の相談へつなぐ。
         // 意味の単位で折る（「ご／相談」「ご相／談」と割れないように）
         title={<Segments segments={['イベントや企画の', 'ご相談は、', 'こちらから。']} />}
-        description="商業施設や企業イベントでのワークショップ・体験企画のご相談をお受けしています。調査の結果は、まとまり次第このページでお知らせします。"
+        description="商業施設や企業イベントでのワークショップ・体験企画のご相談をお受けしています。調査の結果も、企画を考える材料にしています。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         secondary={{ label: '連携について見る', to: '/collaboration' }}
       />

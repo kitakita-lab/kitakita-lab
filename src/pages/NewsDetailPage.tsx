@@ -28,7 +28,7 @@ export function NewsDetailPage() {
     description: item.excerpt,
     mainEntityOfPage: `${site.url}/news/${item.slug}`,
     image: `${site.url}${site.ogImage}`,
-    ...(item.dateLabel ? {} : { datePublished: item.date }),
+    ...(item.dateLabel ? {} : { datePublished: item.datePublished ?? item.date }),
     author: { '@type': 'Organization', name: site.name, url: site.url },
     publisher: {
       '@type': 'Organization',
@@ -79,6 +79,22 @@ export function NewsDetailPage() {
               <p key={i}>{typeset(para)}</p>
             ))}
           </div>
+
+          {item.links && item.links.length > 0 && (
+            <ul className="mx-auto mt-10 max-w-prose space-y-3">
+              {item.links.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    to={link.href}
+                    className="inline-flex items-center gap-1.5 text-[15px] font-medium text-clay-600 underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-700"
+                  >
+                    {link.label}
+                    <Icon name="arrow" size={16} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
 
           <div className="mx-auto mt-14 max-w-prose border-t border-line pt-8">
             <Button to="/news" variant="secondary">

@@ -23,6 +23,9 @@ const EventDetailPage = lazyWithRetry(() =>
 const ResearchPage = lazyWithRetry(() =>
   import('@/pages/ResearchPage').then((m) => ({ default: m.ResearchPage })),
 )
+const ResearchDetailPage = lazyWithRetry(() =>
+  import('@/pages/ResearchDetailPage').then((m) => ({ default: m.ResearchDetailPage })),
+)
 const CollaborationPage = lazyWithRetry(() =>
   import('@/pages/CollaborationPage').then((m) => ({ default: m.CollaborationPage })),
 )
@@ -90,6 +93,14 @@ export function App() {
           element={
             <Suspense fallback={<RouteFallback />}>
               <ResearchPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="research/:slug"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <ResearchDetailPage />
             </Suspense>
           }
         />
