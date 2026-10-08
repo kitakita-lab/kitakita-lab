@@ -125,6 +125,14 @@ describe('researchReports', () => {
       }
       for (const s of r.sections) {
         if (s.headingSegments) expect(s.headingSegments.join(''), s.id).toBe(s.heading)
+        for (const f of s.figures) {
+          if (f.titleSegments) expect(f.titleSegments.join(''), f.title).toBe(f.title.replace(/（[^（）]+）$/, ''))
+          if (f.kind === 'stacked') {
+            for (const row of f.rows) {
+              if (row.labelSegments) expect(row.labelSegments.join(''), row.label).toBe(row.label)
+            }
+          }
+        }
       }
     }
   })

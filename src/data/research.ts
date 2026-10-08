@@ -33,8 +33,10 @@ export type ResearchBar = {
 export type ResearchFigure =
   | {
       kind: 'bars'
-      /** 設問文（図の見出し） */
+      /** 図の見出し。末尾の（…）は補足の行として表示する */
       title: string
+      /** 見出しを意味の単位で折るための分割（連結すると title の（…）より前と一致） */
+      titleSegments?: string[]
       /** 図の下に置く対象・注記（例: 「参加に前向きな427名が回答」） */
       note: string
       items: ResearchBar[]
@@ -42,16 +44,19 @@ export type ResearchFigure =
   | {
       kind: 'stacked'
       title: string
+      titleSegments?: string[]
       note: string
       /** 区分（左から順に積む） */
       legend: string[]
       /** 左から何区分を「前向き」として合計表示するか */
       positive: { segments: number; label: string }
-      rows: { label: string; n: number; counts: number[] }[]
+      /** labelSegments: 行の名前を意味の単位で折るための分割（連結すると label に一致） */
+      rows: { label: string; labelSegments?: string[]; n: number; counts: number[] }[]
     }
   | {
       kind: 'compare'
       title: string
+      titleSegments?: string[]
       note: string
       /** 比べる 2 群 */
       groups: { label: string; n: number }[]
@@ -418,13 +423,29 @@ export const researchReports: ResearchReport[] = [
           {
             kind: 'stacked',
             title: '商業施設でのワークショップ・体験イベントについての考え',
+            titleSegments: ['商業施設での', 'ワークショップ・', '体験イベントについての考え'],
             note: `設問「商業施設で開催されるワークショップ・体験イベントについて、あなたの考えに近いものをそれぞれ答えてください」`,
             legend: ['とてもそう思う', 'ややそう思う', 'あまりそう思わない', '全くそう思わない'],
             positive: { segments: 2, label: 'そう思う' },
             rows: [
-              { label: '参加するために訪れたら、その前後に買い物や飲食もしたい', n: 1023, counts: [198, 406, 245, 174] },
-              { label: '開催されている商業施設は、魅力的だと思う', n: 1023, counts: [156, 411, 263, 193] },
-              { label: '興味のあるものがあれば、その商業施設を訪れたい', n: 1023, counts: [147, 375, 302, 199] },
+              {
+                label: '参加するために訪れたら、その前後に買い物や飲食もしたい',
+                labelSegments: ['参加するために訪れたら、', 'その前後に', '買い物や飲食もしたい'],
+                n: 1023,
+                counts: [198, 406, 245, 174],
+              },
+              {
+                label: '開催されている商業施設は、魅力的だと思う',
+                labelSegments: ['開催されている', '商業施設は、', '魅力的だと思う'],
+                n: 1023,
+                counts: [156, 411, 263, 193],
+              },
+              {
+                label: '興味のあるものがあれば、その商業施設を訪れたい',
+                labelSegments: ['興味のあるものがあれば、', 'その商業施設を', '訪れたい'],
+                n: 1023,
+                counts: [147, 375, 302, 199],
+              },
             ],
           },
         ],
