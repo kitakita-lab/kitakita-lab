@@ -71,7 +71,7 @@ export function ResearchPage() {
                       {typeset(report.summary)}
                     </p>
                     <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-soft">
-                      {report.facts.map((fact) => (
+                      {report.survey.facts.map((fact) => (
                         <li key={fact}>{fact}</li>
                       ))}
                     </ul>

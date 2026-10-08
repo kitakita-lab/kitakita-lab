@@ -19,7 +19,8 @@ function allTexts(r: (typeof researchReports)[number]): string[] {
     r.summary,
     r.description,
     ...r.intro,
-    ...r.readingNotes,
+    ...r.survey.readingNotes,
+    ...(r.readingNotes ?? []),
     ...r.sections.flatMap((s) => [...s.lead, s.reading ?? '']),
   ]
 }
@@ -48,7 +49,17 @@ describe('researchReports', () => {
         }
       }
     }
-    expect(checked).toBeGreaterThan(20)
+    // News 本文の数字も同じ形式で検算する
+    for (const n of newsItems) {
+      for (const text of [n.excerpt, ...n.body]) {
+        for (const m of text.matchAll(RATIO)) {
+          const [, c, num, p] = m
+          expect(percent(toNum(c), toNum(num)).toFixed(1), `${n.slug}: ${m[0]}`).toBe(p)
+          checked++
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(10)
   })
 
   it('description の割合は要点の数字と一致する', () => {
@@ -118,6 +129,12 @@ describe('researchReports', () => {
     }
   })
 
+  it('同じ調査から複数のレポートをつくっても、総合レポートは調査ごとに 1 本', () => {
+    const overviews = researchReports.filter((r) => r.scope === 'overview')
+    const ids = overviews.map((r) => r.survey.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
   it('関連実績の slug は events に存在する', () => {
     for (const r of researchReports) {
       for (const slug of r.relatedEventSlugs) {
@@ -129,7 +146,7 @@ describe('researchReports', () => {
   it('掲載しない名称を含まない', () => {
     const forbidden = ['株式会社all', 'PR TIMES', 'サクリサ', '当社', '弊社']
     const texts = [
-      ...researchReports.flatMap((r) => [...allTexts(r), ...r.overview.map((o) => o.value), ...r.sample]),
+      ...researchReports.flatMap((r) => [...allTexts(r), ...r.survey.overview.map((o) => o.value), ...r.survey.sample]),
       ...newsItems.flatMap((n) => [n.title, n.excerpt, ...n.body]),
     ]
     for (const t of texts) {

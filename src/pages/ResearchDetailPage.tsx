@@ -34,6 +34,8 @@ export function ResearchDetailPage() {
   }
 
   const pageUrl = `${site.url}/research/${report.slug}`
+  // 調査共通の読み方のあとに、このレポート固有の読み方を続ける
+  const readingNotes = [...report.survey.readingNotes, ...(report.readingNotes ?? [])]
   const related = report.relatedEventSlugs
     .map((s) => events.find((e) => e.slug === s))
     .filter((e): e is (typeof events)[number] => Boolean(e))
@@ -100,7 +102,7 @@ export function ResearchDetailPage() {
                 {report.titleSegments ? <Segments segments={report.titleSegments} /> : report.title}
               </h1>
               <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm leading-relaxed text-ink-muted">
-                {report.facts.map((fact) => (
+                {report.survey.facts.map((fact) => (
                   <li key={fact}>{fact}</li>
                 ))}
               </ul>
@@ -237,7 +239,7 @@ export function ResearchDetailPage() {
               <span className="eyebrow">Notes</span>
               <h2 className="mt-3 text-2xl sm:text-3xl">この調査の読み方</h2>
               <ul className="mt-6 space-y-3">
-                {report.readingNotes.map((note) => (
+                {readingNotes.map((note) => (
                   <li key={note} className="flex gap-3 text-sm leading-relaxed text-ink-muted">
                     <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-clay-400" aria-hidden="true" />
                     <span>{typeset(note)}</span>
@@ -251,7 +253,7 @@ export function ResearchDetailPage() {
                 <span className="eyebrow">Overview</span>
                 <h2 className="mt-2 text-xl">調査概要</h2>
                 <dl className="mt-5 space-y-4">
-                  {report.overview.map((row) => (
+                  {report.survey.overview.map((row) => (
                     <div key={row.label}>
                       <dt className="text-xs font-medium text-ink-soft">{row.label}</dt>
                       <dd className="mt-1 text-sm leading-relaxed text-ink">{typeset(row.value)}</dd>
@@ -260,7 +262,7 @@ export function ResearchDetailPage() {
                   <div>
                     <dt className="text-xs font-medium text-ink-soft">回答者の内訳</dt>
                     <dd className="mt-1 space-y-0.5 text-sm leading-relaxed text-ink">
-                      {report.sample.map((s) => (
+                      {report.survey.sample.map((s) => (
                         <span key={s} className="block">
                           {s}
                         </span>
