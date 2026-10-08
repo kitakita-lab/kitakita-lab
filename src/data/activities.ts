@@ -71,7 +71,7 @@ export const flowSteps: FlowStep[] = [
     verb: 'つづけてみる',
     summary: 'ふりかえって、次へ。気になったことは、調査でも確かめています。',
     examples: [
-      { label: '進行中の調査', href: '/research' },
+      { label: '調査の結果', href: '/research/hokkaido-mall-workshop-demand-2026' },
       { label: '次の企画へ' },
     ],
   },

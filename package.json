@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview",
     "assets:og": "node scripts/generate-og.mjs",
+    "assets:og:research": "node scripts/generate-research-og.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
