@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { renderWithProviders, screen, userEvent, within } from '@/test/test-utils'
 import { Header } from './Header'
+import { navItems, desktopNavItems } from '@/data/site'
 
 describe('Header', () => {
   it('ロゴ（ホームへのリンク）が表示される', () => {
@@ -14,22 +15,33 @@ describe('Header', () => {
     expect(logo).toHaveAccessibleName(/KitaKita Lab/)
   })
 
-  it('メインナビゲーションに全メニュー項目が表示される', () => {
+  it('PC のメインナビゲーションは 6 項目（Activities・Creators・News は出さない）', () => {
     renderWithProviders(<Header />)
 
     const nav = screen.getByRole('navigation', { name: 'メインナビゲーション' })
-    for (const label of [
-      'KitaKita Labとは',
-      'Activities',
-      'Workshop',
-      'Research',
-      'Collaboration',
-      'Creators',
-      'News',
-      'FAQ',
-    ]) {
-      expect(within(nav).getByText(label)).toBeInTheDocument()
-    }
+    const labels = within(nav)
+      .getAllByRole('link')
+      .map((a) => a.textContent)
+    expect(labels).toEqual(['KitaKita Labとは', 'Workshop', 'Events', 'Research', 'Collaboration', 'FAQ'])
+    expect(within(nav).getByRole('link', { name: 'KitaKita Labとは' })).toHaveAttribute('href', '/#about')
+  })
+
+  it('PC ヘッダーの項目は 6 項目以内（1024px で 1 行に収めるため）', () => {
+    expect(desktopNavItems.length).toBeLessThanOrEqual(6)
+  })
+
+  it('モバイルメニューには全 9 項目が表示される', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    await user.click(screen.getByRole('button', { name: 'メニューを開く' }))
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    const labels = within(mobileNav)
+      .getAllByRole('link')
+      .map((a) => a.textContent)
+      .filter((t) => t !== 'お問い合わせ')
+    expect(labels).toEqual(navItems.map((i) => i.label))
+    expect(labels).toHaveLength(9)
   })
 
   it('メニューボタンで開閉状態（aria-expanded）が切り替わる', async () => {
