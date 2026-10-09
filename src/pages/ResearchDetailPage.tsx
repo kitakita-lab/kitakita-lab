@@ -36,6 +36,10 @@ export function ResearchDetailPage() {
   const pageUrl = `${site.url}/research/${report.slug}`
   // 調査共通の読み方のあとに、このレポート固有の読み方を続ける
   const readingNotes = [...report.survey.readingNotes, ...(report.readingNotes ?? [])]
+  // 同じ調査の関連レポート（テーマ別 → 総合 など）
+  const relatedReports = (report.relatedReportSlugs ?? [])
+    .map((s) => researchReports.find((r) => r.slug === s))
+    .filter((r): r is (typeof researchReports)[number] => Boolean(r))
   const related = report.relatedEventSlugs
     .map((s) => events.find((e) => e.slug === s))
     .filter((e): e is (typeof events)[number] => Boolean(e))
@@ -69,7 +73,7 @@ export function ResearchDetailPage() {
   return (
     <>
       <Seo
-        title={report.title}
+        title={report.seoTitle ?? report.title}
         path={`/research/${report.slug}`}
         description={report.description}
         image={report.ogImage}
@@ -207,19 +211,22 @@ export function ResearchDetailPage() {
               </div>
             </Reveal>
 
-            <div
-              className={
-                section.figures.length > 1
-                  ? 'mt-10 grid gap-6 lg:grid-cols-2 lg:items-start'
-                  : 'mt-10 max-w-3xl'
-              }
-            >
-              {section.figures.map((figure, j) => (
-                <Reveal key={j} delay={j * 80}>
-                  <ResearchFigure figure={figure} />
-                </Reveal>
-              ))}
-            </div>
+            {/* 図のない章（考察など）では、図の余白を置かない */}
+            {section.figures.length > 0 && (
+              <div
+                className={
+                  section.figures.length > 1
+                    ? 'mt-10 grid gap-6 lg:grid-cols-2 lg:items-start'
+                    : 'mt-10 max-w-3xl'
+                }
+              >
+                {section.figures.map((figure, j) => (
+                  <Reveal key={j} delay={j * 80}>
+                    <ResearchFigure figure={figure} />
+                  </Reveal>
+                ))}
+              </div>
+            )}
 
             {section.reading && (
               <Reveal className="mt-8 max-w-prose">
@@ -227,6 +234,19 @@ export function ResearchDetailPage() {
                   <p className="text-xs font-medium text-clay-600">読み方</p>
                   <p className="mt-1 text-sm leading-relaxed text-ink-muted">{typeset(section.reading)}</p>
                 </div>
+              </Reveal>
+            )}
+
+            {/* 同じテーマを深掘りしたレポートなどへの文字リンク */}
+            {section.link && (
+              <Reveal className="mt-6 max-w-prose">
+                <Link
+                  to={section.link.href}
+                  className="inline-flex items-center gap-1 text-sm text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+                >
+                  {typeset(section.link.label)}
+                  <Icon name="arrow" size={13} />
+                </Link>
               </Reveal>
             )}
           </Section>
@@ -275,9 +295,43 @@ export function ResearchDetailPage() {
           </div>
         </Section>
 
+        {/* ── 同じ調査の関連レポート ─────────────── */}
+        {relatedReports.length > 0 && (
+          <Section tone={report.sections.length % 2 === 0 ? 'paper' : 'tint'} spacing="md">
+            <Reveal className="max-w-prose">
+              <span className="eyebrow">Related</span>
+              <h2 className="mt-3 text-2xl sm:text-3xl">この調査のレポート</h2>
+            </Reveal>
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+              {relatedReports.map((r, i) => (
+                <Reveal key={r.slug} delay={i * 80}>
+                  <Link
+                    to={`/research/${r.slug}`}
+                    className="group flex h-full flex-col rounded-xl2 border border-line bg-paper-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+                  >
+                    <span className="text-xs text-ink-soft">
+                      {r.scope === 'overview' ? '総合レポート' : 'テーマ別レポート'}
+                    </span>
+                    <span className="mt-2 text-lg leading-snug text-ink transition-colors [@media(hover:hover)]:group-hover:text-clay-600">
+                      {r.titleSegments ? <Segments segments={r.titleSegments} /> : r.title}
+                    </span>
+                    <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-medium text-clay-600">
+                      レポートを見る
+                      <Icon name="arrow" size={16} className="transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </Section>
+        )}
+
         {/* ── 現場の実績 ─────────────────────── */}
         {related.length > 0 && (
-          <Section tone={report.sections.length % 2 === 0 ? 'paper' : 'tint'} spacing="md">
+          <Section
+            tone={(report.sections.length + (relatedReports.length > 0 ? 1 : 0)) % 2 === 0 ? 'paper' : 'tint'}
+            spacing="md"
+          >
             <Reveal className="max-w-prose">
               <span className="eyebrow">On site</span>
               <h2 className="mt-3 text-2xl sm:text-3xl">現場では</h2>
@@ -317,7 +371,8 @@ export function ResearchDetailPage() {
           title={<Segments segments={['調査をふまえた', '企画のご相談も、', 'お受けしています。']} />}
           description="商業施設や企業イベントでの体験企画を、この調査の結果もふまえて一緒に考えます。"
           primary={{ label: 'お問い合わせ', to: '/contact' }}
-          secondary={{ label: '連携について見る', to: '/collaboration' }}
+          // 開催の条件・お見積もりの際に伺うこと（依頼条件カード）へ
+          secondary={{ label: '開催のご相談について', to: '/workshop#consultation' }}
         />
       </article>
     </>
