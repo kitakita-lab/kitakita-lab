@@ -15,8 +15,8 @@ export const site = {
   url: 'https://www.kitakita-lab.com',
   // og:image は PNG 必須（SVG は SNS 各社が描画しない）。scripts/generate-og.mjs で再生成。
   ogImage: '/ogp.png',
-  // 問い合わせ先メールアドレス。Footer / Contact ページのメール表示と、
-  // Contact フォームの送信先（mailto）に使われる。
+  // 問い合わせ先メールアドレス。Footer / Contact ページのメール表示と
+  // mailto リンク・コピーボタンに使われる。
   email: 'hello@kitakita-lab.com',
   locale: 'ja_JP',
 } as const

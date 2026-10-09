@@ -39,8 +39,7 @@ src/
 │  ├─ ui/                # Button / Card / Section / Icon などの再利用部品
 │  ├─ home/              # トップページの各セクション
 │  ├─ Seo.tsx            # ページ単位のメタタグ
-│  ├─ CtaBand.tsx        # 共通CTAバンド
-│  └─ ContactForm.tsx    # お問い合わせフォーム（mailto: 方式で正式運用）
+│  └─ CtaBand.tsx        # 共通CTAバンド
 ├─ pages/                # 各ページ
 ├─ data/                 # ★ コンテンツ（CMS化を見据えたデータ層）
 ├─ hooks/                # カスタムフック
@@ -188,15 +187,13 @@ npm run test:coverage  # カバレッジ計測（coverage/ に HTML レポート
 | `/creators` | 作家募集 |
 | `/news`, `/news/:slug` | お知らせ一覧・詳細 |
 | `/faq` | よくある質問 |
-| `/contact` | お問い合わせ（フォーム／メール） |
+| `/contact` | お問い合わせ（メール） |
 
-## お問い合わせフォームについて
+## お問い合わせについて
 
-`src/components/ContactForm.tsx` は、サーバーを持たない構成のため、入力内容を
-`site.email` 宛の `mailto:` に組み立てて利用者のメールソフトを開きます
-（実際の送信は利用者がメールソフト上で行う）。独自の送信バックエンドを
-導入する場合は `handleSubmit` を、フォームサービス（Formspree 等）や
-API エンドポイントへの送信処理に置き換えてください。
+お問い合わせは `site.email`（hello@kitakita-lab.com）宛のメールに一本化しています。
+`/contact` ではアドレスを表示し、件名「KitaKita Labへのお問い合わせ」を初期入力した
+`mailto:` ボタンと、アドレスのコピーボタンを置いています（入力フォーム・外部サービスは持たない）。
 
 ## OGP 画像・アイコンの再生成
 
