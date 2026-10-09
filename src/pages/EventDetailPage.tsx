@@ -338,9 +338,11 @@ export function EventDetailPage() {
               <span className="whitespace-nowrap">つくりませんか。</span>
             </>
           }
-          description="商業施設や企業イベントで、目的や場所に合わせたワークショップや体験企画をかたちにしています。"
+          // 一覧と同じ。実績ではなく、これから相談できる内容の説明。
+          description="商業施設や企業イベントなど、目的や場所に合わせたワークショップや体験企画のご相談をお受けしています。"
           primary={{ label: 'お問い合わせ', to: '/contact' }}
-          secondary={{ label: '他の実績を見る', to: '/events' }}
+          // 一覧へはページ上部のリンクで戻れるため、2つ目は開催の条件（依頼条件カード）へ
+          secondary={{ label: '開催のご相談について', to: '/workshop#consultation' }}
         />
       </article>
     </>

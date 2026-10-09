@@ -42,9 +42,9 @@ export function EventsPage() {
   return (
     <>
       <Seo
-        title="イベント実績"
+        title="ワークショップ開催実績（札幌・北海道）"
         path="/events"
-        description="KitaKita Labのイベント実績。商業施設や公共空間、企業イベントで関わってきたワークショップイベントのレポートをご紹介します。"
+        description="2026年6〜9月に札幌市・北広島市の商業施設や公共空間で開いたワークショップの開催実績です。各会期の参加組数・人数・制作数と、当日の様子をレポートしています。"
       />
 
       <PageHeader
@@ -52,7 +52,7 @@ export function EventsPage() {
         title={<>イベント実績</>}
         // 「開いた」ではなく「関わってきた」。KitaKita Lab が全イベントの主催者・一括請負に
         // 見えないようにする（詳細ページの担当範囲・会場構成の行と整合させる）。
-        description="商業施設や公共空間、企業イベントなど、さまざまな場で関わってきたワークショップイベントの実績です。企画から会場づくり、当日の現場まで、関わるみなさんと一緒につくっています。"
+        description="商業施設や公共空間で関わってきた、ワークショップイベントの実績です。企画から会場づくり、当日の現場まで、関わるみなさんと一緒につくっています。"
       />
 
       <Section tone="paper" spacing="lg">
@@ -148,9 +148,11 @@ export function EventsPage() {
             <span className="whitespace-nowrap">つくりませんか。</span>
           </>
         }
-        description="商業施設や企業イベントで、目的や場所に合わせたワークショップや体験企画をかたちにしています。"
+        // 実績（上の一覧）ではなく、これから相談できる内容の説明。
+        description="商業施設や企業イベントなど、目的や場所に合わせたワークショップや体験企画のご相談をお受けしています。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
-        secondary={{ label: '連携について見る', to: '/collaboration' }}
+        // 実績を見た人が、次に開催の条件（依頼条件カード）を確かめられるようにする
+        secondary={{ label: '開催のご相談について', to: '/workshop#consultation' }}
       />
     </>
   )

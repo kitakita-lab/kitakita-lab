@@ -19,7 +19,7 @@ export function ResearchPage() {
   return (
     <>
       <Seo
-        title="Research"
+        title="調査レポート"
         path="/research"
         description="KitaKita Labが行った調査のレポート。北海道在住の20〜50代1,023名に、商業施設でのワークショップ・体験イベントへの参加意向や参加しやすい条件を尋ねた結果を公開しています。"
       />

@@ -120,9 +120,9 @@ export function WorkshopPage() {
   return (
     <>
       <Seo
-        title="Workshop"
+        title="商業施設・イベントでのワークショップ開催（札幌・北海道）"
         path="/workshop"
-        description="作家 ikyu の「ワークショップをやってみたい」を、KitaKita Lab が企業とのご縁と企画でかたちにした取り組み。つくる楽しさを届ける体験の場です。"
+        description="札幌を拠点に、商業施設やイベントスペースでワークショップを開催しています。現在はハンドメイドアクセサリーブランド ikyu のフラワーボトルづくり体験を中心に、企画・当日運営・実施報告まで担当。開催の条件やご相談の流れも掲載しています。"
       />
 
       <PageHeader

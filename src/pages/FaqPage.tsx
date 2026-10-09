@@ -12,9 +12,9 @@ export function FaqPage() {
   return (
     <>
       <Seo
-        title="FAQ"
+        title="よくある質問"
         path="/faq"
-        description="KitaKita Labへのよくある質問。作家としての参加、企業・自治体との連携などについてお答えします。"
+        description="KitaKita Labへのよくある質問。企業・施設からのワークショップ開催のご相談や、作家としての参加などについてお答えします。"
       />
 
       <PageHeader

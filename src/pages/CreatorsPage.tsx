@@ -14,7 +14,7 @@ export function CreatorsPage() {
   return (
     <>
       <Seo
-        title="Creators"
+        title="作家・つくり手の募集"
         path="/creators"
         description="KitaKita Labは、一緒に「ちょっと進めてみる」仲間を探しています。ワークショップ講師、イベント出店、はじめての企業案件まで。実績より、進めてみたい気持ちを大切にします。"
       />

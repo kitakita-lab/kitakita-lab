@@ -28,9 +28,9 @@ export function ContactPage() {
   return (
     <>
       <Seo
-        title="Contact"
+        title="お問い合わせ"
         path="/contact"
-        description="KitaKita Labへのお問い合わせ・作家応募・連携のご相談はこちらから。"
+        description="ワークショップ開催のご相談、企業・施設との企画、作家としての参加、取材のお問い合わせを、メールで受け付けています。"
       />
 
       <PageHeader

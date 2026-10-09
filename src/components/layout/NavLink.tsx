@@ -12,8 +12,9 @@ type NavLinkProps = {
 
 /**
  * Navigation link that understands both plain routes ("/workshop") and
- * in-page hash targets ("/#about"). For hash targets it smooth-scrolls to
- * the element, navigating home first when on another page.
+ * in-page hash targets ("/#about"). For hash targets on the current page it
+ * smooth-scrolls to the element; on another page it navigates with the hash
+ * kept, and ScrollToTop scrolls once the element has rendered.
  */
 export function NavLink({ href, children, className, onNavigate }: NavLinkProps) {
   const navigate = useNavigate()
@@ -40,9 +41,9 @@ export function NavLink({ href, children, className, onNavigate }: NavLinkProps)
     if (location.pathname === targetPath) {
       scrollToHash(hash)
     } else {
-      navigate(targetPath)
-      // Wait for the destination to render before scrolling.
-      window.setTimeout(() => scrollToHash(hash), 80)
+      // ハッシュを付けたまま遷移する。移動先の要素が描画されるのを待って
+      // スクロールするのは ScrollToTop（遅延読み込みのページにも対応）。
+      navigate(`${targetPath}#${hash}`)
     }
     handleNavigate()
   }
