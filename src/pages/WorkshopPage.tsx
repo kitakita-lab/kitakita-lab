@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Seo } from '@/components/Seo'
 import { typeset } from '@/lib/typo'
@@ -8,8 +9,11 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Reveal } from '@/components/ui/Reveal'
 import { Icon } from '@/components/ui/Icon'
 import { AccordionItem } from '@/components/ui/Accordion'
+import { Button } from '@/components/ui/Button'
+import { Segments } from '@/components/ui/Segments'
 import { CtaBand } from '@/components/CtaBand'
 import { workshopPhotos } from '@/data/workshops'
+import { workshopConsultation as consult } from '@/data/workshopConsultation'
 
 const takeaways = [
   {
@@ -79,6 +83,27 @@ const flow = [
     body: '実施後の声を踏まえて、次の機会や新しい企画につなげていきます。',
   },
 ]
+
+/** 依頼条件カードの小見出し */
+function ConsultHeading({ children }: { children: ReactNode }) {
+  return <h3 className="text-lg leading-snug text-ink">{children}</h3>
+}
+
+/** 依頼条件カードの箇条書き。行頭の点は装飾なので読み上げない */
+function ConsultList({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="mt-4 space-y-2.5">
+      {items.map((item) => (
+        <li
+          key={item}
+          className="relative pl-4 text-[15px] leading-relaxed text-ink-muted before:absolute before:left-0 before:top-[0.7em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-clay-300"
+        >
+          {typeset(item)}
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 const miniFaq = [
   {
@@ -264,6 +289,77 @@ export function WorkshopPage() {
             </Reveal>
           ))}
         </div>
+
+        {/* 依頼条件カード（企業・商業施設・自治体などの担当者向け）。
+            Scenes で「どんな場で」を見せた直後に、依頼するときの条件を置く。
+            原稿は data/workshopConsultation.ts（1 枚資料の裏面と共通）。
+            スマホでは 1 列、PC では「これまで」と「これから決めること」の 2 列。 */}
+        <Reveal delay={120}>
+          <div
+            id="consultation"
+            className="mt-12 scroll-mt-24 rounded-xl2 border border-line bg-paper p-6 sm:mt-16 sm:p-10 lg:p-12"
+          >
+            <h2 className="text-2xl leading-relaxed text-ink sm:text-3xl">
+              <Segments segments={['ワークショップ開催の', 'ご相談について']} />
+            </h2>
+
+            <div className="mt-8 grid gap-10 lg:mt-10 lg:grid-cols-2 lg:gap-12">
+              <div className="space-y-10">
+                <div>
+                  <ConsultHeading>{consult.offer.heading}</ConsultHeading>
+                  <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
+                    {typeset(consult.offer.body)}
+                  </p>
+                </div>
+                <div>
+                  <ConsultHeading>{consult.record.heading}</ConsultHeading>
+                  <ConsultList items={consult.record.items} />
+                </div>
+              </div>
+
+              <div className="space-y-10 border-t border-line pt-10 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
+                <div>
+                  <ConsultHeading>
+                    <Segments segments={['会場や内容に合わせて、', 'ご相談のうえ', '決めること']} />
+                  </ConsultHeading>
+                  <ConsultList items={consult.adjustable.items} />
+                </div>
+                <div>
+                  <ConsultHeading>{consult.cost.heading}</ConsultHeading>
+                  <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
+                    {typeset(consult.cost.body)}
+                  </p>
+                </div>
+                <div>
+                  <ConsultHeading>{consult.questions.heading}</ConsultHeading>
+                  <ol className="mt-4 space-y-2.5">
+                    {consult.questions.items.map((item, i) => (
+                      <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-ink-muted">
+                        <span className="w-4 shrink-0 text-right tabular-nums text-clay-600">
+                          {i + 1}.
+                        </span>
+                        <span>{typeset(item)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 border-t border-line pt-8 lg:mt-12">
+              <p className="text-[15px] leading-relaxed text-ink">{typeset(consult.closing)}</p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button to={consult.actions.primary.to} size="lg" variant="primary">
+                  {consult.actions.primary.label}
+                  <Icon name="arrow" size={18} />
+                </Button>
+                <Button to={consult.actions.secondary.to} size="lg" variant="secondary">
+                  {consult.actions.secondary.label}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Reveal>
       </Section>
 
       <Section tone="paper" spacing="lg">
