@@ -117,6 +117,59 @@ describe('researchReports', () => {
     }
   })
 
+  it('テーマ別レポート（不参加者）の主要な数字（個別データで再検証済み）', () => {
+    const r = researchReports.find((x) => x.slug === 'hokkaido-workshop-nonparticipants-2026')!
+    expect(r.scope).toBe('theme')
+    expect(r.keyFindings.map((k) => [k.count, k.n])).toEqual([
+      [816, 1023],
+      [234, 816],
+      [99, 234],
+    ])
+    const fig = (id: string) => r.sections.find((s) => s.id === id)!.figures[0]
+    // 参加状況別の参加意向: 参加していない 816 名のうち前向き 234 名
+    const intent = fig('intent')
+    if (intent.kind === 'stacked') {
+      const np = intent.rows.find((row) => row.label === '参加していない')!
+      expect([np.counts[0] + np.counts[1], np.n]).toEqual([234, 816])
+      expect(intent.rows.reduce((a, row) => a + row.n, 0)).toBe(1023)
+    }
+    // 理由: 参加意向あり 234 名＋なし 582 名＝不参加 816 名。「知らなかった」は 99 名
+    const reasons = fig('reasons')
+    expect(reasons.kind).toBe('compare')
+    if (reasons.kind === 'compare') {
+      expect(reasons.groups.map((g) => g.n)).toEqual([234, 582])
+      expect(reasons.groups[0].n + reasons.groups[1].n).toBe(816)
+      expect(reasons.items[0].counts[0]).toBe(99)
+    }
+    // 子どもの有無別（不参加者）: 177 + 639 = 816、前向きは 76 + 158 = 234
+    const household = fig('household')
+    if (household.kind === 'stacked') {
+      expect(household.rows.reduce((a, row) => a + row.n, 0)).toBe(816)
+      expect(household.rows.reduce((a, row) => a + row.counts[0] + row.counts[1], 0)).toBe(234)
+    }
+  })
+
+  it('関連レポートと章末のリンクは、実在するレポートを指す', () => {
+    const slugs = new Set(researchReports.map((r) => r.slug))
+    for (const r of researchReports) {
+      for (const s of r.relatedReportSlugs ?? []) {
+        expect(slugs.has(s), `${r.slug} → ${s}`).toBe(true)
+        expect(s).not.toBe(r.slug)
+      }
+      for (const sec of r.sections) {
+        if (sec.link?.href.startsWith('/research/')) {
+          expect(slugs.has(sec.link.href.replace('/research/', '')), sec.link.href).toBe(true)
+        }
+      }
+      if (r.seoTitle !== undefined) expect(r.seoTitle.trim().length, r.slug).toBeGreaterThan(0)
+    }
+    // 総合レポートとテーマ別レポートが相互にたどれる
+    const overview = researchReports.find((r) => r.slug === 'hokkaido-mall-workshop-demand-2026')!
+    expect(overview.sections.some((s) => s.link?.href === '/research/hokkaido-workshop-nonparticipants-2026')).toBe(true)
+    const theme = researchReports.find((r) => r.slug === 'hokkaido-workshop-nonparticipants-2026')!
+    expect(theme.relatedReportSlugs).toContain('hokkaido-mall-workshop-demand-2026')
+  })
+
   it('見出しの分割は連結すると見出しに一致する', () => {
     for (const r of researchReports) {
       if (r.titleSegments) {

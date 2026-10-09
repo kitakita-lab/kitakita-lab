@@ -1,7 +1,8 @@
 /**
  * 調査レポート専用の OGP 画像（1200×630）を生成する。
  *
- *   node scripts/generate-research-og.mjs
+ *   node scripts/generate-research-og.mjs            # すべて生成
+ *   node scripts/generate-research-og.mjs <slug>...  # 指定したレポートだけ生成
  *
  * 生成物: public/research/<slug>/og.png（src/data/research.ts の ogImage と同じパス）
  *
@@ -12,6 +13,9 @@
  * 書体は scripts/og-assets/research-*.woff2（下の文言だけを含むサブセット）。
  * 文言を変えたら、Google Fonts の css2?text= でサブセットを取り直すこと
  * （含まれない文字はフォールバック書体で描かれ、見た目が崩れる）。
+ * レポートを足すときは、既存のサブセットを差し替えず、そのレポート用の
+ * サブセットを og-assets/ に足して serif / sans で指定する（既存画像に影響させない）。
+ * 省略時は research-shippori-mincho-600-subset / research-zen-kaku-500-subset。
  *
  * 依存: playwright または playwright-core（generate-og.mjs と同じ）。
  */
@@ -28,6 +32,13 @@ const reports = [
     slug: 'hokkaido-mall-workshop-demand-2026',
     titleLines: ['北海道の商業施設における', 'ワークショップ・体験イベントの需要調査'],
     meta: '北海道在住の20〜50代・1,023名｜2026年9月調査',
+  },
+  {
+    slug: 'hokkaido-workshop-nonparticipants-2026',
+    titleLines: ['参加していない人の中にも、', '参加したい人がいる'],
+    meta: '北海道在住の20〜50代・1,023名｜2026年9月調査',
+    // 見出しの文字だけを含むサブセット（meta は上と同じ文言なので既存の sans を使う）
+    serif: 'research-nonparticipants-shippori-mincho-600-subset.woff2',
   },
 ]
 
@@ -46,19 +57,19 @@ try {
   }
 }
 
-const b64 = async (p) => (await readFile(p)).toString('base64')
-const serif = await b64(join(here, 'og-assets/research-shippori-mincho-600-subset.woff2'))
-const sans = await b64(join(here, 'og-assets/research-zen-kaku-500-subset.woff2'))
+const b64 = async (name) => (await readFile(join(here, 'og-assets', name))).toString('base64')
+const DEFAULT_SERIF = 'research-shippori-mincho-600-subset.woff2'
+const DEFAULT_SANS = 'research-zen-kaku-500-subset.woff2'
 
-const fontCss = `
+const fontCss = async (r) => `
   @font-face { font-family: 'Shippori Mincho'; font-weight: 600;
-    src: url(data:font/woff2;base64,${serif}) format('woff2'); }
+    src: url(data:font/woff2;base64,${await b64(r.serif ?? DEFAULT_SERIF)}) format('woff2'); }
   @font-face { font-family: 'Zen Kaku Gothic New'; font-weight: 500;
-    src: url(data:font/woff2;base64,${sans}) format('woff2'); }
+    src: url(data:font/woff2;base64,${await b64(r.sans ?? DEFAULT_SANS)}) format('woff2'); }
 `
 
-const html = (r) => `<!doctype html><html><head><meta charset="utf-8"><style>
-  ${fontCss}
+const html = async (r) => `<!doctype html><html><head><meta charset="utf-8"><style>
+  ${await fontCss(r)}
   * { margin: 0; padding: 0; }
   body { width: 1200px; height: 630px; overflow: hidden; position: relative;
          background: linear-gradient(180deg, #E6EDF3 0%, #F7F8F8 72%);
@@ -93,11 +104,18 @@ const browser = await chromium.launch({
   args: ['--no-sandbox', '--no-proxy-server'],
 })
 
-for (const r of reports) {
+const only = process.argv.slice(2)
+const targets = only.length ? reports.filter((r) => only.includes(r.slug)) : reports
+if (only.length && targets.length !== only.length) {
+  console.error('未知の slug があります: ' + only.filter((s) => !reports.some((r) => r.slug === s)).join(', '))
+  process.exit(1)
+}
+
+for (const r of targets) {
   const out = join('research', r.slug, 'og.png')
   await mkdir(join(root, 'public', 'research', r.slug), { recursive: true })
   const page = await browser.newPage({ viewport: { width: 1200, height: 630 } })
-  await page.setContent(html(r), { waitUntil: 'load' })
+  await page.setContent(await html(r), { waitUntil: 'load' })
   await page.evaluate(() => document.fonts.ready)
   await page.screenshot({ path: join(root, 'public', out) })
   await page.close()

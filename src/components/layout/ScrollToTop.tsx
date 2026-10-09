@@ -36,7 +36,10 @@ export function ScrollToTop() {
       return
     }
 
-    const scrollToTarget = (el: HTMLElement) => el.scrollIntoView({ behavior: 'auto', block: 'start' })
+    // index.css の html { scroll-behavior: smooth } に従うと、別ページから着いたときに
+    // 長いページを 1 秒近くかけて流れてしまうため、ハッシュへの移動は瞬時に行う
+    // （同じページ内のアンカー移動は NavLink がスムーズスクロールする）。
+    const scrollToTarget = (el: HTMLElement) => el.scrollIntoView({ behavior: 'instant', block: 'start' })
 
     const el = findTarget(hash)
     if (el) {
@@ -45,7 +48,7 @@ export function ScrollToTop() {
     }
 
     // 遷移直後はページ先頭から始める（前のページのスクロール位置を引き継がない）
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
 
     const observer = new MutationObserver(() => {
       const found = findTarget(hash)
