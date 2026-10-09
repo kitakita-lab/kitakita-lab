@@ -8,6 +8,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { CtaBand } from '@/components/CtaBand'
+import { NavLink } from '@/components/layout/NavLink'
 
 const partners = [
   {
@@ -48,9 +49,9 @@ export function CollaborationPage() {
   return (
     <>
       <Seo
-        title="Collaboration"
+        title="企業・商業施設・自治体との企画連携"
         path="/collaboration"
-        description="札幌を拠点に、商業施設や企業イベントでのワークショップ・体験企画を、企業・施設、作家やつくり手と一緒に企画・運営しています。自治体や教育機関との企画のご相談もお受けしています。"
+        description="企業・商業施設・自治体・教育機関と、作家やつくり手の表現を活かしたワークショップ・体験企画を一緒につくります。札幌を拠点に、企画から当日の運営までご相談いただけます。"
       />
 
       <PageHeader
@@ -92,7 +93,21 @@ export function CollaborationPage() {
         <SectionHeading
           eyebrow="Flow"
           title="連携の進め方"
-          description="お問い合わせから当日まで、一貫してサポートします。"
+          // 説明の末尾に、依頼条件カード（開催の条件・お見積もりの際に伺うこと）への文字リンク。
+          // ボタンは増やさない。
+          description={
+            <>
+              お問い合わせから当日まで、一貫してサポートします。
+              ワークショップ開催の条件は、
+              <NavLink
+                href="/workshop#consultation"
+                className="text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+              >
+                開催のご相談について
+              </NavLink>
+              にまとめています。
+            </>
+          }
         />
         <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {flow.map((f, i) => (

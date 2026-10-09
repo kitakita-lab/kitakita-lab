@@ -18,7 +18,7 @@ import { CtaBand } from '@/components/CtaBand'
 export function HomePage() {
   return (
     <>
-      <Seo path="/" />
+      <Seo path="/" title="札幌の体験イベント・ワークショップ企画" />
       <Hero />
       <About />
       <Philosophy />

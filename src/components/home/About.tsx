@@ -1,5 +1,13 @@
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
+import { Icon } from '@/components/ui/Icon'
+import { NavLink } from '@/components/layout/NavLink'
+import { typeset } from '@/lib/typo'
+
+const aboutLinks = [
+  { label: '開催実績を見る', href: '/events' },
+  { label: '開催のご相談について', href: '/workshop#consultation' },
+] as const
 
 /**
  * 「私たちのこと」— 会社紹介ではなく、人格の自己紹介。
@@ -43,6 +51,31 @@ export function About() {
             {/* 狭幅で「ひとつ／ずつ。」と割れないよう文節で固定。 */}
             どちらも、話すところから、<span className="whitespace-nowrap">ひとつずつ。</span>
           </p>
+          {/* 現在の活動の補足（企業・施設の担当者向け）。About の自己紹介を受けたあとに、
+              いま実際に開いている体験と実績、相談先へ進めるようにする。
+              本文より一段小さく控えめにし、リンクは Activities と同じ下線付きの文字リンク。
+              会場名は出さない（取引先・提携先と誤認させないため）。
+              活動が増えたら「現在の活動のひとつが、」の文を差し替える。 */}
+          <div className="!mt-10 border-t border-line pt-8">
+            <p className="text-[15px] leading-relaxed text-ink-muted">
+              {typeset(
+                '現在の活動のひとつが、ハンドメイドアクセサリーブランド ikyu と取り組むフラワーボトルづくり体験です。2026年6月から9月にかけて、札幌市・北広島市の商業施設や公共空間で6会期を開催。制作されたフラワーボトルは、計1,127本になりました。',
+              )}
+            </p>
+            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {aboutLinks.map((link) => (
+                <li key={link.href}>
+                  <NavLink
+                    href={link.href}
+                    className="inline-flex items-center gap-1 text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+                  >
+                    {link.label}
+                    <Icon name="arrow" size={13} />
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
         </Reveal>
       </div>
     </Section>
