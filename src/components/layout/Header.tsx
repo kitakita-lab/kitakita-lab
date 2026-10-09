@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
-import { navItems } from '@/data/site'
+import { navItems, desktopNavItems } from '@/data/site'
 import { cn } from '@/lib/cn'
 import { Logo } from './Logo'
 import { NavLink } from './NavLink'
@@ -52,15 +52,17 @@ export function Header() {
         )}
       >
         <div className="container-content flex h-16 items-center justify-between sm:h-18">
-          <Logo />
+          {/* ロゴ・ナビ・お問い合わせは折り返さない（幅が足りないときに文字が縦に崩れないよう、
+              縮めずに固定する）。PC のナビ項目数は data/site.ts の desktopNavItems で管理。 */}
+          <Logo className="shrink-0 whitespace-nowrap" />
 
           <nav className="hidden lg:block" aria-label="メインナビゲーション">
             <ul className="flex items-center gap-1">
-              {navItems.map((item) => (
+              {desktopNavItems.map((item) => (
                 <li key={item.href}>
                   <NavLink
                     href={item.href}
-                    className="rounded-full px-3.5 py-2 text-sm text-ink-muted transition-colors hover:bg-paper-200 hover:text-ink"
+                    className="whitespace-nowrap rounded-full px-3.5 py-2 text-sm text-ink-muted transition-colors hover:bg-paper-200 hover:text-ink"
                   >
                     {item.label}
                   </NavLink>
@@ -69,8 +71,8 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="hidden items-center gap-3 lg:flex">
-            <Button to="/contact" size="md">
+          <div className="hidden shrink-0 items-center gap-3 lg:flex">
+            <Button to="/contact" size="md" className="whitespace-nowrap">
               お問い合わせ
             </Button>
           </div>
