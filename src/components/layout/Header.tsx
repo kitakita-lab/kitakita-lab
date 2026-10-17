@@ -65,7 +65,10 @@ export function Header() {
       const last = items[items.length - 1]
       const active = document.activeElement
       let next: HTMLElement | null = null
-      if (!e.shiftKey && active === toggle) next = first
+      // タップで開くとボタンにフォーカスが移らないブラウザ（iOS Safari など）では
+      // フォーカスが body 等に残るため、外側からの Tab もメニューへ引き込む。
+      if (active !== toggle && !(active && menu.contains(active))) next = e.shiftKey ? last : first
+      else if (!e.shiftKey && active === toggle) next = first
       else if (!e.shiftKey && active === last) next = toggle
       else if (e.shiftKey && active === first) next = toggle
       else if (e.shiftKey && active === toggle) next = last

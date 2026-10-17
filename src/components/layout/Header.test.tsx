@@ -140,6 +140,25 @@ describe('Header', () => {
     expect(toggle).toHaveFocus()
   })
 
+  it('フォーカスがメニューの外（body 等）にあるときも、Tab でメニューへ入る', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    await user.click(screen.getByRole('button', { name: 'メニューを開く' }))
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    const items = within(mobileNav).getAllByRole('link')
+
+    // iOS Safari ではタップしてもボタンにフォーカスが移らない状況を再現する
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    expect(document.body).toHaveFocus()
+    await user.tab()
+    expect(items[0]).toHaveFocus()
+
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    await user.tab({ shift: true })
+    expect(items[items.length - 1]).toHaveFocus()
+  })
+
   it('お問い合わせボタンが /contact へリンクしている', () => {
     renderWithProviders(<Header />)
 
