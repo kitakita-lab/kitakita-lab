@@ -43,6 +43,20 @@ export function Header() {
     }
   }, [menuOpen])
 
+  // 開いたまま PC 幅（Tailwind の lg = 1024px）へ広がると、メニューと開閉ボタンは
+  // 非表示になるが状態は開いたまま残り、下の Tab 巡回やスクロールのロックが続く。
+  // 画面の回転などでこの境界を越えたら閉じる。
+  useEffect(() => {
+    if (!menuOpen) return
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => {
+      if (mq.matches) setMenuOpen(false)
+    }
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [menuOpen])
+
   // キーボード操作。メニューは <body> 末尾に描画されるため、DOM 順のままだと
   // 開閉ボタンの次の Tab が裏の本文へ進んでしまう。開いている間は
   // 開閉ボタンとメニュー内の項目だけを Tab で巡回させ、Escape で閉じて

@@ -1,9 +1,24 @@
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { act } from 'react'
 import { renderWithProviders, screen, userEvent, within } from '@/test/test-utils'
 import { Header } from './Header'
 import { navItems, desktopNavItems } from '@/data/site'
 
 describe('Header', () => {
+  // setup.ts の matchMedia モックは restoreMocks で実装が消えるため、テストごとに用意する
+  // （メニューを開いている間、PC 幅へ広がったかを matchMedia で見ている）。
+  beforeEach(() => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }) as unknown as MediaQueryList,
+    )
+  })
+
   it('ロゴ（ホームへのリンク）が表示される', () => {
     renderWithProviders(<Header />)
 
@@ -157,6 +172,32 @@ describe('Header', () => {
     ;(document.activeElement as HTMLElement | null)?.blur()
     await user.tab({ shift: true })
     expect(items[items.length - 1]).toHaveFocus()
+  })
+
+  it('開いたまま PC 幅（lg 以上）へ広がるとメニューが閉じる', async () => {
+    // matchMedia の change を手動で発火できるようにする
+    let listener: (() => void) | undefined
+    const mql = {
+      matches: false,
+      addEventListener: (_: string, fn: () => void) => {
+        listener = fn
+      },
+      removeEventListener: vi.fn(),
+    }
+    const spy = vi.spyOn(window, 'matchMedia').mockReturnValue(mql as unknown as MediaQueryList)
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    const toggle = screen.getByRole('button', { name: 'メニューを開く' })
+    await user.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(spy).toHaveBeenCalledWith('(min-width: 1024px)')
+
+    mql.matches = true
+    act(() => listener?.())
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(document.body.style.overflow).toBe('')
+    spy.mockRestore()
   })
 
   it('お問い合わせボタンが /contact へリンクしている', () => {
