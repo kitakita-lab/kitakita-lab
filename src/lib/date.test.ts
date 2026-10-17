@@ -11,6 +11,19 @@ describe('formatDate', () => {
     expect(formatDate('2025-12-31')).toBe('2025.12.31')
   })
 
+  it('閲覧者のタイムゾーンに関係なく同じ日付を表示する（UTC より西でも前日にならない）', () => {
+    const original = process.env.TZ
+    try {
+      for (const tz of ['America/Los_Angeles', 'Asia/Tokyo', 'UTC']) {
+        process.env.TZ = tz
+        expect(formatDate('2026-06-01'), tz).toBe('2026.06.01')
+        expect(formatDate('2026-08-31'), tz).toBe('2026.08.31')
+      }
+    } finally {
+      process.env.TZ = original
+    }
+  })
+
   it('不正な日付文字列はそのまま返す（表示を壊さない）', () => {
     expect(formatDate('未定')).toBe('未定')
     expect(formatDate('')).toBe('')
