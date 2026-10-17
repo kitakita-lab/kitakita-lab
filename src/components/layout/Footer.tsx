@@ -1,6 +1,7 @@
 import { footerGroups, site } from '@/data/site'
 import { Logo } from './Logo'
 import { NavLink } from './NavLink'
+import { EmailOff } from '@/components/ui/EmailOff'
 
 export function Footer() {
   const year = new Date().getFullYear()
@@ -22,12 +23,14 @@ export function Footer() {
             {site.email && (
               <p className="mt-4 text-sm text-ink-muted">
                 お問い合わせ：
-                <a
-                  href={`mailto:${site.email}`}
-                  className="break-all underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
-                >
-                  {site.email}
-                </a>
+                <EmailOff>
+                  <a
+                    href={`mailto:${site.email}`}
+                    className="break-all underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+                  >
+                    {site.email}
+                  </a>
+                </EmailOff>
               </p>
             )}
           </div>

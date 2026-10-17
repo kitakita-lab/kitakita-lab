@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
 import { navItems, desktopNavItems } from '@/data/site'
@@ -16,6 +16,8 @@ export function Header() {
   // 描画する。メニューは操作して初めて開くものなので挙動は変わらない。
   const [mounted, setMounted] = useState(false)
   const location = useLocation()
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -39,6 +41,58 @@ export function Header() {
     return () => {
       document.body.style.overflow = ''
     }
+  }, [menuOpen])
+
+  // 開いたまま PC 幅（Tailwind の lg = 1024px）へ広がると、メニューと開閉ボタンは
+  // 非表示になるが状態は開いたまま残り、下の Tab 巡回やスクロールのロックが続く。
+  // 画面の回転などでこの境界を越えたら閉じる。
+  useEffect(() => {
+    if (!menuOpen) return
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => {
+      if (mq.matches) setMenuOpen(false)
+    }
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [menuOpen])
+
+  // キーボード操作。メニューは <body> 末尾に描画されるため、DOM 順のままだと
+  // 開閉ボタンの次の Tab が裏の本文へ進んでしまう。開いている間は
+  // 開閉ボタンとメニュー内の項目だけを Tab で巡回させ、Escape で閉じて
+  // 開閉ボタンへフォーカスを戻す。
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      const toggle = toggleRef.current
+      const menu = menuRef.current
+      if (!toggle || !menu) return
+      if (e.key === 'Escape') {
+        setMenuOpen(false)
+        toggle.focus()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = Array.from(menu.querySelectorAll<HTMLElement>('a[href], button'))
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement
+      let next: HTMLElement | null = null
+      // タップで開くとボタンにフォーカスが移らないブラウザ（iOS Safari など）では
+      // フォーカスが body 等に残るため、外側からの Tab もメニューへ引き込む。
+      if (active !== toggle && !(active && menu.contains(active))) next = e.shiftKey ? last : first
+      else if (!e.shiftKey && active === toggle) next = first
+      else if (!e.shiftKey && active === last) next = toggle
+      else if (e.shiftKey && active === first) next = toggle
+      else if (e.shiftKey && active === toggle) next = last
+      if (next) {
+        e.preventDefault()
+        next.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
   }, [menuOpen])
 
   return (
@@ -78,6 +132,7 @@ export function Header() {
           </div>
 
           <button
+            ref={toggleRef}
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-paper-200 lg:hidden"
             aria-label={menuOpen ? 'メニューを閉じる' : 'メニューを開く'}
@@ -104,6 +159,7 @@ export function Header() {
         createPortal(
         <div
           id="mobile-menu"
+          ref={menuRef}
           className={cn(
             'lg:hidden',
             menuOpen ? 'pointer-events-auto' : 'pointer-events-none',
@@ -112,7 +168,10 @@ export function Header() {
           <div
             className={cn(
               'fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto border-t border-line bg-paper transition-all duration-300 sm:top-18',
-              menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0',
+              // 閉じている間は visibility: hidden にして、Tab の移動先と
+              // 読み上げの対象から外す。visibility は transition-all で
+              // フェードアウトの終了時に切り替わるため、閉じる動きは変わらない。
+              menuOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0',
             )}
           >
             <nav className="container-content py-6" aria-label="モバイルナビゲーション">

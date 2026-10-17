@@ -1,9 +1,24 @@
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { act } from 'react'
 import { renderWithProviders, screen, userEvent, within } from '@/test/test-utils'
 import { Header } from './Header'
 import { navItems, desktopNavItems } from '@/data/site'
 
 describe('Header', () => {
+  // setup.ts の matchMedia モックは restoreMocks で実装が消えるため、テストごとに用意する
+  // （メニューを開いている間、PC 幅へ広がったかを matchMedia で見ている）。
+  beforeEach(() => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }) as unknown as MediaQueryList,
+    )
+  })
+
   it('ロゴ（ホームへのリンク）が表示される', () => {
     renderWithProviders(<Header />)
 
@@ -85,6 +100,104 @@ describe('Header', () => {
     await user.click(within(mobileNav).getByText('Workshop'))
 
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('閉じているモバイルメニューは visibility: hidden（Tab・読み上げの対象外）で、開くと表示される', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    // jsdom は Tailwind の CSS を解釈しないため、付与されるクラスで確認する。
+    const panel = document.querySelector('#mobile-menu > div') as HTMLElement
+    expect(panel).toHaveClass('invisible')
+    expect(panel).not.toHaveClass('visible')
+
+    await user.click(screen.getByRole('button', { name: 'メニューを開く' }))
+    expect(panel).toHaveClass('visible')
+    expect(panel).not.toHaveClass('invisible')
+  })
+
+  it('開いている間は Escape で閉じ、フォーカスが開閉ボタンへ戻る', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    const toggle = screen.getByRole('button', { name: 'メニューを開く' })
+    await user.click(toggle)
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    within(mobileNav).getAllByRole('link')[0].focus()
+
+    await user.keyboard('{Escape}')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveFocus()
+  })
+
+  it('開いている間の Tab は開閉ボタンとメニュー内の項目だけを巡回する', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    const toggle = screen.getByRole('button', { name: 'メニューを開く' })
+    await user.click(toggle)
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    const items = within(mobileNav).getAllByRole('link')
+    const first = items[0]
+    const last = items[items.length - 1]
+
+    toggle.focus()
+    await user.tab()
+    expect(first).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(toggle).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(last).toHaveFocus()
+
+    await user.tab()
+    expect(toggle).toHaveFocus()
+  })
+
+  it('フォーカスがメニューの外（body 等）にあるときも、Tab でメニューへ入る', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    await user.click(screen.getByRole('button', { name: 'メニューを開く' }))
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    const items = within(mobileNav).getAllByRole('link')
+
+    // iOS Safari ではタップしてもボタンにフォーカスが移らない状況を再現する
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    expect(document.body).toHaveFocus()
+    await user.tab()
+    expect(items[0]).toHaveFocus()
+
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    await user.tab({ shift: true })
+    expect(items[items.length - 1]).toHaveFocus()
+  })
+
+  it('開いたまま PC 幅（lg 以上）へ広がるとメニューが閉じる', async () => {
+    // matchMedia の change を手動で発火できるようにする
+    let listener: (() => void) | undefined
+    const mql = {
+      matches: false,
+      addEventListener: (_: string, fn: () => void) => {
+        listener = fn
+      },
+      removeEventListener: vi.fn(),
+    }
+    const spy = vi.spyOn(window, 'matchMedia').mockReturnValue(mql as unknown as MediaQueryList)
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    const toggle = screen.getByRole('button', { name: 'メニューを開く' })
+    await user.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(spy).toHaveBeenCalledWith('(min-width: 1024px)')
+
+    mql.matches = true
+    act(() => listener?.())
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(document.body.style.overflow).toBe('')
+    spy.mockRestore()
   })
 
   it('お問い合わせボタンが /contact へリンクしている', () => {
