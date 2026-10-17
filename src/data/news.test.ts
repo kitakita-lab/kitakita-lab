@@ -24,6 +24,21 @@ describe('news データ', () => {
     }
   })
 
+  it('正式な公開日が確定した 3 件は、その日付で表示し「公開準備中」を出さない', () => {
+    const expected: Record<string, string> = {
+      'kitakita-lab-launch': '2026-06-01',
+      'creators-recruitment-open': '2026-08-31',
+      'research-coming-soon': '2026-07-27',
+    }
+    for (const [slug, date] of Object.entries(expected)) {
+      const item = newsItems.find((n) => n.slug === slug)
+      expect(item, slug).toBeDefined()
+      expect(item?.date, slug).toBe(date)
+      expect(item?.dateLabel, slug).toBeUndefined()
+    }
+    expect(newsItems.some((n) => n.dateLabel === '公開準備中')).toBe(false)
+  })
+
   it('sortedNews は日付の新しい順に並んでいる', () => {
     for (let i = 1; i < sortedNews.length; i++) {
       const prev = new Date(sortedNews[i - 1].date).getTime()

@@ -18,6 +18,9 @@ export const site = {
   // 問い合わせ先メールアドレス。Footer / Contact ページのメール表示と
   // mailto リンク・コピーボタンに使われる。
   email: 'hello@kitakita-lab.com',
+  // 運営主体。KitaKita Lab は個人事業「きたきた」が運営する（法人ではない）。
+  // 屋号のみを表記し、個人名・住所・電話番号は載せない。
+  operator: 'きたきた（個人事業）',
   locale: 'ja_JP',
 } as const
 

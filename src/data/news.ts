@@ -164,8 +164,7 @@ export const newsItems: NewsItem[] = [
     slug: 'kitakita-lab-launch',
     title: 'KitaKita Lab を始動しました',
     titleSegments: ['KitaKita Lab を', '始動しました'],
-    date: '2025-04-01',
-    dateLabel: '公開準備中',
+    date: '2026-06-01',
     category: 'お知らせ',
     excerpt:
       'ハンドメイド作家が「ちょっと進めてみる」ための場所として、プロジェクト「KitaKita Lab」を始動しました。',
@@ -179,8 +178,7 @@ export const newsItems: NewsItem[] = [
     slug: 'creators-recruitment-open',
     title: '一緒に活動する作家を募集しています',
     titleSegments: ['一緒に活動する', '作家を', '募集しています'],
-    date: '2025-04-15',
-    dateLabel: '公開準備中',
+    date: '2026-08-31',
     category: 'お知らせ',
     excerpt:
       'KitaKita Labの考え方に共感してくださる作家を募集しています。「ちょっと進めてみたい」気持ちを、かたちにしませんか。',
@@ -194,8 +192,7 @@ export const newsItems: NewsItem[] = [
     slug: 'research-coming-soon',
     title: '商業施設でのワークショップ需要について、調査を進めています',
     titleSegments: ['商業施設での', 'ワークショップ', '需要について、', '調査を進めています'],
-    date: '2025-05-01',
-    dateLabel: '公開準備中',
+    date: '2026-07-27',
     category: 'お知らせ',
     excerpt:
       '商業施設でのワークショップ・体験イベントの需要について、北海道在住の20〜50代を対象とした調査を進めていました。結果はResearchページで公開しています。',
