@@ -5,6 +5,7 @@ import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
 import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
+import { EmailOff } from '@/components/ui/EmailOff'
 import { site } from '@/data/site'
 import { useRef, useState } from 'react'
 
@@ -108,22 +109,24 @@ function MailContact() {
         <Icon name="mail" size={20} />
       </span>
       <h2 className="mt-4 text-sm font-normal text-ink-muted">メールでのお問い合わせ</h2>
-      <p
-        ref={addressRef}
-        className="mt-2 select-all break-all text-2xl text-ink sm:text-3xl"
-      >
-        {site.email}
-      </p>
+      <EmailOff>
+        <p
+          ref={addressRef}
+          className="mt-2 select-all break-all text-2xl text-ink sm:text-3xl"
+        >
+          {site.email}
+        </p>
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <Button href={buildMailtoHref()} size="lg">
-          <Icon name="mail" size={18} />
-          メールで問い合わせる
-        </Button>
-        <Button type="button" variant="secondary" size="lg" onClick={handleCopy}>
-          アドレスをコピー
-        </Button>
-      </div>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Button href={buildMailtoHref()} size="lg">
+            <Icon name="mail" size={18} />
+            メールで問い合わせる
+          </Button>
+          <Button type="button" variant="secondary" size="lg" onClick={handleCopy}>
+            アドレスをコピー
+          </Button>
+        </div>
+      </EmailOff>
 
       <p className="mt-3 min-h-[1.5rem] text-sm text-clay-600" role="status" aria-live="polite">
         {copyState === 'copied' && 'メールアドレスをコピーしました。'}

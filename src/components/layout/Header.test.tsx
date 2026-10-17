@@ -87,6 +87,59 @@ describe('Header', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
+  it('閉じているモバイルメニューは visibility: hidden（Tab・読み上げの対象外）で、開くと表示される', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    // jsdom は Tailwind の CSS を解釈しないため、付与されるクラスで確認する。
+    const panel = document.querySelector('#mobile-menu > div') as HTMLElement
+    expect(panel).toHaveClass('invisible')
+    expect(panel).not.toHaveClass('visible')
+
+    await user.click(screen.getByRole('button', { name: 'メニューを開く' }))
+    expect(panel).toHaveClass('visible')
+    expect(panel).not.toHaveClass('invisible')
+  })
+
+  it('開いている間は Escape で閉じ、フォーカスが開閉ボタンへ戻る', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    const toggle = screen.getByRole('button', { name: 'メニューを開く' })
+    await user.click(toggle)
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    within(mobileNav).getAllByRole('link')[0].focus()
+
+    await user.keyboard('{Escape}')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveFocus()
+  })
+
+  it('開いている間の Tab は開閉ボタンとメニュー内の項目だけを巡回する', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Header />)
+
+    const toggle = screen.getByRole('button', { name: 'メニューを開く' })
+    await user.click(toggle)
+    const mobileNav = screen.getByRole('navigation', { name: 'モバイルナビゲーション' })
+    const items = within(mobileNav).getAllByRole('link')
+    const first = items[0]
+    const last = items[items.length - 1]
+
+    toggle.focus()
+    await user.tab()
+    expect(first).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(toggle).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(last).toHaveFocus()
+
+    await user.tab()
+    expect(toggle).toHaveFocus()
+  })
+
   it('お問い合わせボタンが /contact へリンクしている', () => {
     renderWithProviders(<Header />)
 
