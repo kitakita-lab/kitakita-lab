@@ -47,13 +47,6 @@ describe('Footer', () => {
     ).toBeInTheDocument()
   })
 
-  it('運営主体を屋号で表記する（運営：きたきた（個人事業））', () => {
-    renderWithProviders(<Footer />)
-
-    expect(screen.getByText(`運営：${site.operator}`)).toBeInTheDocument()
-    expect(site.operator).toBe('きたきた（個人事業）')
-  })
-
   it('読みの「キタキタラボ」を単独では表示しない（可視表記は KitaKita Lab に統一）', () => {
     renderWithProviders(<Footer />)
 

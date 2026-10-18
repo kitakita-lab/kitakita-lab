@@ -62,7 +62,6 @@ export function Footer() {
           <p>
             © {year} {site.name}. All rights reserved.
           </p>
-          <p>運営：{site.operator}</p>
         </div>
       </div>
     </footer>
