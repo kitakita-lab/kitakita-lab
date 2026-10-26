@@ -1,4 +1,4 @@
-export const CODEX_LOGIN_PREFIX: string
+export const CODEX_LOGIN: string
 
 export type CodexComment = { login: string; body: string; updatedAt?: string }
 export type CodexThread = { resolved: boolean; outdated?: boolean }

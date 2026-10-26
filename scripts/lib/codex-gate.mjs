@@ -17,12 +17,17 @@
  * 取得できなかった項目は合格扱いにしない（threads が null なら PENDING）。
  */
 
-export const CODEX_LOGIN_PREFIX = 'chatgpt-codex-connector'
+/**
+ * Codex の GitHub App のログイン名（完全一致で照合する）。
+ * 「[bot]」で終わる名前は GitHub App にしか付かないため、利用者が同じ名前を名乗ることはできない。
+ * 前方一致にすると `chatgpt-codex-connector-fake` のようなアカウントのコメントを信用してしまう。
+ */
+export const CODEX_LOGIN = 'chatgpt-codex-connector[bot]'
 
 const STATE_RE = /<!--\s*codex-review-state:v1\s*(\{[\s\S]*?\})\s*-->/
 const RECEIPT_RE = /codex-review-receipt:v1[\s\S]*?Reviewed commit:\*{0,2}\s*`([0-9a-f]{7,40})`/
 
-const isCodex = (login) => typeof login === 'string' && login.startsWith(CODEX_LOGIN_PREFIX)
+const isCodex = (login) => login === CODEX_LOGIN
 
 /** 要約コメントから state を取り出す（最後に更新されたものを採用） */
 export function parseCodexState(comments) {

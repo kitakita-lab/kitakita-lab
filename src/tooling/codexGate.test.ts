@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { evaluateCodex, parseCodexState, receiptCommits } from '../../scripts/lib/codex-gate.mjs'
+import { parseDeployArgs } from '../../scripts/lib/deploy-args.mjs'
 
 /**
  * Codex レビューの合否判定（scripts/lib/codex-gate.mjs）のテスト。
@@ -98,6 +99,17 @@ describe('evaluateCodex', () => {
     expect(parseCodexState([fake])).toBeNull()
   })
 
+  it('Codex に似た名前のアカウント（前方一致）が書いた state・受領は信用しない', () => {
+    const login = 'chatgpt-codex-connector-fake'
+    const r = evaluateCodex({
+      headSha: HEAD,
+      comments: [{ ...summary(HEAD, 'completed', false), login }, { ...receipt(HEAD), login }],
+      reviews: [],
+      threads: [],
+    })
+    expect(r.verdict).toBe('PENDING')
+  })
+
   it('要約コメントが複数あれば、最後に更新されたものを使う', () => {
     const s = parseCodexState([summary(HEAD, 'completed', false, '2026-10-17T23:00:00Z'), summary(OLD, 'completed', true, '2026-10-17T22:00:00Z')])
     expect(s?.code_review?.commit_sha).toBe(HEAD)
@@ -105,5 +117,19 @@ describe('evaluateCodex', () => {
 
   it('壊れた state は null（合格扱いにしない）', () => {
     expect(parseCodexState([{ login: BOT, body: '<!-- codex-review-state:v1 {broken} -->' }])).toBeNull()
+  })
+})
+
+describe('parseDeployArgs', () => {
+  it('--expect がなければ URL をすべて残す', () => {
+    expect(parseDeployArgs(['https://a.example/x'])).toEqual({ urls: ['https://a.example/x'], expect: undefined })
+  })
+
+  it('--expect とその値だけを取り除く（位置を問わない）', () => {
+    expect(parseDeployArgs(['https://a.example/x', '--expect', 'タイトル', 'https://a.example/y'])).toEqual({
+      urls: ['https://a.example/x', 'https://a.example/y'],
+      expect: 'タイトル',
+    })
+    expect(parseDeployArgs(['--expect', 'タイトル', 'https://a.example/x'])).toEqual({ urls: ['https://a.example/x'], expect: 'タイトル' })
   })
 })

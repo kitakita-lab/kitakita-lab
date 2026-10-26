@@ -14,6 +14,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { evaluateCodex } from './lib/codex-gate.mjs'
+import { parseDeployArgs } from './lib/deploy-args.mjs'
 
 const repo =
   process.env.GH_REPO ??
@@ -120,9 +121,7 @@ let result
 if (cmd === 'codex' && arg) result = codex(arg)
 else if (cmd === 'checks' && arg) result = checks(arg)
 else if (cmd === 'deploy' && arg) {
-  const i = rest.indexOf('--expect')
-  const expect = i >= 0 ? rest[i + 1] : undefined
-  const urls = rest.filter((v, j) => v !== '--expect' && j !== i + 1)
+  const { urls, expect } = parseDeployArgs(rest)
   result = await deploy(arg, urls, expect)
 } else {
   console.error('使い方: node scripts/pr-gates.mjs codex <PR> | checks <PR> | deploy <commit> [URL ...] [--expect 文字列]')
