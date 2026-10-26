@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest'
+import fs from 'node:fs'
+import path from 'node:path'
+import { inspectImageMetadata } from '../../scripts/lib/image-metadata.mjs'
 import { events, sortedEvents, brandJourney } from './events'
 
 /**
@@ -54,6 +57,90 @@ describe('events データ', () => {
     for (const e of events) {
       expect(e.overview.length, `${e.slug} の overview`).toBeGreaterThan(0)
       expect(e.excerpt.trim().length, `${e.slug} の excerpt`).toBeGreaterThan(0)
+    }
+  })
+})
+
+/**
+ * 公開前チェック（実績更新ハーネス。docs/EVENT-UPDATE.md）。
+ * 実施報告書と写真から実績を追加するときに、機械的に判定できるものをここで止める。
+ * 文章の自然さ・写真の公開可否など、機械で判定できないものは EVENT-UPDATE.md のチェックリストで扱う。
+ */
+describe('events データ（公開前チェック）', () => {
+  const PUBLIC_DIR = path.resolve(process.cwd(), 'public')
+  const MAX_IMAGE_BYTES = 500 * 1024
+  const images = (e: (typeof events)[number]) =>
+    [
+      e.heroImage && { src: e.heroImage.src, alt: e.heroImage.alt },
+      e.heroImageMobile && { src: e.heroImageMobile.src, alt: e.heroImage?.alt ?? '' },
+      ...(e.photos ?? []),
+    ].filter((x): x is { src: string; alt: string } => Boolean(x))
+
+  it('画像ファイルが実在し、500KB 以下で、撮影情報・位置情報などのメタデータを含まない', () => {
+    for (const e of events) {
+      for (const { src } of images(e)) {
+        const file = path.join(PUBLIC_DIR, src)
+        expect(fs.existsSync(file), `${e.slug}: ${src} が public/ にない`).toBe(true)
+        const buf = fs.readFileSync(file)
+        expect(buf.length, `${e.slug}: ${src} のサイズ`).toBeLessThanOrEqual(MAX_IMAGE_BYTES)
+        // ファイル構造をたどり、表示に必要な部分以外（EXIF・XMP・IPTC・PNG/WebP のテキストや EXIF など）がないこと。
+        // 解析できない画像も合格にしない（scripts/lib/image-metadata.mjs）。写真は prepare-event-photos.mjs で書き出す
+        const meta = inspectImageMetadata(buf)
+        expect(meta.error, `${e.slug}: ${src} を解析できない`).toBeUndefined()
+        expect(meta.findings, `${e.slug}: ${src} にメタデータが残っている`).toEqual([])
+        expect(meta.ok, `${e.slug}: ${src}`).toBe(true)
+      }
+    }
+  })
+
+  it('画像の alt が空でなく、ファイル名のままでもない', () => {
+    for (const e of events) {
+      for (const { src, alt } of images(e)) {
+        expect(alt.trim().length, `${e.slug}: ${src} の alt`).toBeGreaterThan(5)
+        expect(alt, `${e.slug}: ${src} の alt`).not.toMatch(/\.(jpe?g|png|webp)$|^IMG_|^DSC/i)
+      }
+    }
+  })
+
+  it('dateISO は会期（dateLabel）の初日と一致する', () => {
+    for (const e of events) {
+      const m = e.dateLabel.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日/)
+      expect(m, `${e.slug} の dateLabel`).not.toBeNull()
+      const [, y, mo, d] = m!
+      expect(e.dateISO, `${e.slug}`).toBe(`${y}-${mo.padStart(2, '0')}-${d.padStart(2, '0')}`)
+    }
+  })
+
+  it('日別の数字の合計が参加実績（組数・人数・制作数）と一致する', () => {
+    const stat = (e: (typeof events)[number], label: string) => {
+      const v = e.stats?.find((s) => s.label === label)?.value
+      return v === undefined ? undefined : Number(v.replace(/[^\d]/g, ''))
+    }
+    for (const e of events) {
+      const days = e.dayReports ?? []
+      if (days.length === 0) continue
+      for (const [unit, label] of [
+        ['組', '総参加組数'],
+        ['名', '総参加人数'],
+        ['本', 'フラワーボトル制作数'],
+      ] as const) {
+        // 各日の本文で最初に出てくる「N組」「N名」「N本」をその日の数字とする（全日にある場合だけ検算）
+        const nums = days.map((d) => d.body.match(new RegExp(`(\\d+)${unit}`))?.[1])
+        const total = stat(e, label)
+        if (total === undefined || nums.some((n) => n === undefined)) continue
+        expect(nums.reduce((a, n) => a + Number(n), 0), `${e.slug}: 日別の${unit}の合計`).toBe(total)
+      }
+      const dayCount = e.stats?.map((s) => s.value.match(/^(\d+)日間$/)?.[1]).find(Boolean)
+      if (dayCount) expect(days.length, `${e.slug}: 開催日数と日別レポートの数`).toBe(Number(dayCount))
+    }
+  })
+
+  it('報告書の宛先・企業名・連絡先を掲載しない', () => {
+    // 実施報告書にある提出先（「〜 御中」）、企業名、担当者のメールアドレスなど
+    const forbidden = [/御中/, /株式会社/, /J\.?C\.?O\.?S/i, /[\w.+-]+@[\w-]+\.[\w.]+/, /担当[:：]/]
+    for (const e of events) {
+      const text = JSON.stringify(e)
+      for (const re of forbidden) expect(text, `${e.slug} に ${re} が含まれる`).not.toMatch(re)
     }
   })
 })
