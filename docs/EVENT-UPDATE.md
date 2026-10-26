@@ -57,7 +57,7 @@
 
 - 受け取る形式: JPEG・PNG・WebP（HEIC は先に JPEG へ変換）。長辺 2000px 以上が望ましい。
 - 書き出し: `npm run photos:prepare -- <slug> hero=<元画像>:16x9 venue=<元画像> ...`
-  （規格サイズに切り抜き、500KB 以下、EXIF・位置情報を除去。`@x%,y%` で切り抜きの中心を指定）
+  （規格サイズに切り抜き、500KB 以下。EXIF・XMP・PNG/WebP のテキストなどのメタデータを残さず、書き出した画像を検査する。`@x%,y%` で切り抜きの中心を指定）
 
 公開可否（AI が判断し、迷ったら止める）:
 
@@ -82,7 +82,7 @@
 | チェック | 実行 | 判定すること |
 |---|---|---|
 | 型・Lint・テスト・ビルド | `npm run typecheck && npm run lint && npm run test:coverage && npm run build` | CI と同じ。ビルドはページごとの title 重複・meta 重複・本文欠落でも失敗する |
-| 公開前チェック（`src/data/events.test.ts`） | 上のテストに含まれる | 画像の実在・500KB 以下・EXIF なし・alt／`dateISO` と会期の一致／日別の合計＝総数／宛先・企業名・メールアドレスを含まない |
+| 公開前チェック（`src/data/events.test.ts`） | 上のテストに含まれる | 画像の実在・500KB 以下・メタデータなし（JPEG・PNG・WebP の構造をたどり、表示に必要な部分以外があれば不合格。解析できない画像も不合格）・alt／`dateISO` と会期の一致／日別の合計＝総数／宛先・企業名・メールアドレスを含まない |
 | 表示 | `npm run check:visual -- --shots /events/<slug>,/events` | 全ページ × 6 幅（320〜1440px）で横スクロール・読み込めない画像・JS エラーがない。スクリーンショットを保存 |
 | 変更範囲 | `git diff --name-only origin/main...HEAD` | 「0. 対象範囲」のファイルだけ |
 | CI | `npm run gate:checks -- <PR>` | Quality Checks・Cloudflare Pages（プレビュー）が成功 |
@@ -167,7 +167,7 @@ Claude Code のクラウド環境では、ネットワーク設定の許可ド�
 状態: 公開済み（本番 URL で確認）｜デプロイ済み・本番 URL 未確認｜停止（理由）
 PR: #<番号>（Codex: PASS／レビュー n 回・指摘 n 件対応）
 数字: <組>・<名>・<本>（報告書と一致、日別合計も一致）
-写真: <枚数>（EXIF 除去・500KB 以下）
+写真: <枚数>（メタデータなし・500KB 以下）
 確認: テスト n 件・ビルド・表示 28 ページ × 6 幅 問題 0
 スクリーンショット: <保存場所>
 要確認: <あれば>

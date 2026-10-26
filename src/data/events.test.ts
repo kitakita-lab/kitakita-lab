@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+import { inspectImageMetadata } from '../../scripts/lib/image-metadata.mjs'
 import { events, sortedEvents, brandJourney } from './events'
 
 /**
@@ -75,15 +76,19 @@ describe('events データ（公開前チェック）', () => {
       ...(e.photos ?? []),
     ].filter((x): x is { src: string; alt: string } => Boolean(x))
 
-  it('画像ファイルが実在し、500KB 以下で、撮影情報（EXIF・位置情報）を含まない', () => {
+  it('画像ファイルが実在し、500KB 以下で、撮影情報・位置情報などのメタデータを含まない', () => {
     for (const e of events) {
       for (const { src } of images(e)) {
         const file = path.join(PUBLIC_DIR, src)
         expect(fs.existsSync(file), `${e.slug}: ${src} が public/ にない`).toBe(true)
         const buf = fs.readFileSync(file)
         expect(buf.length, `${e.slug}: ${src} のサイズ`).toBeLessThanOrEqual(MAX_IMAGE_BYTES)
-        // JPEG の APP1 Exif（撮影日時・機種・GPS など）。scripts/prepare-event-photos.mjs で取り除く
-        expect(buf.subarray(0, 65536).includes(Buffer.from('Exif\0\0', 'binary')), `${e.slug}: ${src} に EXIF が残っている`).toBe(false)
+        // ファイル構造をたどり、表示に必要な部分以外（EXIF・XMP・IPTC・PNG/WebP のテキストや EXIF など）がないこと。
+        // 解析できない画像も合格にしない（scripts/lib/image-metadata.mjs）。写真は prepare-event-photos.mjs で書き出す
+        const meta = inspectImageMetadata(buf)
+        expect(meta.error, `${e.slug}: ${src} を解析できない`).toBeUndefined()
+        expect(meta.findings, `${e.slug}: ${src} にメタデータが残っている`).toEqual([])
+        expect(meta.ok, `${e.slug}: ${src}`).toBe(true)
       }
     }
   })

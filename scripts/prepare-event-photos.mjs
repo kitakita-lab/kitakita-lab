@@ -13,17 +13,19 @@
  * @x%,y% は切り抜きの中心（省略時 50%,50%）。
  *
  * - 出力: public/events/<slug>/<名前>.jpg（JPEG。500KB を超えないよう画質を自動調整）
- * - ブラウザ（Chromium）の canvas で描き直すため、EXIF（撮影日時・機種・GPS）は残らない。
- *   向き（EXIF Orientation）は描画時に反映される。
+ * - ブラウザ（Chromium）の canvas で描き直すため、EXIF・XMP・PNG/WebP のテキストなどのメタデータは残らない。
+ *   向き（EXIF Orientation）は描画時に反映される。書き出した画像は scripts/lib/image-metadata.mjs で検査し、
+ *   通らなければ保存しない。
  * - 入力は JPEG / PNG / WebP。HEIC は Chromium が読めないため、先に JPEG へ変換する。
  * - 元画像より大きくは引き伸ばさない（足りない場合は警告して元の解像度のまま書き出す）。
  */
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { homedir } from 'node:os'
 import { launchChromium } from './lib/browser.mjs'
+import { inspectImageMetadata } from './lib/image-metadata.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SIZES = { '16x9': [1600, 900], '4x3': [1200, 900], '1x1': [1000, 1000] }
@@ -99,6 +101,14 @@ for (const job of jobs) {
   )
   const out = join(outDir, `${job.name}.jpg`)
   const buf = Buffer.from(result.b64, 'base64')
+  // 書き出した画像を、公開前チェック（events.test.ts）と同じ検査にかける。通らなければ残さない
+  const meta = inspectImageMetadata(buf)
+  if (!meta.ok) {
+    await rm(out, { force: true })
+    console.error(`${job.name}: 書き出した画像にメタデータが残っている、または解析できない: ${[...meta.findings, meta.error].filter(Boolean).join(' / ')}`)
+    process.exitCode = 1
+    continue
+  }
   await writeFile(out, buf)
   report.push({
     file: `public/events/${slug}/${job.name}.jpg`,
