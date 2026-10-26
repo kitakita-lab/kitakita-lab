@@ -48,10 +48,21 @@ function reviewThreads(pr) {
   const ccr = gh(`repos/${repo}/pulls/${pr}/ccr/review_threads`, { allowFail: true })
   if (Array.isArray(ccr)) return ccr.map((t) => ({ resolved: Boolean(t.resolved), outdated: Boolean(t.outdated) }))
   const [owner, name] = repo.split('/')
+  // GraphQL は 1 回 100 件まで。hasNextPage が続く限りたどり、途中で失敗したら null（合格扱いにしない）
+  const threads = []
+  let after = null
   try {
-    const q = `query{repository(owner:"${owner}",name:"${name}"){pullRequest(number:${Number(pr)}){reviewThreads(first:100){nodes{isResolved isOutdated}}}}}`
-    const res = JSON.parse(execFileSync('gh', ['api', 'graphql', '-f', `query=${q}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }))
-    return res.data.repository.pullRequest.reviewThreads.nodes.map((t) => ({ resolved: t.isResolved, outdated: t.isOutdated }))
+    for (let page = 0; page < 50; page++) {
+      const q = `query($after:String){repository(owner:"${owner}",name:"${name}"){pullRequest(number:${Number(pr)}){reviewThreads(first:100,after:$after){nodes{isResolved isOutdated} pageInfo{hasNextPage endCursor}}}}}`
+      const args = ['api', 'graphql', '-f', `query=${q}`]
+      if (after) args.push('-f', `after=${after}`)
+      const res = JSON.parse(execFileSync('gh', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }))
+      const conn = res.data.repository.pullRequest.reviewThreads
+      threads.push(...conn.nodes.map((t) => ({ resolved: t.isResolved, outdated: t.isOutdated })))
+      if (!conn.pageInfo.hasNextPage) return threads
+      after = conn.pageInfo.endCursor
+    }
+    return null // 上限まで続いた場合も全件を確認できていない
   } catch {
     return null
   }
