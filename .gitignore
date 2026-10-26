@@ -40,3 +40,6 @@ dist-ssr
 
 # Test coverage output
 coverage
+
+# scripts/visual-check.mjs のスクリーンショット
+visual-check/
