@@ -9,6 +9,7 @@ Vite + React 18 の SPA を、ビルド時に全ページ静的 HTML へプリ�
 ```
 npm run typecheck && npm run lint && npm run test:coverage && npm run build   # CI と同じ
 npm run check:visual -- --shots /events/<slug>   # 全ページ × 6 幅の表示確認（要 playwright-core）
+npm run photos:audit                              # 公開中のヒーロー画像の明るさ（中央値 L*）の点検
 ```
 
 playwright は devDependencies に含めていない。必要なときは `npm i --no-save playwright-core`
