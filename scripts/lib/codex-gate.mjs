@@ -158,15 +158,24 @@ export function planCodexReview({ headSha, headCommittedAt, now, comments, revie
   const judged = evaluateCodex({ headSha, comments, reviews, threads })
   const requests = codexRequests(comments, headSha, headCommittedAt)
   const onHead = requests.filter((r) => r.forHead)
-  // 依頼がなくても Codex が head のレビューを始めている（PR 作成時の自動レビューなど）なら、それを依頼とみなす
+  // 依頼より前に Codex が head のレビューを始めている（PR 作成時の自動レビューなど）なら、それを最初の依頼とみなす
   const running = latestCodexStateComment(comments)
-  if (onHead.length === 0 && running?.state.code_review?.commit_sha === headSha && running.state.code_review.status !== 'completed') {
-    onHead.push({ sha: headSha, kind: 'auto', at: running.updatedAt ?? '', forHead: true })
+  const startedAt = running?.updatedAt ?? ''
+  if (
+    running?.state.code_review?.commit_sha === headSha &&
+    running.state.code_review.status !== 'completed' &&
+    (onHead.length === 0 || (startedAt && startedAt < onHead[0].at))
+  ) {
+    onHead.unshift({ sha: headSha, kind: 'auto', at: startedAt, forHead: true })
   }
+  // 再依頼の目印は、その前に最初の依頼（自動レビューを含む）があったことを示す。
+  // 自動レビューの記録（要約コメント）が再依頼の後に更新されて数えられなくなっても、再依頼を重ねないようにする
+  const impliedFirst = onHead.some((r) => r.kind === 'rerequest') && !onHead.some((r) => r.kind !== 'rerequest') ? 1 : 0
+  const requestCount = onHead.length + impliedFirst
   // レビューした（依頼した）commit の数。受領と目印付き依頼の commit を合わせて数える
   const commits = new Set([...receiptCommits([...comments, ...reviews]).map((s) => s.slice(0, 10)), ...requests.filter((r) => r.sha).map((r) => r.sha.slice(0, 10))])
   const roundsUsed = commits.size
-  const base = { verdict: judged.verdict, requestsOnHead: onHead.length, roundsUsed }
+  const base = { verdict: judged.verdict, requestsOnHead: requestCount, roundsUsed }
 
   if (judged.verdict === 'PASS') return { ...base, action: 'done', elapsedMinutes: null, reasons: judged.reasons }
   if (judged.verdict === 'FAIL') {
@@ -187,13 +196,13 @@ export function planCodexReview({ headSha, headCommittedAt, now, comments, revie
   if (elapsedMinutes < policy.stallMinutes) {
     return { ...base, action: 'wait', elapsedMinutes, reasons: [...judged.reasons, `依頼から ${Math.floor(elapsedMinutes)} 分（${policy.stallMinutes} 分まで待つ）`] }
   }
-  if (onHead.length < policy.maxRequestsPerCommit) {
+  if (requestCount < policy.maxRequestsPerCommit) {
     return { ...base, action: 'rerequest', elapsedMinutes, reasons: [...judged.reasons, `依頼から ${policy.stallMinutes} 分以上たっても完了しない`] }
   }
   return {
     ...base,
     action: 'stop',
     elapsedMinutes,
-    reasons: [...judged.reasons, `同じ commit への依頼が ${onHead.length} 回、最後の依頼から ${policy.stallMinutes} 分以上たっても完了しない`],
+    reasons: [...judged.reasons, `同じ commit への依頼が ${requestCount} 回、最後の依頼から ${policy.stallMinutes} 分以上たっても完了しない`],
   }
 }

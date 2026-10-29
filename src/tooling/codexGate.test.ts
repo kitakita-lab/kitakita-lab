@@ -198,6 +198,24 @@ describe('planCodexReview', () => {
     expect(r.action).toBe('wait')
   })
 
+  it('自動レビューの後に再依頼したら、要約が再依頼の後に更新されても 2 回目の再依頼はしない（Codex の指摘 #85）', () => {
+    // 12:29:30 自動で running → 13:00 再依頼 → 13:00:20 要約が running のまま更新 → 13:31 時点
+    const r = plan([running(HEAD, '2026-10-29T13:00:20Z'), marked(HEAD, 'rerequest', '2026-10-29T13:00:00Z')], '2026-10-29T13:31:00Z')
+    expect(r.requestsOnHead).toBe(2)
+    expect(r.action).toBe('stop')
+  })
+
+  it('自動レビューが依頼より前に始まっていれば、最初の依頼として数える', () => {
+    const r = plan([running(HEAD, '2026-10-29T12:29:30Z'), marked(HEAD, 'rerequest', '2026-10-29T13:00:00Z')], '2026-10-29T13:31:00Z')
+    expect(r.requestsOnHead).toBe(2)
+    expect(r.action).toBe('stop')
+  })
+
+  it('依頼の後に running になった要約は、自動レビューとして数えない（依頼への応答）', () => {
+    const r = plan([req('2026-10-29T12:30:54Z'), running(HEAD, '2026-10-29T12:31:15Z')], '2026-10-29T12:40:00Z')
+    expect(r.requestsOnHead).toBe(1)
+  })
+
   it('Codex の要約に含まれる「@codex review」の文字列は依頼として数えない', () => {
     expect(codexRequests([{ login: BOT, body: 'Comment "@codex review" or "@codex security review".', createdAt: '2026-10-29T12:40:00Z' }], HEAD, COMMITTED)).toEqual([])
   })
