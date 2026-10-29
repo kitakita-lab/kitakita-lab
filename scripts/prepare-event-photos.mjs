@@ -2,7 +2,7 @@
  * 実績ページ用の写真を、サイトの規格に揃えて書き出す（実績更新ハーネス。docs/EVENT-UPDATE.md）。
  *
  *   node scripts/prepare-event-photos.mjs <slug> <名前>=<元画像>[:<比率>][*<幅>%][@<x>%,<y>%][<±n>ev] ...
- *   node scripts/prepare-event-photos.mjs --audit [<slug> ...]     … 公開中の画像の明るさを監査する（書き出さない）
+ *   node scripts/prepare-event-photos.mjs --audit [<slug> ...]     … 公開中のヒーロー画像の明るさを監査する（書き出さない。対象は events.ts から）
  *
  *   例: node scripts/prepare-event-photos.mjs ario-sapporo-harvest-court-2026-10 \
  *         hero=~/photos/IMG_0101.jpg:16x9@50%,40% venue=~/photos/IMG_0102.jpg making=~/photos/IMG_0110.jpg
@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url'
 import { homedir } from 'node:os'
 import { launchChromium } from './lib/browser.mjs'
 import { inspectImageMetadata } from './lib/image-metadata.mjs'
-import { SRGB_TO_LINEAR, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, exposePixel } from './lib/photo-tone.mjs'
+import { SRGB_TO_LINEAR, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, exposePixel, heroImagesFromEventsSource } from './lib/photo-tone.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SIZES = { '16x9': [1600, 900], '4x3': [1200, 900], '1x1': [1000, 1000] }
@@ -73,13 +73,16 @@ const describe = (hist) => {
 }
 
 if (audit) {
-  // 公開中の実績画像（ヒーロー）の明るさを監査する。書き出しはしない
-  const eventsDir = join(root, 'public', 'events')
+  // 公開中の実績画像（ヒーロー）の明るさを監査する。書き出しはしない。
+  // 対象は src/data/events.ts の heroImage・heroImageMobile（public/events/ 以外の共有画像も含む）
+  const records = heroImagesFromEventsSource(await readFile(join(root, 'src', 'data', 'events.ts'), 'utf8'))
   const slugs = args.slice(1)
-  const targets = []
-  for (const s of slugs.length ? slugs : (await readdir(eventsDir)).sort()) {
-    for (const f of (await readdir(join(eventsDir, s)).catch(() => [])).sort()) if (/^hero.*\.(jpe?g|png|webp)$/.test(f)) targets.push(join(eventsDir, s, f))
+  const unknown = slugs.filter((s) => !records.some((r) => r.slug === s))
+  if (unknown.length) {
+    console.error(`実績が見つからない: ${unknown.join(', ')}`)
+    process.exit(1)
   }
+  const targets = records.filter((r) => !slugs.length || slugs.includes(r.slug)).flatMap((r) => r.srcs.map((src) => join(root, 'public', src)))
   const rows = []
   for (const file of targets) {
     const dataUrl = `data:${MIME[extname(file).toLowerCase()]};base64,${(await readFile(file)).toString('base64')}`

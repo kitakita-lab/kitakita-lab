@@ -5,7 +5,7 @@
  * 画素の sRGB をリニアに戻して輝度 Y（Rec.709 の係数）を求め、L* に換算する。
  *
  * 「暗い」の基準（ヒーロー画像）: 中央値 L* が 42 未満（画面の半分以上が、中間の灰色より明らかに暗い）。
- *   公開済みの実績のヒーロー（7 枚。npm run photos:audit、2026-10-29）は中央値 49.8〜69.5 で、
+ *   公開済みの実績のヒーロー（8 枚。npm run photos:audit、2026-10-29）は中央値 49.8〜73.1 で、
  *   ザ・ビッグ厚別店のヒーロー（中央値 36.4）だけがこの基準に当たった。
  *   L* 25 未満の画素の割合（暗部）は参考として表示するが、判定には使わない。黒い服・椅子など被写体そのものが
  *   黒い部分でも増え、露出の不足と区別できないため（ザ・ビッグ厚別店は +0.7ev でも 31% のまま）。
@@ -126,4 +126,21 @@ export function parsePhotoSpec(spec) {
   if (Number(x) > 100 || Number(y) > 100) throw new Error(`切り抜きの中心は 0〜100% で指定する: ${spec}`)
   if (Math.abs(Number(ev)) > EV_LIMIT) throw new Error(`露出の補正は ±${EV_LIMIT}ev までで指定する: ${spec}`)
   return { name, file, ratio, zoom: Number(zoom) / 100, fx: Number(x) / 100, fy: Number(y) / 100, ev: Number(ev) }
+}
+
+/**
+ * src/data/events.ts の本文から、実績ごとのヒーロー画像（heroImage・heroImageMobile）のパスを取り出す（photos:audit）。
+ * 画像は public/events/ 以外（共有の /workshops/ など）にある場合もあるため、実績のデータから対象を決める。
+ * events.test.ts ではなく photoTone.test.ts で、実際の events データと一致することを確かめている。
+ * @returns {{ slug: string, srcs: string[] }[]}
+ */
+export function heroImagesFromEventsSource(text) {
+  const start = text.indexOf('export const events')
+  const end = text.indexOf('export const', start + 1)
+  const body = text.slice(start, end < 0 ? undefined : end)
+  const slugs = [...body.matchAll(/\bslug:\s*'([^']+)'/g)]
+  return slugs.map((m, i) => {
+    const chunk = body.slice(m.index, slugs[i + 1]?.index)
+    return { slug: m[1], srcs: [...chunk.matchAll(/heroImage(?:Mobile)?:\s*\{\s*src:\s*'([^']+)'/g)].map((x) => x[1]) }
+  })
 }

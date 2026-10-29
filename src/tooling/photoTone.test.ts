@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { lightness, toneCurve, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, exposePixel, SRGB_TO_LINEAR, EV_LIMIT } from '../../scripts/lib/photo-tone.mjs'
+import fs from 'node:fs'
+import path from 'node:path'
+import { lightness, toneCurve, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, exposePixel, heroImagesFromEventsSource, SRGB_TO_LINEAR, EV_LIMIT } from '../../scripts/lib/photo-tone.mjs'
+import { events } from '../data/events'
 
 /**
  * 写真の明るさの監査と露出の補正（scripts/lib/photo-tone.mjs）のテスト。
@@ -83,8 +86,8 @@ describe('lightnessStats / brightnessVerdict', () => {
     expect(brightnessVerdict({ mean: 70, p05: 30, median: 72, p95: 99, shadowShare: 0, highlightShare: 0.06 }).bright).toBe(true)
   })
 
-  it('公開済みの基準どおりの明るさ（中央値 49.8〜69.5）は ok', () => {
-    for (const median of [49.8, 51.8, 56.1, 63.1, 67.7, 69.5]) {
+  it('公開済みの基準どおりの明るさ（中央値 49.8〜73.1）は ok', () => {
+    for (const median of [49.8, 51.8, 56.1, 63.1, 67.7, 69.5, 73.1]) {
       expect(brightnessVerdict({ mean: median, p05: 10, median, p95: 85, shadowShare: 0.15, highlightShare: 0.01 }).reasons).toEqual([])
     }
   })
@@ -138,5 +141,20 @@ describe('parsePhotoSpec', () => {
     expect(() => parsePhotoSpec('hero=/p/a.jpg:16x9*30%')).toThrow()
     expect(() => parsePhotoSpec('hero=/p/a.jpg:16x9@150%,50%')).toThrow()
     expect(() => parsePhotoSpec('Hero=/p/a.jpg')).toThrow()
+  })
+})
+
+describe('heroImagesFromEventsSource（photos:audit の対象。Codex の指摘 #87）', () => {
+  const source = fs.readFileSync(path.resolve(process.cwd(), 'src/data/events.ts'), 'utf8')
+
+  it('実際の events データのヒーロー画像（共有の /workshops/ を含む）と一致する', () => {
+    const expected = events.map((e) => ({ slug: e.slug, srcs: [e.heroImage?.src, e.heroImageMobile?.src].filter(Boolean) }))
+    expect(heroImagesFromEventsSource(source)).toEqual(expected)
+    expect(heroImagesFromEventsSource(source).flatMap((r) => r.srcs)).toContain('/workshops/booth-wide-01.jpg')
+  })
+
+  it('brandJourney など events 以外の slug は含めない', () => {
+    const slugs = heroImagesFromEventsSource(source).map((r) => r.slug)
+    expect(new Set(slugs).size).toBe(slugs.length)
   })
 })

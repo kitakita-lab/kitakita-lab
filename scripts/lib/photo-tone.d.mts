@@ -9,3 +9,4 @@ export function lightnessStats(hist: number[]): LightnessStats
 export function brightnessVerdict(stats: LightnessStats, t?: typeof TONE_THRESHOLDS): { dark: boolean; bright: boolean; reasons: string[] }
 export function exposePixel(r: number, g: number, b: number, k: number): [number, number, number]
 export function parsePhotoSpec(spec: string): { name: string; file: string; ratio: string; zoom: number; fx: number; fy: number; ev: number }
+export function heroImagesFromEventsSource(text: string): { slug: string; srcs: string[] }[]
