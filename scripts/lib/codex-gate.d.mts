@@ -27,11 +27,12 @@ export function evaluateCodex(input: {
 }): CodexVerdict
 
 export const CODEX_POLICY: { stallMinutes: number; maxRequestsPerCommit: number; maxReviewRounds: number }
-export function codexRequestBody(sha: string, kind: 'initial' | 'rerequest'): string
+export function codexRequestBody(sha: string, kind: 'initial' | 'rerequest' | 'integration'): string
 export type CodexRequest = { sha: string | null; kind: string; at: string; forHead: boolean }
 export function codexRequests(comments: (CodexComment & { createdAt?: string })[], headSha: string, headCommittedAt?: string): CodexRequest[]
 export type CodexPlan = {
   action: 'done' | 'stop' | 'wait' | 'request' | 'rerequest'
+  requestKind?: 'initial' | 'integration'
   verdict: 'PASS' | 'PENDING' | 'FAIL'
   reasons: string[]
   requestsOnHead: number
@@ -45,5 +46,6 @@ export function planCodexReview(input: {
   comments: (CodexComment & { createdAt?: string })[]
   reviews: CodexComment[]
   threads: CodexThread[] | null
+  integration?: { verified: boolean; reason: string; parent?: string } | null
   policy?: { stallMinutes: number; maxRequestsPerCommit: number; maxReviewRounds: number }
 }): CodexPlan
