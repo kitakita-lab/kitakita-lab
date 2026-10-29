@@ -11,6 +11,7 @@
     "assets:og": "node scripts/generate-og.mjs",
     "assets:og:research": "node scripts/generate-research-og.mjs",
     "photos:prepare": "node scripts/prepare-event-photos.mjs",
+    "photos:audit": "node scripts/prepare-event-photos.mjs --audit",
     "check:visual": "node scripts/visual-check.mjs",
     "check:production": "node scripts/visual-check.mjs --base https://www.kitakita-lab.com",
     "gate:codex": "node scripts/pr-gates.mjs codex",

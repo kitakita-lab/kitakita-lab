@@ -11,6 +11,7 @@ npm run typecheck && npm run lint && npm run test:coverage && npm run build   # 
 npm run check:visual -- --shots /events/<slug>   # 全ページ × 6 幅の表示確認（ローカルの dist/。要 playwright-core）
 npm run check:production -- --only /events/<slug> # 公開 URL での表示確認（本番。結果はローカルと分けて記録）
 npm run gate:codex-wait -- <PR>                   # Codex レビューの依頼と待機（停滞時は同じ commit に 1 回だけ再依頼）
+npm run photos:audit                              # 公開中のヒーロー画像の明るさ（中央値 L*）の点検
 ```
 
 playwright は devDependencies に含めていない。必要なときは `npm i --no-save playwright-core`
