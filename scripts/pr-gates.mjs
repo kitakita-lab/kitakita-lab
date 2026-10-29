@@ -92,7 +92,7 @@ function codex(pr) {
 /**
  * head が「最新 main の取り込み（競合解消を含む）」だけの merge commit かを確かめる（統合の例外。lib/codex-gate.mjs）。
  *   1. 親が 2 つ（merge commit）
- *   2. 取り込んだ側（2 番目の親）が main の履歴にある
+ *   2. 取り込んだ側（2 番目の親）が、いまの main の先端そのもの（古い main の取り込みでは例外を使わない）
  *   3. merge で変わったファイル（1 番目の親 → head）が、main 側で変わったファイル（共通の祖先 → 2 番目の親）に含まれる
  *      （競合解消で main 側のファイルを直すのはよいが、それ以外のファイルの変更＝新しい実装や修正は含めない）
  * 取得できない情報は verified: false にする。
@@ -103,7 +103,10 @@ function integrationCheck(headSha, base = 'main') {
     if (commit.parents?.length !== 2) return { verified: false, reason: 'head が merge commit ではない' }
     const [parent, merged] = commit.parents.map((x) => x.sha)
     const fromMain = gh(`repos/${repo}/compare/${merged}...${base}`)
-    if (!['ahead', 'identical'].includes(fromMain.status)) return { verified: false, reason: `取り込んだ commit（${merged.slice(0, 7)}）が ${base} の履歴にない`, parent }
+    if (fromMain.status !== 'identical') {
+      // 取り込んだ後に main が進んだ（または main 以外を取り込んだ）。最新の main を取り込み直してから例外を使う
+      return { verified: false, reason: `取り込んだ commit（${merged.slice(0, 7)}）が最新の ${base} の先端ではない（${fromMain.status}）`, parent }
+    }
     const files = (path) => {
       const r = gh(`repos/${repo}/compare/${path}`)
       if ((r.files?.length ?? 0) >= 300) throw new Error('変更ファイルが多すぎて確認できない')
