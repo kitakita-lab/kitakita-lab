@@ -3,18 +3,24 @@
  *
  *   node scripts/pr-gates.mjs codex <PR番号>
  *     Codex レビューの合否。PASS=0 / FAIL=1 / PENDING=2 で終了する。
+ *   node scripts/pr-gates.mjs codex-wait <PR番号> [--timeout <分>]
+ *     レビューを依頼し、完了まで待つ（lib/codex-gate.mjs の planCodexReview）。依頼から 30 分たっても完了しなければ
+ *     同じ commit に 1 回だけ再依頼し、それでも完了しなければ止める。終了時の合否は codex と同じ判定（PASS=0 / FAIL=1 / PENDING=2）。
  *   node scripts/pr-gates.mjs checks <PR番号>
  *     PR の head commit の CI（Quality Checks・Cloudflare Pages など）が全件成功か。PASS=0 / FAIL=1 / PENDING=2
- *   node scripts/pr-gates.mjs deploy <commit> [URL ...] [--expect <文字列>]
+ *   node scripts/pr-gates.mjs deploy <commit> [URL ...] --expect <文字列> [--wait <秒>] [--interval <秒>]
  *     main の commit が Cloudflare Pages に本番デプロイされ、公開 URL で反映を確認できたか。
+ *     デプロイ直後の 404 などの反映待ちは --wait 秒（既定 300）まで再試行する（lib/deploy-gate.mjs）。
  *     VERIFIED=0 / FAIL=1 / PENDING=2 / DEPLOYED_UNVERIFIED=3（デプロイ成功だが URL を確認できない）
  *
  * GitHub への通信は `gh api`（GitHub CLI、または Claude Code の gh）を使う。
  * 取得できなかった情報は合格扱いにしない。
  */
 import { execFileSync } from 'node:child_process'
-import { evaluateCodex } from './lib/codex-gate.mjs'
+import { setTimeout as sleep } from 'node:timers/promises'
+import { evaluateCodex, planCodexReview, codexRequestBody, CODEX_POLICY } from './lib/codex-gate.mjs'
 import { parseDeployArgs } from './lib/deploy-args.mjs'
+import { classifyPage, decideDeploy } from './lib/deploy-gate.mjs'
 
 const repo =
   process.env.GH_REPO ??
@@ -68,12 +74,62 @@ function reviewThreads(pr) {
   }
 }
 
-function codex(pr) {
+/** 判定に使う PR の状態（head・コメント・レビュー・スレッド） */
+function codexContext(pr) {
   const p = gh(`repos/${repo}/pulls/${pr}`)
-  const comments = ghAll(`repos/${repo}/issues/${pr}/comments`).map((c) => ({ login: c.user?.login, body: c.body, updatedAt: c.updated_at }))
+  const comments = ghAll(`repos/${repo}/issues/${pr}/comments`).map((c) => ({ login: c.user?.login, body: c.body, createdAt: c.created_at, updatedAt: c.updated_at }))
   const reviews = ghAll(`repos/${repo}/pulls/${pr}/reviews`).map((r) => ({ login: r.user?.login, body: r.body }))
-  const result = evaluateCodex({ headSha: p.head.sha, comments, reviews, threads: reviewThreads(pr) })
+  return { p, comments, reviews, threads: reviewThreads(pr) }
+}
+
+function codex(pr) {
+  const { p, comments, reviews, threads } = codexContext(pr)
+  const result = evaluateCodex({ headSha: p.head.sha, comments, reviews, threads })
   return { pr: Number(pr), head: p.head.sha, state: p.state, draft: p.draft, ...result }
+}
+
+/** レビューの依頼と待機。合否は最後に codex() で判定する（ここでは合格にしない） */
+async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
+  const started = Date.now()
+  const log = []
+  const plan = () => {
+    const ctx = codexContext(pr)
+    const commit = gh(`repos/${repo}/commits/${ctx.p.head.sha}`)
+    const headCommittedAt = commit.commit?.committer?.date
+    return { head: ctx.p.head.sha, ...planCodexReview({ headSha: ctx.p.head.sha, headCommittedAt, now: new Date().toISOString(), ...ctx }) }
+  }
+  let last
+  let lastKey = ''
+  for (;;) {
+    last = plan()
+    // 状態が変わったときだけ記録する（待機中の経過時間の更新は記録しない）
+    const key = `${last.action} ${last.head} ${last.requestsOnHead}`
+    if (key !== lastKey) {
+      const entry = `${new Date().toISOString()} ${last.action} ${last.head.slice(0, 10)} 依頼${last.requestsOnHead}回 ${last.reasons.at(-1) ?? ''}`
+      log.push(entry)
+      console.error(entry)
+      lastKey = key
+    }
+    if (last.action === 'request' || last.action === 'rerequest') {
+      // 投稿の直前に取り直し、同じ判断のときだけ投稿する（手動の依頼や別の実行との重複を防ぐ）
+      const again = plan()
+      if (again.action === last.action && again.head === last.head && again.requestsOnHead === last.requestsOnHead) {
+        const kind = last.action === 'request' ? 'initial' : 'rerequest'
+        execFileSync('gh', ['api', '-X', 'POST', `repos/${repo}/issues/${pr}/comments`, '-f', `body=${codexRequestBody(last.head, kind)}`], { stdio: ['ignore', 'ignore', 'pipe'] })
+        log.push(`${new Date().toISOString()} posted ${kind} ${last.head.slice(0, 10)}`)
+      }
+      await sleep(5000)
+      continue
+    }
+    if (last.action === 'done' || last.action === 'stop') break
+    if ((Date.now() - started) / 60000 >= timeoutMinutes) {
+      log.push(`${new Date().toISOString()} timeout ${timeoutMinutes} 分`)
+      break
+    }
+    await sleep(pollSeconds * 1000)
+  }
+  const final = codex(pr)
+  return { ...final, stalled: last.action === 'stop' && final.verdict === 'PENDING', plan: { action: last.action, requestsOnHead: last.requestsOnHead, roundsUsed: last.roundsUsed, elapsedMinutes: last.elapsedMinutes, reasons: last.reasons }, log }
 }
 
 function checks(pr) {
@@ -92,50 +148,74 @@ function checks(pr) {
   return { pr: Number(pr), head: p.head.sha, verdict, checks: list, missing, pending, failed, mergeable: p.mergeable, mergeableState: p.mergeable_state }
 }
 
-async function deploy(sha, urls, expect) {
-  const runs = gh(`repos/${repo}/commits/${sha}/check-runs?per_page=100`).check_runs
-  const cf = runs.find((r) => r.name === 'Cloudflare Pages')
-  if (!cf || cf.status !== 'completed') return { verdict: 'PENDING', sha, reasons: ['Cloudflare Pages のデプロイが完了していない'] }
-  const summary = cf.output?.summary ?? ''
-  if (cf.conclusion !== 'success' || !/Deploy successful/.test(summary)) {
-    return { verdict: 'FAIL', sha, reasons: [`Cloudflare Pages: ${cf.conclusion}`] }
-  }
-  const deployUrl = summary.match(/https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev/)?.[0] ?? null
-  const pages = []
-  for (const url of urls) {
+/** 公開 URL を 1 回取得する。Node の fetch（HTTPS_PROXY を見ない）が失敗したら curl で取得する */
+async function fetchPage(url) {
+  try {
+    const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) })
+    return { status: res.status, body: await res.text(), via: 'fetch' }
+  } catch {
     try {
-      const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) })
-      const html = await res.text()
-      pages.push({ url, status: res.status, ok: res.ok && (!expect || html.includes(expect)), expectFound: expect ? html.includes(expect) : null })
+      const out = execFileSync('curl', ['-sS', '-L', '--max-time', '15', '-w', '\n%{http_code}', url], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+      return { status: Number(out.slice(out.lastIndexOf('\n') + 1)), body: out.slice(0, out.lastIndexOf('\n')), via: 'curl' }
     } catch (e) {
-      // Node の fetch は HTTPS_PROXY を見ないため、プロキシ環境では curl でも試す
-      try {
-        const out = execFileSync('curl', ['-sS', '-L', '--max-time', '15', '-w', '\n%{http_code}', url], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
-        const status = Number(out.slice(out.lastIndexOf('\n') + 1))
-        const html = out.slice(0, out.lastIndexOf('\n'))
-        pages.push({ url, status, ok: status >= 200 && status < 300 && (!expect || html.includes(expect)), expectFound: expect ? html.includes(expect) : null })
-      } catch (e2) {
-        pages.push({ url, status: null, ok: null, error: `${String(e.cause?.code ?? e.message)} / curl: ${String(e2.stderr ?? e2.message).trim().slice(0, 120)}` })
-      }
+      return { error: { code: e.status ?? undefined, message: String(e.stderr ?? e.message) }, via: 'curl' }
     }
   }
-  if (pages.some((p) => p.ok === false)) return { verdict: 'FAIL', sha, deployUrl, pages, reasons: ['公開 URL の内容が期待と異なる'] }
-  if (urls.length === 0 || pages.some((p) => p.ok === null)) {
-    return { verdict: 'DEPLOYED_UNVERIFIED', sha, deployUrl, pages, reasons: ['デプロイは成功。公開 URL での反映は確認できていない'] }
+}
+
+/** commit の Cloudflare Pages チェック（pending / success / failure）と、その commit のデプロイ URL */
+function cloudflareState(sha) {
+  const runs = gh(`repos/${repo}/commits/${sha}/check-runs?per_page=100`).check_runs
+  const cf = runs.find((r) => r.name === 'Cloudflare Pages')
+  if (!cf || cf.status !== 'completed') return { deploy: 'pending', deployUrl: null }
+  const summary = cf.output?.summary ?? ''
+  const deployUrl = summary.match(/https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev/)?.[0] ?? null
+  return { deploy: cf.conclusion === 'success' && /Deploy successful/.test(summary) ? 'success' : 'failure', deployUrl, conclusion: cf.conclusion }
+}
+
+async function deploy(sha, urls, expect, { wait = 300, interval = 15 } = {}) {
+  const started = Date.now()
+  let attempts = 0
+  for (;;) {
+    attempts++
+    const cf = cloudflareState(sha)
+    const pages = []
+    if (cf.deploy === 'success') {
+      for (const url of urls) {
+        const r = await fetchPage(url)
+        pages.push({ url, status: r.status ?? null, via: r.via, ...classifyPage({ ...r, expect }) })
+      }
+    }
+    const elapsedSeconds = Math.round((Date.now() - started) / 1000)
+    const d = decideDeploy({ deploy: cf.deploy, pages, expectGiven: expect !== undefined, deadlineReached: elapsedSeconds >= wait })
+    if (d.done) {
+      // その commit のデプロイ URL でも同じ内容を照合する（参考。この環境から届かない場合もある）
+      let deployment = null
+      if (cf.deployUrl && expect !== undefined && urls[0]) {
+        const r = await fetchPage(new URL(new URL(urls[0]).pathname, cf.deployUrl).href)
+        deployment = { url: new URL(new URL(urls[0]).pathname, cf.deployUrl).href, status: r.status ?? null, ...classifyPage({ ...r, expect }) }
+      }
+      return { verdict: d.verdict, sha, deployUrl: cf.deployUrl, attempts, elapsedSeconds, pages, deployment, reasons: d.reasons }
+    }
+    await sleep(interval * 1000)
   }
-  return { verdict: 'VERIFIED', sha, deployUrl, pages, reasons: ['デプロイ成功・公開 URL で反映を確認'] }
 }
 
 const EXIT = { PASS: 0, VERIFIED: 0, FAIL: 1, PENDING: 2, DEPLOYED_UNVERIFIED: 3 }
 const [cmd, arg, ...rest] = process.argv.slice(2)
 let result
 if (cmd === 'codex' && arg) result = codex(arg)
-else if (cmd === 'checks' && arg) result = checks(arg)
+else if (cmd === 'codex-wait' && arg) {
+  const i = rest.indexOf('--timeout')
+  const timeoutMinutes = i >= 0 ? Number(rest[i + 1]) : CODEX_POLICY.stallMinutes * CODEX_POLICY.maxRequestsPerCommit + 5
+  if (!Number.isFinite(timeoutMinutes) || timeoutMinutes <= 0) throw new Error('--timeout は分で指定する')
+  result = await codexWait(arg, { timeoutMinutes })
+} else if (cmd === 'checks' && arg) result = checks(arg)
 else if (cmd === 'deploy' && arg) {
-  const { urls, expect } = parseDeployArgs(rest)
-  result = await deploy(arg, urls, expect)
+  const { urls, expect, wait, interval } = parseDeployArgs(rest)
+  result = await deploy(arg, urls, expect, { wait, interval })
 } else {
-  console.error('使い方: node scripts/pr-gates.mjs codex <PR> | checks <PR> | deploy <commit> [URL ...] [--expect 文字列]')
+  console.error('使い方: node scripts/pr-gates.mjs codex <PR> | codex-wait <PR> [--timeout 分] | checks <PR> | deploy <commit> [URL ...] --expect 文字列 [--wait 秒] [--interval 秒]')
   process.exit(64)
 }
 console.log(JSON.stringify(result, null, 2))
