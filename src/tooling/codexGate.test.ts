@@ -260,6 +260,63 @@ describe('planCodexReview', () => {
   })
 })
 
+/**
+ * 統合の例外（上限 3 回の後、最新 main の取り込みだけの merge commit に最終確認を 1 回だけ）。
+ * PR #87 では 3 回目の PASS の後に main を取り込み（5342c3e）、最終確認のレビューで PASS してマージした。
+ */
+describe('planCodexReview（統合の例外）', () => {
+  const COMMITTED = '2026-10-29T12:28:00Z'
+  const PRE = 'c3c3c3c3c3'.padEnd(40, '0')
+  const three = [receipt('a1a1a1a1a1'.padEnd(40, '0')), receipt('b2b2b2b2b2'.padEnd(40, '0')), receipt(PRE)]
+  const verified = { verified: true, reason: 'main の取り込みだけ', parent: PRE }
+  const plan = (comments: Parameters<typeof planCodexReview>[0]['comments'], integration: Parameters<typeof planCodexReview>[0]['integration'], now = '2026-10-29T12:29:00Z') =>
+    planCodexReview({ headSha: HEAD, headCommittedAt: COMMITTED, now, comments, reviews: [], threads: [], integration })
+
+  it('上限に達していても、取り込みだけの merge commit なら最終確認を依頼する（種別 integration）', () => {
+    const r = plan(three, verified)
+    expect(r.action).toBe('request')
+    expect(r.requestKind).toBe('integration')
+  })
+
+  it('取り込み以外の変更を含む・merge commit でない場合は、上限で止める（例外を流用しない）', () => {
+    expect(plan(three, { verified: false, reason: 'main 側で変わっていないファイルを変更している: src/x.ts', parent: PRE }).action).toBe('stop')
+    expect(plan(three, null).action).toBe('stop')
+  })
+
+  it('統合の例外は PR につき 1 回まで', () => {
+    const used = { login: 'kitakita-lab', body: codexRequestBody(OLD, 'integration'), createdAt: '2026-10-29T12:00:00Z' }
+    const r = plan([...three, used], verified)
+    expect(r.action).toBe('stop')
+    expect(r.reasons.join()).toContain('1 回まで')
+  })
+
+  it('取り込む前の commit がレビューされていなければ止める', () => {
+    expect(plan(three.slice(0, 2), verified).action).toBe('request') // 上限未満なら通常の依頼
+    const r = plan([...three.slice(0, 2), receipt('d4d4d4d4d4'.padEnd(40, '0'))], verified)
+    expect(r.action).toBe('stop')
+    expect(r.reasons.join()).toContain('レビューされていない')
+  })
+
+  it('例外のレビューで指摘が出たら FAIL で止まる（回数を増やさない）', () => {
+    const r = plan([...three, { login: 'kitakita-lab', body: codexRequestBody(HEAD, 'integration'), createdAt: '2026-10-29T12:30:00Z' }, summary(HEAD, 'completed', true, '2026-10-29T12:35:00Z'), receipt(HEAD)], verified, '2026-10-29T12:40:00Z')
+    expect(r.action).toBe('stop')
+    expect(r.verdict).toBe('FAIL')
+  })
+
+  it('例外のレビューも PASS は gate:codex と同じ条件（最新 commit の完了・受領・スレッド）', () => {
+    const req = { login: 'kitakita-lab', body: codexRequestBody(HEAD, 'integration'), createdAt: '2026-10-29T12:30:00Z' }
+    expect(plan([...three, req, summary(OLD, 'completed', false, '2026-10-29T12:35:00Z')], verified, '2026-10-29T12:40:00Z').verdict).toBe('PENDING')
+    expect(plan([...three, req, summary(HEAD, 'completed', false, '2026-10-29T12:35:00Z'), receipt(HEAD)], verified, '2026-10-29T12:40:00Z')).toMatchObject({ action: 'done', verdict: 'PASS' })
+  })
+
+  it('例外のレビューが停滞したときの再依頼は、レビュー回数とは別に 1 回まで', () => {
+    const req = { login: 'kitakita-lab', body: codexRequestBody(HEAD, 'integration'), createdAt: '2026-10-29T12:30:00Z' }
+    expect(plan([...three, req], verified, '2026-10-29T13:01:00Z').action).toBe('rerequest')
+    const rereq = { login: 'kitakita-lab', body: codexRequestBody(HEAD, 'rerequest'), createdAt: '2026-10-29T13:01:00Z' }
+    expect(plan([...three, req, rereq], verified, '2026-10-29T13:32:00Z').action).toBe('stop')
+  })
+})
+
 describe('parseDeployArgs', () => {
   it('--expect がなければ URL をすべて残す', () => {
     expect(parseDeployArgs(['https://a.example/x'])).toEqual({ urls: ['https://a.example/x'], expect: undefined })

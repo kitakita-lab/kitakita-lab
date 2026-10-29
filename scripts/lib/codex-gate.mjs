@@ -108,6 +108,10 @@ export function evaluateCodex({ headSha, comments, reviews, threads }) {
  *   - 同じ commit への依頼は、誰が投稿したものも数える（初回＋再依頼 1 回まで。重複依頼をしない）
  *   - レビュー回数の上限（3 回）は「レビューした commit の数」で数える。同じ commit への再依頼は数えない
  *   - FAIL（未解決の指摘）は再依頼で解消しない。指摘に対応して新しい commit を積む
+ *   - 統合の例外: 上限に達した後でも、head が「最新 main の取り込み（競合解消を含む）」だけの merge commit なら、
+ *     最終確認のレビューを 1 回だけ依頼できる（integration.verified。判定は pr-gates.mjs の integrationCheck）。
+ *     PR につき 1 回まで（2 回目の統合では止める）。取り込む前の commit がレビュー済みであることも条件。
+ *     例外のレビューで指摘が出たら、通常どおり FAIL で止まる（回数は増やさない）
  */
 export const CODEX_POLICY = { stallMinutes: 30, maxRequestsPerCommit: 2, maxReviewRounds: 3 }
 
@@ -154,7 +158,7 @@ export function codexRequests(comments, headSha, headCommittedAt) {
  * @returns {{ action: 'done'|'stop'|'wait'|'request'|'rerequest', verdict: 'PASS'|'FAIL'|'PENDING', reasons: string[],
  *   requestsOnHead: number, elapsedMinutes: number|null, roundsUsed: number }}
  */
-export function planCodexReview({ headSha, headCommittedAt, now, comments, reviews, threads, policy = CODEX_POLICY }) {
+export function planCodexReview({ headSha, headCommittedAt, now, comments, reviews, threads, integration = null, policy = CODEX_POLICY }) {
   const judged = evaluateCodex({ headSha, comments, reviews, threads })
   const requests = codexRequests(comments, headSha, headCommittedAt)
   const onHead = requests.filter((r) => r.forHead)
@@ -184,9 +188,20 @@ export function planCodexReview({ headSha, headCommittedAt, now, comments, revie
   if (onHead.length === 0) {
     const used = commits.has(headSha.slice(0, 10)) ? roundsUsed - 1 : roundsUsed
     if (used >= policy.maxReviewRounds) {
-      return { ...base, action: 'stop', elapsedMinutes: null, reasons: [`レビュー回数の上限（${policy.maxReviewRounds} 回）に達している`] }
+      const limit = `レビュー回数の上限（${policy.maxReviewRounds} 回）に達している`
+      if (!integration?.verified) {
+        return { ...base, action: 'stop', elapsedMinutes: null, reasons: [limit, ...(integration ? [`統合の例外に当たらない: ${integration.reason}`] : [])] }
+      }
+      if (requests.some((r) => r.kind === 'integration' && !r.forHead)) {
+        return { ...base, action: 'stop', elapsedMinutes: null, reasons: [limit, '統合の例外は PR につき 1 回まで（使用済み）'] }
+      }
+      const reviewed = receiptCommits([...comments, ...reviews]).some((sha) => integration.parent?.startsWith(sha))
+      if (!reviewed) {
+        return { ...base, action: 'stop', elapsedMinutes: null, reasons: [limit, '取り込む前の commit が Codex にレビューされていない'] }
+      }
+      return { ...base, action: 'request', requestKind: 'integration', elapsedMinutes: null, reasons: [limit, `統合の例外として最終確認を依頼する（${integration.reason}）`] }
     }
-    return { ...base, action: 'request', elapsedMinutes: null, reasons: ['head の commit にレビューを依頼していない'] }
+    return { ...base, action: 'request', requestKind: 'initial', elapsedMinutes: null, reasons: ['head の commit にレビューを依頼していない'] }
   }
   const last = onHead.at(-1)
   const elapsedMinutes = Math.max(0, (Date.parse(now) - Date.parse(last.at)) / 60000)

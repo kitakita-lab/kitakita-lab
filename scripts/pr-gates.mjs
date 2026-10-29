@@ -6,6 +6,7 @@
  *   node scripts/pr-gates.mjs codex-wait <PR番号> [--timeout <分>]
  *     レビューを依頼し、完了まで待つ（lib/codex-gate.mjs の planCodexReview）。依頼から 30 分たっても完了しなければ
  *     同じ commit に 1 回だけ再依頼し、それでも完了しなければ止める。終了時の合否は codex と同じ判定（PASS=0 / FAIL=1 / PENDING=2）。
+ *     レビュー回数の上限（3 回）の後でも、head が最新 main の取り込みだけの merge commit なら、最終確認を 1 回だけ依頼する。
  *   node scripts/pr-gates.mjs checks <PR番号>
  *     PR の head commit の CI（Quality Checks・Cloudflare Pages など）が全件成功か。PASS=0 / FAIL=1 / PENDING=2
  *   node scripts/pr-gates.mjs deploy <commit> [URL ...] --expect <文字列> [--wait <秒>] [--interval <秒>]
@@ -88,15 +89,51 @@ function codex(pr) {
   return { pr: Number(pr), head: p.head.sha, state: p.state, draft: p.draft, ...result }
 }
 
+/**
+ * head が「最新 main の取り込み（競合解消を含む）」だけの merge commit かを確かめる（統合の例外。lib/codex-gate.mjs）。
+ *   1. 親が 2 つ（merge commit）
+ *   2. 取り込んだ側（2 番目の親）が、いまの main の先端そのもの（古い main の取り込みでは例外を使わない）
+ *   3. merge で変わったファイル（1 番目の親 → head）が、main 側で変わったファイル（共通の祖先 → 2 番目の親）に含まれる
+ *      （競合解消で main 側のファイルを直すのはよいが、それ以外のファイルの変更＝新しい実装や修正は含めない）
+ * 取得できない情報は verified: false にする。
+ */
+function integrationCheck(headSha, base = 'main') {
+  try {
+    const commit = gh(`repos/${repo}/commits/${headSha}`)
+    if (commit.parents?.length !== 2) return { verified: false, reason: 'head が merge commit ではない' }
+    const [parent, merged] = commit.parents.map((x) => x.sha)
+    const fromMain = gh(`repos/${repo}/compare/${merged}...${base}`)
+    if (fromMain.status !== 'identical') {
+      // 取り込んだ後に main が進んだ（または main 以外を取り込んだ）。最新の main を取り込み直してから例外を使う
+      return { verified: false, reason: `取り込んだ commit（${merged.slice(0, 7)}）が最新の ${base} の先端ではない（${fromMain.status}）`, parent }
+    }
+    const files = (path) => {
+      const r = gh(`repos/${repo}/compare/${path}`)
+      if ((r.files?.length ?? 0) >= 300) throw new Error('変更ファイルが多すぎて確認できない')
+      return (r.files ?? []).map((f) => f.filename)
+    }
+    const changed = files(`${parent}...${headSha}`)
+    const mainSide = new Set(files(`${parent}...${merged}`))
+    const extra = changed.filter((f) => !mainSide.has(f))
+    if (extra.length) return { verified: false, reason: `main 側で変わっていないファイルを変更している: ${extra.slice(0, 5).join(', ')}`, parent }
+    return { verified: true, reason: `${base} の取り込み（${merged.slice(0, 7)}）だけの merge commit・変更 ${changed.length} ファイル`, parent }
+  } catch (e) {
+    return { verified: false, reason: `確認できない: ${e.message.slice(0, 120)}` }
+  }
+}
+
 /** レビューの依頼と待機。合否は最後に codex() で判定する（ここでは合格にしない） */
 async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
   const started = Date.now()
   const log = []
+  const integrations = new Map() // head ごとに 1 回だけ確かめる
   const plan = () => {
     const ctx = codexContext(pr)
-    const commit = gh(`repos/${repo}/commits/${ctx.p.head.sha}`)
+    const head = ctx.p.head.sha
+    const commit = gh(`repos/${repo}/commits/${head}`)
     const headCommittedAt = commit.commit?.committer?.date
-    return { head: ctx.p.head.sha, ...planCodexReview({ headSha: ctx.p.head.sha, headCommittedAt, now: new Date().toISOString(), ...ctx }) }
+    if (!integrations.has(head)) integrations.set(head, commit.parents?.length === 2 ? integrationCheck(head, ctx.p.base.ref) : null)
+    return { head, ...planCodexReview({ headSha: head, headCommittedAt, now: new Date().toISOString(), integration: integrations.get(head), ...ctx }) }
   }
   let last
   let lastKey = ''
@@ -114,7 +151,7 @@ async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
       // 投稿の直前に取り直し、同じ判断のときだけ投稿する（手動の依頼や別の実行との重複を防ぐ）
       const again = plan()
       if (again.action === last.action && again.head === last.head && again.requestsOnHead === last.requestsOnHead) {
-        const kind = last.action === 'request' ? 'initial' : 'rerequest'
+        const kind = last.action === 'request' ? (last.requestKind ?? 'initial') : 'rerequest'
         execFileSync('gh', ['api', '-X', 'POST', `repos/${repo}/issues/${pr}/comments`, '-f', `body=${codexRequestBody(last.head, kind)}`], { stdio: ['ignore', 'ignore', 'pipe'] })
         log.push(`${new Date().toISOString()} posted ${kind} ${last.head.slice(0, 10)}`)
       }
@@ -129,7 +166,7 @@ async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
     await sleep(pollSeconds * 1000)
   }
   const final = codex(pr)
-  return { ...final, stalled: last.action === 'stop' && final.verdict === 'PENDING', plan: { action: last.action, requestsOnHead: last.requestsOnHead, roundsUsed: last.roundsUsed, elapsedMinutes: last.elapsedMinutes, reasons: last.reasons }, log }
+  return { ...final, stalled: last.action === 'stop' && final.verdict === 'PENDING', plan: { action: last.action, requestsOnHead: last.requestsOnHead, roundsUsed: last.roundsUsed, elapsedMinutes: last.elapsedMinutes, reasons: last.reasons }, integration: integrations.get(last.head) ?? null, log }
 }
 
 function checks(pr) {
