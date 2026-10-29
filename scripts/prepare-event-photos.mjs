@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url'
 import { homedir } from 'node:os'
 import { launchChromium } from './lib/browser.mjs'
 import { inspectImageMetadata } from './lib/image-metadata.mjs'
-import { SRGB_TO_LINEAR, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec } from './lib/photo-tone.mjs'
+import { SRGB_TO_LINEAR, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, exposePixel } from './lib/photo-tone.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SIZES = { '16x9': [1600, 900], '4x3': [1200, 900], '1x1': [1000, 1000] }
@@ -53,6 +53,8 @@ const browser = await launchChromium()
 const page = await browser.newPage()
 await page.setContent('<!doctype html><html><body></body></html>')
 
+// 露出の補正（1 画素）は、テストしている lib の関数をそのままページに渡して使う
+await page.evaluate(`window.exposePixel = ${exposePixel.toString()}`)
 // canvas の画素から、リニア輝度 Y のヒストグラム（HIST_BINS 段階）を作る関数をページに用意する（画素は変えない）
 await page.evaluate(() => {
   window.lumaHistogram = (ctx, w, h, lin, bins) => {
@@ -96,7 +98,7 @@ if (audit) {
       { dataUrl, lin: SRGB_TO_LINEAR, bins: HIST_BINS },
     )
     const { stats, verdict } = describe(hist)
-    rows.push({ file: file.replace(root + '/', ''), 'L*中央値': stats.median, 'L*平均': stats.mean, '暗部(L*<25)': `${Math.round(stats.shadowShare * 100)}%`, '白飛び(L*>97)': `${Math.round(stats.highlightShare * 100)}%`, 判定: verdict.level === 'ok' ? 'ok' : `要確認（${verdict.level === 'dark' ? '暗い' : '白飛び'}）: ${verdict.reasons.join('・')}` })
+    rows.push({ file: file.replace(root + '/', ''), 'L*中央値': stats.median, 'L*平均': stats.mean, '暗部(L*<25)': `${Math.round(stats.shadowShare * 100)}%`, '白飛び(L*>97)': `${Math.round(stats.highlightShare * 100)}%`, 判定: verdict.reasons.length ? `要確認: ${verdict.reasons.join(' / ')}` : 'ok' })
   }
   await browser.close()
   console.table(rows)
@@ -152,7 +154,7 @@ for (const job of jobs) {
       const histogram = window.lumaHistogram
       let before = null
       if (gain) {
-        // 露出の補正: リニアの輝度に応じた倍率を RGB に同じだけ掛ける（色相を保つ。photo-tone.mjs の toneCurve）
+        // 露出の補正: リニアの輝度に応じた倍率を RGB に同じだけ掛ける（色相を保つ。photo-tone.mjs の toneCurve・exposePixel）
         before = histogram(ctx, outW, outH, lin, bins)
         const image = ctx.getImageData(0, 0, outW, outH)
         const d = image.data
@@ -165,10 +167,10 @@ for (const job of jobs) {
           const g = lin[d[i + 1]]
           const b = lin[d[i + 2]]
           const y = 0.2126 * r + 0.7152 * g + 0.0722 * b
-          const k = gain[Math.min(bins - 1, Math.round(y * (bins - 1)))]
-          d[i] = toSrgb(Math.min(1, r * k))
-          d[i + 1] = toSrgb(Math.min(1, g * k))
-          d[i + 2] = toSrgb(Math.min(1, b * k))
+          const [r2, g2, b2] = window.exposePixel(r, g, b, gain[Math.min(bins - 1, Math.round(y * (bins - 1)))])
+          d[i] = toSrgb(r2)
+          d[i + 1] = toSrgb(g2)
+          d[i + 2] = toSrgb(b2)
         }
         ctx.putImageData(image, 0, 0)
       }
@@ -202,8 +204,9 @@ for (const job of jobs) {
   const beforeTone = result.before ? describe(result.before) : null
   const warnings = [
     result.upscaleNeeded ? `元画像が小さく ${W}×${H} に満たない` : buf.length > MAX_BYTES ? '480KB を超えた' : null,
-    tone.verdict.level === 'dark' ? `暗い可能性: ${tone.verdict.reasons.join('・')}（見え方を確かめ、必要なら +0.3ev から試す）` : null,
-    tone.verdict.level === 'bright' ? `白飛びの可能性: ${tone.verdict.reasons.join('・')}` : null,
+    ...tone.verdict.reasons,
+    tone.verdict.dark && !tone.verdict.bright ? '見え方を確かめ、必要なら +0.3ev から試す' : null,
+    tone.verdict.dark && tone.verdict.bright ? '白飛びがあるため、露出の補正より別の写真を検討する' : null,
   ].filter(Boolean)
   report.push({
     file: `public/events/${slug}/${job.name}.jpg`,

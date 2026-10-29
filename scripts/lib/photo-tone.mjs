@@ -16,7 +16,8 @@
  *   リニアの輝度 Y に対して Y' = gY / (1 + (g - 1)Y)、g = 2^ev。
  *   - Y = 0 と Y = 1 は動かない（黒は黒、白は白のまま。白飛びを作らない）
  *   - 中間調ほど持ち上がる（+0.5ev で中間の灰色 L* 49.5 → 約 55.8）
- *   - RGB を同じ倍率で掛けるので、色相は変えない（色味を変えない）
+ *   - RGB を同じ倍率で掛けるので、色相は変えない（色味を変えない）。鮮やかな色で倍率を掛けるとどれかのチャンネルが
+ *     1 を超える場合は、超えない倍率までに抑える（チャンネルごとに切り詰めると、比率が崩れて色相が変わるため）
  *   - 指定できる範囲は ±1ev まで（大きな補正は不自然になるため）
  */
 
@@ -38,6 +39,16 @@ export function lightness(y) {
 export function toneCurve(y, ev) {
   const g = 2 ** ev
   return (g * y) / (1 + (g - 1) * y)
+}
+
+/**
+ * 1 画素の露出の補正（リニアの RGB に倍率 k を掛ける）。どのチャンネルも 1 を超えない倍率までに抑え、RGB の比率（色相）を保つ。
+ * ブラウザ側（prepare-event-photos.mjs）にもこの関数をそのまま渡して使う（外の変数を参照しないこと）。
+ */
+export function exposePixel(r, g, b, k) {
+  const m = Math.max(r, g, b)
+  const kk = m > 0 ? Math.min(k, 1 / m) : k
+  return [r * kk, g * kk, b * kk]
 }
 
 /**
@@ -90,17 +101,16 @@ export function lightnessStats(hist) {
 }
 
 /**
- * 明るさの判定（警告だけ。合否ではない）。
- * @returns {{ level: 'ok'|'dark'|'bright', reasons: string[] }}
+ * 明るさの判定（警告だけ。合否ではない）。暗さと白飛びは別々に判定する（明暗差の大きい写真では両方に当たる）。
+ * @returns {{ dark: boolean, bright: boolean, reasons: string[] }}
  */
 export function brightnessVerdict(stats, t = TONE_THRESHOLDS) {
-  if (stats.median < t.darkMedian) {
-    return { level: 'dark', reasons: [`中央値 L* ${stats.median}（${t.darkMedian} 未満）・参考: L* ${t.shadowL} 未満 ${Math.round(stats.shadowShare * 100)}%`] }
-  }
-  if (stats.highlightShare > t.highlightShare) {
-    return { level: 'bright', reasons: [`L* ${t.highlightL} 超が ${Math.round(stats.highlightShare * 100)}%（白飛びの可能性）`] }
-  }
-  return { level: 'ok', reasons: [] }
+  const dark = stats.median < t.darkMedian
+  const bright = stats.highlightShare > t.highlightShare
+  const reasons = []
+  if (dark) reasons.push(`暗い可能性: 中央値 L* ${stats.median}（${t.darkMedian} 未満）・参考: L* ${t.shadowL} 未満 ${Math.round(stats.shadowShare * 100)}%`)
+  if (bright) reasons.push(`白飛びの可能性: L* ${t.highlightL} 超が ${Math.round(stats.highlightShare * 100)}%`)
+  return { dark, bright, reasons }
 }
 
 /**

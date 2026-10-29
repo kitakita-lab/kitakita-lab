@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { lightness, toneCurve, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, SRGB_TO_LINEAR, EV_LIMIT } from '../../scripts/lib/photo-tone.mjs'
+import { lightness, toneCurve, toneGainLut, lightnessStats, brightnessVerdict, parsePhotoSpec, exposePixel, SRGB_TO_LINEAR, EV_LIMIT } from '../../scripts/lib/photo-tone.mjs'
 
 /**
  * 写真の明るさの監査と露出の補正（scripts/lib/photo-tone.mjs）のテスト。
@@ -72,21 +72,52 @@ describe('lightnessStats / brightnessVerdict', () => {
   })
 
   it('中央値 L* が 42 未満なら dark（ザ・ビッグ厚別店の補正前: 36.4）', () => {
-    expect(brightnessVerdict({ mean: 37.7, p05: 10, median: 36.4, p95: 80, shadowShare: 0.37, highlightShare: 0 }).level).toBe('dark')
+    expect(brightnessVerdict({ mean: 37.7, p05: 10, median: 36.4, p95: 80, shadowShare: 0.37, highlightShare: 0 }).dark).toBe(true)
   })
 
   it('暗部が多くても、中央値が基準以上なら dark にしない（黒い服・椅子は露出の不足ではない）', () => {
-    expect(brightnessVerdict({ mean: 45, p05: 8, median: 43.1, p95: 82, shadowShare: 0.32, highlightShare: 0 }).level).toBe('ok')
+    expect(brightnessVerdict({ mean: 45, p05: 8, median: 43.1, p95: 82, shadowShare: 0.32, highlightShare: 0 })).toMatchObject({ dark: false, bright: false })
   })
 
   it('L* 97 超が 5% を超えれば bright（白飛び・補正しすぎ）', () => {
-    expect(brightnessVerdict({ mean: 70, p05: 30, median: 72, p95: 99, shadowShare: 0, highlightShare: 0.06 }).level).toBe('bright')
+    expect(brightnessVerdict({ mean: 70, p05: 30, median: 72, p95: 99, shadowShare: 0, highlightShare: 0.06 }).bright).toBe(true)
   })
 
   it('公開済みの基準どおりの明るさ（中央値 49.8〜69.5）は ok', () => {
     for (const median of [49.8, 51.8, 56.1, 63.1, 67.7, 69.5]) {
-      expect(brightnessVerdict({ mean: median, p05: 10, median, p95: 85, shadowShare: 0.15, highlightShare: 0.01 }).level).toBe('ok')
+      expect(brightnessVerdict({ mean: median, p05: 10, median, p95: 85, shadowShare: 0.15, highlightShare: 0.01 }).reasons).toEqual([])
     }
+  })
+})
+
+describe('exposePixel（Codex の指摘 #87）', () => {
+  const lin = (v: number) => SRGB_TO_LINEAR[v]
+
+  it('鮮やかな色でも、どのチャンネルも 1 を超えず、RGB の比率（色相）を保つ', () => {
+    // sRGB [240, 100, 30] に +1ev 相当の倍率を掛けると、赤がそのままでは約 1.36 になる
+    const [r, g, b] = [lin(240), lin(100), lin(30)]
+    const k = toneGainLut(1, 1024)[Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) * 1023)]
+    expect(r * k).toBeGreaterThan(1)
+    const out = exposePixel(r, g, b, k)
+    expect(Math.max(...out)).toBeLessThanOrEqual(1 + 1e-12)
+    expect(out[1] / out[0]).toBeCloseTo(g / r, 10)
+    expect(out[2] / out[0]).toBeCloseTo(b / r, 10)
+  })
+
+  it('1 を超えない画素は、そのまま倍率を掛ける', () => {
+    expect(exposePixel(0.2, 0.2, 0.2, 1.3)).toEqual([0.26, 0.26, 0.26].map((v) => expect.closeTo(v, 12)))
+  })
+
+  it('黒は黒のまま', () => {
+    expect(exposePixel(0, 0, 0, 2)).toEqual([0, 0, 0])
+  })
+})
+
+describe('brightnessVerdict（暗さと白飛びを別々に判定する。Codex の指摘 #87）', () => {
+  it('中央値が暗く、白飛びもある写真は、両方を警告する', () => {
+    const v = brightnessVerdict({ mean: 38, p05: 5, median: 35, p95: 100, shadowShare: 0.4, highlightShare: 0.15 })
+    expect(v).toMatchObject({ dark: true, bright: true })
+    expect(v.reasons).toHaveLength(2)
   })
 })
 
