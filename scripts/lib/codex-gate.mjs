@@ -31,13 +31,18 @@ const isCodex = (login) => login === CODEX_LOGIN
 
 /** 要約コメントから state を取り出す（最後に更新されたものを採用） */
 export function parseCodexState(comments) {
+  return latestCodexStateComment(comments)?.state ?? null
+}
+
+/** 最後に更新された要約コメントの state と更新時刻（壊れていれば null） */
+function latestCodexStateComment(comments) {
   const states = comments
     .filter((c) => isCodex(c.login) && STATE_RE.test(c.body ?? ''))
     .sort((a, b) => String(a.updatedAt ?? '').localeCompare(String(b.updatedAt ?? '')))
   const last = states.at(-1)
   if (!last) return null
   try {
-    return JSON.parse(last.body.match(STATE_RE)[1])
+    return { state: JSON.parse(last.body.match(STATE_RE)[1]), updatedAt: last.updatedAt }
   } catch {
     return null
   }
@@ -92,5 +97,103 @@ export function evaluateCodex({ headSha, comments, reviews, threads }) {
     verdict: 'PASS',
     reasons: [`Codex が ${headSha.slice(0, 10)} をレビュー済み。未解決の指摘・スレッドなし`],
     findingsOnHead: cr.has_any_findings === true,
+  }
+}
+
+/**
+ * レビュー依頼の運用（codex-wait）。合否は判定しない（合否は evaluateCodex だけが決める）。
+ *
+ *   - 依頼から stallMinutes 分たっても head のレビューが完了しなければ、同じ commit に 1 回だけ再依頼する
+ *   - 再依頼からさらに stallMinutes 分たっても完了しなければ止める（PENDING のまま。合格扱いにしない）
+ *   - 同じ commit への依頼は、誰が投稿したものも数える（初回＋再依頼 1 回まで。重複依頼をしない）
+ *   - レビュー回数の上限（3 回）は「レビューした commit の数」で数える。同じ commit への再依頼は数えない
+ *   - FAIL（未解決の指摘）は再依頼で解消しない。指摘に対応して新しい commit を積む
+ */
+export const CODEX_POLICY = { stallMinutes: 30, maxRequestsPerCommit: 2, maxReviewRounds: 3 }
+
+/** ハーネスが投稿する依頼コメントの目印（どの commit への依頼かを残す） */
+const REQUEST_MARK_RE = /<!--\s*harness-codex-request:v1\s*(\{[^}]*\})\s*-->/
+const REQUEST_RE = /(^|\s)@codex review(\s|$)/
+
+/** 依頼コメントの本文。`@codex review` に、対象の commit と種別を目印として添える */
+export function codexRequestBody(sha, kind) {
+  return `@codex review\n\n<!-- harness-codex-request:v1 ${JSON.stringify({ sha, kind })} -->`
+}
+
+/**
+ * head commit への依頼を列挙する。
+ * 目印付きは目印の commit で、目印のない依頼（手動）は head の commit 時刻以降のものを head への依頼とみなす。
+ * bot（Codex の要約にも「@codex review」の文字列がある）のコメントは数えない。
+ * @param {{login:string, body:string, createdAt?:string}[]} comments
+ */
+export function codexRequests(comments, headSha, headCommittedAt) {
+  const out = []
+  for (const c of comments) {
+    if (!c.login || c.login.endsWith('[bot]')) continue
+    const body = c.body ?? ''
+    if (!REQUEST_RE.test(body)) continue
+    let sha = null
+    let kind = 'manual'
+    const m = body.match(REQUEST_MARK_RE)
+    if (m) {
+      try {
+        ;({ sha, kind } = JSON.parse(m[1]))
+      } catch {
+        sha = null
+      }
+    }
+    const at = c.createdAt ?? ''
+    const forHead = sha ? sha === headSha : Boolean(headCommittedAt) && at >= headCommittedAt
+    out.push({ sha: sha ?? (forHead ? headSha : null), kind, at, forHead })
+  }
+  return out.sort((a, b) => a.at.localeCompare(b.at))
+}
+
+/**
+ * 次に行うことを決める（純粋関数）。
+ * @returns {{ action: 'done'|'stop'|'wait'|'request'|'rerequest', verdict: 'PASS'|'FAIL'|'PENDING', reasons: string[],
+ *   requestsOnHead: number, elapsedMinutes: number|null, roundsUsed: number }}
+ */
+export function planCodexReview({ headSha, headCommittedAt, now, comments, reviews, threads, policy = CODEX_POLICY }) {
+  const judged = evaluateCodex({ headSha, comments, reviews, threads })
+  const requests = codexRequests(comments, headSha, headCommittedAt)
+  const onHead = requests.filter((r) => r.forHead)
+  // 依頼がなくても Codex が head のレビューを始めている（PR 作成時の自動レビューなど）なら、それを依頼とみなす
+  const running = latestCodexStateComment(comments)
+  if (onHead.length === 0 && running?.state.code_review?.commit_sha === headSha && running.state.code_review.status !== 'completed') {
+    onHead.push({ sha: headSha, kind: 'auto', at: running.updatedAt ?? '', forHead: true })
+  }
+  // レビューした（依頼した）commit の数。受領と目印付き依頼の commit を合わせて数える
+  const commits = new Set([...receiptCommits([...comments, ...reviews]).map((s) => s.slice(0, 10)), ...requests.filter((r) => r.sha).map((r) => r.sha.slice(0, 10))])
+  const roundsUsed = commits.size
+  const base = { verdict: judged.verdict, requestsOnHead: onHead.length, roundsUsed }
+
+  if (judged.verdict === 'PASS') return { ...base, action: 'done', elapsedMinutes: null, reasons: judged.reasons }
+  if (judged.verdict === 'FAIL') {
+    return { ...base, action: 'stop', elapsedMinutes: null, reasons: [...judged.reasons, '指摘に対応して新しい commit を積む（再依頼では解消しない）'] }
+  }
+  if (onHead.length === 0) {
+    const used = commits.has(headSha.slice(0, 10)) ? roundsUsed - 1 : roundsUsed
+    if (used >= policy.maxReviewRounds) {
+      return { ...base, action: 'stop', elapsedMinutes: null, reasons: [`レビュー回数の上限（${policy.maxReviewRounds} 回）に達している`] }
+    }
+    return { ...base, action: 'request', elapsedMinutes: null, reasons: ['head の commit にレビューを依頼していない'] }
+  }
+  const last = onHead.at(-1)
+  const elapsedMinutes = Math.max(0, (Date.parse(now) - Date.parse(last.at)) / 60000)
+  if (Number.isNaN(elapsedMinutes)) {
+    return { ...base, action: 'stop', elapsedMinutes: null, reasons: ['依頼の時刻を読めない（合格扱いにしない）'] }
+  }
+  if (elapsedMinutes < policy.stallMinutes) {
+    return { ...base, action: 'wait', elapsedMinutes, reasons: [...judged.reasons, `依頼から ${Math.floor(elapsedMinutes)} 分（${policy.stallMinutes} 分まで待つ）`] }
+  }
+  if (onHead.length < policy.maxRequestsPerCommit) {
+    return { ...base, action: 'rerequest', elapsedMinutes, reasons: [...judged.reasons, `依頼から ${policy.stallMinutes} 分以上たっても完了しない`] }
+  }
+  return {
+    ...base,
+    action: 'stop',
+    elapsedMinutes,
+    reasons: [...judged.reasons, `同じ commit への依頼が ${onHead.length} 回、最後の依頼から ${policy.stallMinutes} 分以上たっても完了しない`],
   }
 }

@@ -25,3 +25,25 @@ export function evaluateCodex(input: {
   reviews: CodexComment[]
   threads: CodexThread[] | null
 }): CodexVerdict
+
+export const CODEX_POLICY: { stallMinutes: number; maxRequestsPerCommit: number; maxReviewRounds: number }
+export function codexRequestBody(sha: string, kind: 'initial' | 'rerequest'): string
+export type CodexRequest = { sha: string | null; kind: string; at: string; forHead: boolean }
+export function codexRequests(comments: (CodexComment & { createdAt?: string })[], headSha: string, headCommittedAt?: string): CodexRequest[]
+export type CodexPlan = {
+  action: 'done' | 'stop' | 'wait' | 'request' | 'rerequest'
+  verdict: 'PASS' | 'PENDING' | 'FAIL'
+  reasons: string[]
+  requestsOnHead: number
+  elapsedMinutes: number | null
+  roundsUsed: number
+}
+export function planCodexReview(input: {
+  headSha: string
+  headCommittedAt?: string
+  now: string
+  comments: (CodexComment & { createdAt?: string })[]
+  reviews: CodexComment[]
+  threads: CodexThread[] | null
+  policy?: { stallMinutes: number; maxRequestsPerCommit: number; maxReviewRounds: number }
+}): CodexPlan

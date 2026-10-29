@@ -86,9 +86,11 @@
 | 表示 | `npm run check:visual -- --shots /events/<slug>,/events` | 全ページ × 6 幅（320〜1440px）で横スクロール・読み込めない画像・JS エラーがない。スクリーンショットを保存 |
 | 変更範囲 | `git diff --name-only origin/main...HEAD` | 「0. 対象範囲」のファイルだけ |
 | CI | `npm run gate:checks -- <PR>` | Quality Checks・Cloudflare Pages（プレビュー）が成功 |
-| Codex レビュー | `npm run gate:codex -- <PR>` | 「7.」の条件 |
+| Codex レビュー | `npm run gate:codex-wait -- <PR>` → `npm run gate:codex -- <PR>` | 「7.」の条件 |
 
-`check:visual` は外部通信を遮断するため、書体は代替フォントで描かれる（はみ出しの判定には十分。最終的な見た目はプレビュー URL で確認できる環境なら確認する）。
+`check:visual` はローカル（`dist/`）の確認で、外部通信を遮断するため書体は代替フォントで描かれる（はみ出しの判定には十分）。
+結果は `report-local.json` に `target: "local"` として残る。本番の確認（「9.」の `check:production`）とは別のものとして扱い、
+ローカルで問題がないことを「本番で確認済み」と書かない。
 
 ## 6. AI が判断するもの（機械では判定できない）
 
@@ -103,19 +105,29 @@ PR 本文にチェック結果を書く。
 ## 7. PR と Codex レビュー
 
 1. PR を作り、本文に照合表・変更ファイル・自動チェックの結果・判断事項を書く。
-2. PR に `@codex review` とコメントする。
-3. 数分待って `npm run gate:codex -- <PR>` を実行する。
+2. `npm run gate:codex-wait -- <PR>` を実行する（最長で約 65 分かかるため、バックグラウンドで実行する）。
+   - head の commit への依頼がなければ `@codex review` を投稿する（どの commit への依頼かを目印として残す）。
+   - **依頼から 30 分**たっても head のレビューが完了しなければ、同じ commit に **1 回だけ**再依頼する。
+   - 再依頼からさらに 30 分たっても完了しなければ止める（PENDING のまま終わる。合格扱いにしない）。
+   - 終了時に `gate:codex` と同じ判定を行い、PASS=0／FAIL=1／PENDING=2 で終わる。
+3. マージの直前に `npm run gate:codex -- <PR>` を実行する。合否はこの結果だけで決める（`codex-wait` は依頼と待機の道具）。
    - **PASS**: 最新の commit を Codex がレビュー済みで、未解決の指摘・スレッドがない
-   - **PENDING**: 未実行・実行中・古い commit のレビュー結果しかない → 待つ
+   - **PENDING**: 未実行・実行中・古い commit のレビュー結果しかない
    - **FAIL**: 未解決の指摘・スレッドがある
 4. 指摘への対応:
    - 再現・妥当性を確認する。妥当なら修正の commit を積み、スレッドに対応内容を返信して解決（resolve）する。
    - 妥当でないと判断した指摘は、理由を返信し、**解決にはせず**止めてユーザーに報告する。
-   - 修正したら再び `@codex review` → `gate:codex`。
-5. 上限: レビューは 3 回（初回＋再レビュー 2 回）まで。超えたら止める。PENDING が 30 分続いたら止める。
+   - 修正したら再び `gate:codex-wait` → `gate:codex`（新しい commit への依頼は `codex-wait` が投稿する）。
+5. 上限:
+   - レビューは 3 回まで。回数は「レビューした commit の数」で数える（初回＋修正後の再レビュー 2 回）。超えたら止める。
+   - 停滞したときの同じ commit への再依頼は 1 回まで。これはレビュー回数に数えない。
+   - 同じ commit への依頼は、手動で投稿したものも含めて数える（2 回あれば `codex-wait` はそれ以上依頼しない）。
+   - `codex-wait` は 1 つの PR につき同時に 1 つだけ実行する（投稿の直前にも状態を取り直し、重複して依頼しない）。
+   - 30 分は「その commit への最後の依頼の時刻」から数える。依頼がなくても Codex が head のレビューを始めていれば
+     （PR 作成時の自動レビューなど）、その開始時刻から数え、依頼を重ねない。
 
 コメントを投稿しただけ、レビューを依頼しただけでは合格にしない。判定は `gate:codex` の結果（Codex が残す
-`codex-review-state` の commit・状態・未解決の有無と、レビュースレッド）で行う。
+`codex-review-state` の commit・状態・未解決の有無と、レビュースレッド）で行う。FAIL（未解決の指摘）は再依頼では解消しない。
 
 ## 8. マージの条件（すべて満たすときだけ）
 
@@ -142,11 +154,43 @@ gh api -X PUT repos/kitakita-lab/kitakita-lab/pulls/<PR>/merge -f merge_method=m
 npm run gate:deploy -- <マージcommit> https://www.kitakita-lab.com/events/<slug> --expect "<実績のタイトル>"
 ```
 
-- **VERIFIED**: Cloudflare Pages のデプロイ成功、公開 URL で新しいページを確認 → 完了
-- **DEPLOYED_UNVERIFIED**: デプロイは成功したが、公開 URL を確認できない → 「デプロイ成功・公開 URL 未確認」と報告する（完了とは書かない）
-- **FAIL**／**PENDING** が続く → 止めて報告する
+デプロイ直後は公開 URL が一時的に 404 を返すことがある（PR #84 で発生）。`gate:deploy` は反映待ちと判断できる状態を
+`--wait` 秒（既定 300 秒、15 秒おき）まで再試行してから判定する（`--wait 0` で 1 回だけ）。
+
+| 公開 URL の状態 | 扱い |
+|---|---|
+| 2xx で `--expect` の文字列がある | 確認できた |
+| 404・5xx・429、2xx でも文字列がない、名前解決・接続の失敗 | 反映待ちとして再試行する |
+| 403、401・407（認証）、プロキシによる遮断、証明書を検証できない | この環境からは確認できない（再試行しない） |
+| それ以外の 4xx | 失敗（再試行しない） |
+
+- **VERIFIED**: Cloudflare Pages のデプロイ成功、公開 URL で `--expect` の文字列を確認 → 完了
+- **DEPLOYED_UNVERIFIED**: デプロイは成功したが、公開 URL を確認できない（遮断・認証・期限内に通信できない・`--expect` の指定なし）
+  → 「デプロイ成功・公開 URL 未確認」と報告する（完了とは書かない）
+- **FAIL**: デプロイ失敗、または期限を過ぎても 404・期待する文字列がない → 止めて報告する
+- **PENDING**: 期限を過ぎてもデプロイが完了しない → 止めて報告する
 
 Claude Code のクラウド環境では、ネットワーク設定の許可ドメインに `www.kitakita-lab.com` がないと公開 URL を確認できない。
+
+続けて、本番の表示を確認する。
+
+```
+npm run check:production -- --only /events/<slug>,/events,/news/<slug>-report --shots /events/<slug>
+```
+
+- 公開 URL を Chromium で直接開き、ローカルの `check:visual` と同じ項目（6 幅の横スクロール・読み込めない画像・
+  JS エラー・HTTP 200 以外）を確認する。結果は `report-production.json` に `target: "production"` として残る。
+- 読み込んだリソースを種別（document・stylesheet・script・image・font）ごとに数える。公開サイトと Google Fonts だけを
+  読み込み、それ以外の外部通信（アクセス解析など）は遮断して「対象外」として一覧にする。
+- 終了コード: 0 = 問題なし・表示に関わるリソースをすべて読み込めた／1 = 問題を検出／3 = 問題はないが読み込めない
+  リソースがある（一覧のものは本番で検証できていない。報告に書く）
+- 証明書: クラウド環境では外部への HTTPS が出口ゲートウェイで中継され、その CA は環境の CA バンドル
+  （`SSL_CERT_FILE`。curl・Node が使う）にしかないため、そのままの Chromium では `ERR_CERT_AUTHORITY_INVALID` になる。
+  `check:production` は、開くホストごとに openssl で証明書チェーンとホスト名を CA バンドルだけに対して検証し、
+  通ったチェーンの CA の公開鍵だけを Chromium に信頼させる。検証できないホストは開けない（＝未検証になる）。
+  証明書の検証を無効にする方法（`--ignore-certificate-errors`・`ignoreHTTPSErrors`）は使わない。
+- curl で取得した HTML を Chromium に渡す方法は使わない（応答ヘッダーが失われ、外部フォントなどを読み込めず、
+  本番の表示を再現できないため）。
 
 ## 10. 止める条件
 
@@ -159,6 +203,7 @@ Claude Code のクラウド環境では、ネットワーク設定の許可ド�
 - 公開可否を判断できない写真・情報がある、写真が足りない
 - 「0. 対象範囲」外のファイルや共通デザインの変更が必要
 - 本番デプロイの状態が分からない、権限不足・認証失敗
+- Codex レビューが、再依頼の後も 30 分完了しない（`codex-wait` が PENDING で終わった）
 
 ## 11. 完了報告（短く）
 
@@ -168,7 +213,8 @@ Claude Code のクラウド環境では、ネットワーク設定の許可ド�
 PR: #<番号>（Codex: PASS／レビュー n 回・指摘 n 件対応）
 数字: <組>・<名>・<本>（報告書と一致、日別合計も一致）
 写真: <枚数>（メタデータなし・500KB 以下）
-確認: テスト n 件・ビルド・表示 28 ページ × 6 幅 問題 0
+確認: テスト n 件・ビルド・表示（ローカル）n ページ × 6 幅 問題 0
+本番の表示: check:production 問題 0（未検証: <なし／一覧>・対象外: <遮断した外部通信>）
 スクリーンショット: <保存場所>
 要確認: <あれば>
 ```
