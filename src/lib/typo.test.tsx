@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { render } from '@testing-library/react'
-import { typeset } from './typo'
+import { scriptBreaks, scriptSegments, typeset } from './typo'
 
 const html = (text: string) => renderToStaticMarkup(<>{typeset(text)}</>)
 const nowraps = (text: string) =>
@@ -116,5 +116,18 @@ describe('typeset', () => {
     it('nowrap が不要な文字列は文字列のまま返す', () => {
       expect(typeset('会ってみる')).toBe('会ってみる')
     })
+  })
+})
+
+describe('scriptSegments / scriptBreaks（統計のラベル）', () => {
+  it('文字種の切り替わる位置で区切る', () => {
+    expect(scriptSegments('フラワーボトル制作数')).toEqual(['フラワーボトル', '制作数'])
+    expect(scriptSegments('総参加組数')).toEqual(['総参加組数'])
+    expect(scriptSegments('Day 1')).toEqual(['Day 1'])
+  })
+
+  it('区切りの位置にだけ <wbr> を入れ、文字列は変えない', () => {
+    expect(renderToStaticMarkup(<>{scriptBreaks('フラワーボトル制作数')}</>)).toBe('フラワーボトル<wbr/>制作数')
+    expect(scriptBreaks('平日開催')).toBe('平日開催')
   })
 })

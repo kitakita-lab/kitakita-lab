@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { inspectImageMetadata } from '../../scripts/lib/image-metadata.mjs'
 import { events, sortedEvents, brandJourney } from './events'
+import { scriptSegments } from '../lib/typo'
 
 /**
  * イベント実績データの整合性テスト。
@@ -132,6 +133,16 @@ describe('events データ（公開前チェック）', () => {
       }
       const dayCount = e.stats?.map((s) => s.value.match(/^(\d+)日間$/)?.[1]).find(Boolean)
       if (dayCount) expect(days.length, `${e.slug}: 開催日数と日別レポートの数`).toBe(Number(dayCount))
+    }
+  })
+
+  it('統計のラベルは、区切り（文字種の切り替わり）ごとに 8 文字以内（320px 幅のカードに収まる）', () => {
+    // 実績ページの統計カードは 320px 幅で文字の幅が約 100px（12px の文字で 8 文字）。ラベルは区切りの位置でだけ折り返す
+    // （EventDetailPage の break-keep と scriptBreaks）ため、区切りが長いとはみ出す
+    for (const e of events) {
+      for (const s of e.stats ?? []) {
+        for (const seg of scriptSegments(s.label)) expect(seg.length, `${e.slug}: 「${s.label}」の「${seg}」`).toBeLessThanOrEqual(8)
+      }
     }
   })
 

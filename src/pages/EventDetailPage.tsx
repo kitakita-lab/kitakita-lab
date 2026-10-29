@@ -1,7 +1,7 @@
 import { useParams, Navigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Seo } from '@/components/Seo'
-import { typeset } from '@/lib/typo'
+import { scriptBreaks, typeset } from '@/lib/typo'
 import { Segments } from '@/components/ui/Segments'
 import { site } from '@/data/site'
 import { Section } from '@/components/ui/Section'
@@ -207,13 +207,15 @@ export function EventDetailPage() {
             </Reveal>
             <div className="mt-10 grid grid-cols-2 gap-6 lg:grid-cols-4">
               {event.stats.map((stat, i) => (
-                <Reveal key={stat.label} delay={i * 80}>
-                  <div className="rounded-xl2 border border-line bg-paper-50 px-6 py-8 text-center">
-                    <div className="font-serif text-3xl text-clay-600 sm:text-4xl">
+                <Reveal key={stat.label} delay={i * 80} className="h-full">
+                  {/* スマホ幅（2 列）では左右の余白を詰めて、ラベルを 1 行に収める（390px で「フラワーボトル制作数」）。
+                      さらに狭い幅では、ラベルを語の境目（文字種の切り替わり）でだけ折り返す。sm 以上は従来どおり */}
+                  <div className="h-full rounded-xl2 border border-line bg-paper-50 px-3 py-8 text-center sm:px-6">
+                    <div className="whitespace-nowrap font-serif text-3xl text-clay-600 sm:text-4xl">
                       {stat.value}
                     </div>
-                    <div className="mt-2 text-xs font-medium text-ink-muted sm:text-sm">
-                      {stat.label}
+                    <div className="mt-2 break-keep text-xs font-medium text-ink-muted sm:text-sm">
+                      {scriptBreaks(stat.label)}
                     </div>
                   </div>
                 </Reveal>

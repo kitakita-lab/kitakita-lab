@@ -10,6 +10,7 @@ import type { ReactNode } from 'react'
  *
  * - typeset(text): 短い「」の中身と、最後の文節を折り返さない
  * - <Segments />（components/ui/Segments.tsx）: 見出しなどを意味の単位で折り返させる
+ * - scriptBreaks(text): 短いラベルを、文字種の切り替わり（カタカナ→漢字など）でだけ折り返させる
  *
  * 方針: 「必ず末尾を守る」より「誤った位置を切れ目として固定しない」を優先する。
  * 安全な切れ目が見つからない文は、ブラウザの自然な折り返しに任せる。
@@ -129,4 +130,37 @@ export function typeset(text: string): ReactNode {
   }
   if (nodes.length === 1 && typeof nodes[0] === 'string') return text
   return <span>{nodes}</span>
+}
+
+/** 文字種（カタカナ・漢字・ひらがな・それ以外）。 */
+function scriptOf(ch: string): string {
+  if (/[\u30A0-\u30FF\u31F0-\u31FF]/.test(ch)) return 'katakana'
+  if (/[\u4E00-\u9FFF\u3005\u3006]/.test(ch)) return 'kanji'
+  if (/[\u3040-\u309F]/.test(ch)) return 'hiragana'
+  return 'other'
+}
+
+/**
+ * 短いラベルを、文字種が切り替わる位置で区切る（例: 「フラワーボトル制作数」→「フラワーボトル」「制作数」）。
+ * 統計のラベルのような短い語に使う。カタカナ語と漢字語の境目は、たいてい語の境目になる。
+ */
+export function scriptSegments(text: string): string[] {
+  const out: string[] = []
+  for (const ch of text) {
+    const last = out.at(-1)
+    if (last !== undefined && scriptOf(last.at(-1)!) === scriptOf(ch)) out[out.length - 1] = last + ch
+    else out.push(ch)
+  }
+  return out
+}
+
+/**
+ * 短いラベルの折り返しを、文字種の切り替わる位置だけに限る（<wbr> を入れる）。
+ * 表示側で `break-keep`（word-break: keep-all）と組み合わせる。区切りのないラベルは折り返さないため、
+ * 各区切りが表示幅に収まる長さであること（統計のラベルは events.test.ts で確かめる）。
+ */
+export function scriptBreaks(text: string): ReactNode {
+  const segs = scriptSegments(text)
+  if (segs.length <= 1) return text
+  return segs.flatMap((seg, i) => (i === 0 ? [seg] : [<wbr key={i} />, seg]))
 }
