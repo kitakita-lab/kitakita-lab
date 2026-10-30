@@ -11,6 +11,8 @@ npm run typecheck && npm run lint && npm run test:coverage && npm run build   # 
 npm run check:visual -- --shots /events/<slug>   # 全ページ × 6 幅の表示確認（ローカルの dist/。要 playwright-core）
 npm run check:production -- --only /events/<slug> # 公開 URL での表示確認（本番。結果はローカルと分けて記録）
 npm run gate:codex-wait -- <PR>                   # Codex レビューの依頼と待機（停滞時は同じ commit に 1 回だけ再依頼）
+npm run gate:ledger -- <PR>                       # PR 本文の進捗台帳を読む・照合して更新する（docs/AUTOPILOT.md §4）
+npm run gate:scope -- <PR>                        # 変更ファイルが台帳の許可ファイルに収まっているか（同 §5）
 npm run photos:audit                              # 公開中のヒーロー画像の明るさ（中央値 L*）の点検
 ```
 
@@ -42,3 +44,8 @@ playwright は devDependencies に含めていない。必要なときは `npm i
 
 「いつものハーネスで」「最終承認待ちまで」などと依頼された作業（実績の追加以外）は、`docs/AUTOPILOT.md` の手順・上限・止める条件に従う。
 作業範囲を確定してから進め、Draft PR のまま人の最終承認を待って止まる。マージ・Draft の解除・本番公開はしない。
+
+## 報告の言語
+
+- ユーザーへの説明・進捗報告・質問・最終レポートは日本語で書く。結論・実施内容・検証結果・人が判断すべき事項を簡潔に伝える。
+- コード・コマンド・識別子・ログ・GitHub 上の技術的な記録は、必要に応じて英語のままでよい。
