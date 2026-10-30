@@ -6,6 +6,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { EmailOff } from '@/components/ui/EmailOff'
+import { NavLink } from '@/components/layout/NavLink'
 import { site } from '@/data/site'
 import { useRef, useState } from 'react'
 
@@ -14,6 +15,13 @@ const points = [
   '作家として参加したい方からのご応募',
   '取材・メディア掲載のお問い合わせ',
 ]
+
+/**
+ * 企業・施設からのご相談で、最初のメールにあると助かること（任意の案内。必須項目にはしない）。
+ * 作家の応募・取材のお問い合わせを妨げないよう、「企業・施設の方へ」として分け、
+ * スマホではメール欄の後ろに置く（メールアドレスを先に見せる）。
+ */
+const consultHints = ['開催の目的', '時期と場所', '想定している参加者と、規模', 'ご予算の目安'] as const
 
 /** メール起動ボタンで初期入力する件名（企業以外の方も使える共通の件名）。 */
 const mailSubject = 'KitaKita Labへのお問い合わせ'
@@ -41,9 +49,11 @@ export function ContactPage() {
       />
 
       <Section tone="paper" spacing="lg">
-        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          <Reveal>
-            <div className="lg:sticky lg:top-24">
+        {/* スマホ: お待ちしているご連絡 → メール → 企業・施設の方への案内 の順。
+            PC: 左の列に「お待ちしているご連絡」と案内、右の列にメール。 */}
+        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-x-16">
+          <Reveal className="lg:col-start-1 lg:row-start-1">
+            <div>
               <h2 className="text-2xl text-ink">
                 こんなご連絡を
                 <br className="sm:hidden" />
@@ -62,9 +72,34 @@ export function ContactPage() {
             </div>
           </Reveal>
 
-          <Reveal delay={80}>
+          <Reveal delay={80} className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <div className="rounded-[1.75rem] border border-line bg-paper p-6 sm:p-8">
               <MailContact />
+            </div>
+          </Reveal>
+
+          <Reveal delay={120} className="lg:col-start-1 lg:row-start-2">
+            <div className="border-t border-line pt-8">
+              <h2 className="text-lg text-ink">企業・施設の方へ</h2>
+              <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+                {typeset('ご相談のときは、次のことをわかる範囲でお知らせください。')}
+              </p>
+              <ul className="mt-4 list-disc space-y-1.5 pl-5 text-[15px] text-ink-muted marker:text-clay-300">
+                {consultHints.map((h) => (
+                  <li key={h}>{h}</li>
+                ))}
+              </ul>
+              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                未定のことがあっても大丈夫です。開催の条件は「
+                {/* リンク名（10文字）は語の途中で折り返さない */}
+                <NavLink
+                  href="/workshop#consultation"
+                  className="whitespace-nowrap text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+                >
+                  開催のご相談について
+                </NavLink>
+                」にまとめています。
+              </p>
             </div>
           </Reveal>
         </div>

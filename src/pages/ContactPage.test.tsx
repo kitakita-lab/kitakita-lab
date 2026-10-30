@@ -49,4 +49,27 @@ describe('ContactPage', () => {
     const items = screen.getAllByRole('listitem')
     expect(items[0]).toHaveTextContent('企業・商業施設・自治体・教育機関との連携のご相談')
   })
+
+  it('企業・施設の方への任意の案内（4項目）があり、未定でもよいことと開催条件へのリンクを示す', () => {
+    renderWithProviders(<ContactPage />, { route: '/contact' })
+
+    const heading = screen.getByRole('heading', { name: '企業・施設の方へ' })
+    const block = heading.parentElement!
+    for (const text of ['開催の目的', '時期と場所', '想定している参加者と、規模', 'ご予算の目安']) {
+      expect(block).toHaveTextContent(text)
+    }
+    expect(block).toHaveTextContent('わかる範囲で')
+    expect(block).toHaveTextContent('未定のことがあっても大丈夫です')
+    expect(screen.getByRole('link', { name: '開催のご相談について' })).toHaveAttribute('href', '/workshop#consultation')
+    // 必須項目にしない（入力フォームは置かない）
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('メールアドレスは、企業・施設の方への案内より前に表示される（スマホでの見つけやすさ）', () => {
+    renderWithProviders(<ContactPage />, { route: '/contact' })
+
+    const address = screen.getByText(site.email)
+    const heading = screen.getByRole('heading', { name: '企業・施設の方へ' })
+    expect(address.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
 })
