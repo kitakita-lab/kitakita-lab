@@ -134,7 +134,23 @@ export function WorkshopPage() {
             体験として<span className="whitespace-nowrap">届ける。</span>
           </>
         }
-        description="少人数レッスンから企業コラボ、商業施設イベントまで。手を動かすと、ちょっと進む。参加者には「つくる喜び」を、作家には「はじめての舞台」を。"
+        // 冒頭は、公開している実績（商業施設のイベントスペースと、チカホなどの公共空間）に合わせて書く。
+        // 企業イベントやブランドとの協業は「これからご相談いただける領域」として、
+        // 下の「企業」カードと Collaboration への導線で伝える（冒頭で実績のように並べない）。
+        // 狭い幅でも語の途中で折り返さないよう、文節ごとに固定する。
+        description={
+          <>
+            <span className="whitespace-nowrap">商業施設の</span>
+            <span className="whitespace-nowrap">イベントスペースから、</span>
+            <span className="whitespace-nowrap">まちの広場まで。</span>
+            <span className="whitespace-nowrap">手を動かすと、</span>
+            <span className="whitespace-nowrap">ちょっと進む。</span>
+            <span className="whitespace-nowrap">参加者には</span>
+            <span className="whitespace-nowrap">「つくる喜び」を、</span>
+            <span className="whitespace-nowrap">作家には</span>
+            <span className="whitespace-nowrap">「はじめての舞台」を。</span>
+          </>
+        }
       />
 
       <Section tone="paper" spacing="md">
