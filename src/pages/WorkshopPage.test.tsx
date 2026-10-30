@@ -73,3 +73,18 @@ describe('WorkshopPage 依頼条件カード', () => {
     expect(el.compareDocumentPosition(flow) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })
+
+describe('WorkshopPage 冒頭', () => {
+  it('冒頭の説明は公開している実績の範囲で書き、企業向けの相談先は残す', () => {
+    const { container } = renderWithProviders(<WorkshopPage />, { route: '/workshop' })
+    const h1 = screen.getByRole('heading', { level: 1 })
+    const hero = h1.closest('section') ?? container
+    expect(hero.textContent).toContain('商業施設のイベントスペースから、まちの広場まで。')
+    // 実績のない領域（少人数レッスン・企業コラボ）を、冒頭で実績のように並べない
+    expect(hero.textContent).not.toContain('少人数レッスン')
+    expect(hero.textContent).not.toContain('企業コラボ')
+    // 企業イベントの相談は、ページ内の「企業」カードと Collaboration への導線で伝える
+    expect(screen.getByRole('heading', { name: '企業' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '連携について見る' })).toHaveAttribute('href', '/collaboration')
+  })
+})
