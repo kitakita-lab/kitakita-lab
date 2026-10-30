@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { renderWithProviders, screen, within } from '@/test/test-utils'
+import { renderWithProviders, screen, within, waitFor } from '@/test/test-utils'
 import { App } from '@/App'
 import { sortedEvents, brandJourney } from '@/data/events'
 
@@ -9,6 +9,16 @@ import { sortedEvents, brandJourney } from '@/data/events'
  * データ駆動の前提が崩れていないことを保証する。
  */
 describe('EventsPage（/events）', () => {
+  it('meta description に開催期間を書かない（実績が増えても古くならない）', async () => {
+    renderWithProviders(<App />, { route: '/events' })
+    await screen.findByRole('heading', { level: 1 })
+    await waitFor(() => {
+      const content = document.head.querySelector('meta[name="description"]')?.getAttribute('content') ?? ''
+      expect(content).toContain('ワークショップの開催実績です')
+      expect(content).not.toMatch(/\d{4}年|\d+月/)
+    })
+  })
+
   it('h1 と、実データのイベント数ぶんのカードが描画される', async () => {
     renderWithProviders(<App />, { route: '/events' })
 
