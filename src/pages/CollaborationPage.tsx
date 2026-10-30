@@ -14,7 +14,9 @@ const partners = [
   {
     icon: 'collab',
     title: '企業',
-    body: 'ブランドメッセージや商品を、ハンドメイドの体験として届けるコラボワークショップ。社内イベントやノベルティ企画にも対応します。',
+    // ブランドとの協業・社内イベントは、これから相談を受けたい領域（実績はまだない）。
+    // 自治体・教育機関と同じく、実績に読める言い方ではなく、相談できる相手として書く。
+    body: 'ブランドメッセージや商品を、ハンドメイドの体験として届ける企画。ブランドとの協業や、社内イベントでの開催も、ご相談いただけます。',
   },
   {
     icon: 'event',
@@ -35,6 +37,16 @@ const partners = [
   },
 ] as const
 
+// KitaKita Lab が担当できる作業の範囲。「連携の進め方」（flow）が順序を示すのに対し、こちらは範囲を示す。
+// 実績のある作業だけを並べ、POP・Web・資料制作などは常設のサービスとして載せない。
+const scope = [
+  '体験イベント・ワークショップの企画',
+  '開催に向けた準備と、会場のレイアウト',
+  '当日の運営と、スタッフの体制',
+  '参加状況の集計と、実施報告',
+  '必要に応じて、企画や調査、改善のご提案',
+] as const
+
 const flow = [
   { step: '01', title: 'お問い合わせ', body: '目的やイメージをお聞かせください。まだ漠然とした段階でも歓迎です。' },
   { step: '02', title: '企画のご提案', body: '目的・対象・会場に合わせて、最適なワークショップや企画を設計します。' },
@@ -51,7 +63,7 @@ export function CollaborationPage() {
       <Seo
         title="企業・商業施設・自治体との企画連携"
         path="/collaboration"
-        description="企業・商業施設・自治体・教育機関と、作家やつくり手の表現を活かしたワークショップ・体験企画を一緒につくります。札幌を拠点に、企画から当日の運営までご相談いただけます。"
+        description="商業施設や企業イベントで、作家やつくり手の表現を活かしたワークショップ・体験企画を一緒につくります。自治体・教育機関との企画も含め、札幌を拠点に、企画から当日の運営までご相談いただけます。"
       />
 
       <PageHeader
@@ -86,6 +98,45 @@ export function CollaborationPage() {
               </Card>
             </Reveal>
           ))}
+        </div>
+
+        {/* 担当できる範囲。同じ面（paper）の中の節として置き、面の交互（paper → tint → paper）を崩さない。 */}
+        <div className="mt-20 sm:mt-24">
+          <SectionHeading
+            size="md"
+            eyebrow="Scope"
+            title="一緒に担当できること"
+            description="体験の場を考えるところから、終わったあとの振り返りまで。必要なところだけのご相談も歓迎です。"
+          />
+          <Reveal>
+            <ul className="mt-8 grid max-w-3xl gap-x-10 gap-y-3 sm:grid-cols-2">
+              {scope.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-ink-muted">
+                  <span className="mt-1 shrink-0 text-clay-500">
+                    <Icon name="check" size={18} />
+                  </span>
+                  {typeset(item)}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-8 max-w-prose text-sm leading-relaxed text-ink-soft">
+              当日の様子や参加状況は
+              <NavLink
+                href="/events"
+                className="text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+              >
+                開催実績
+              </NavLink>
+              で、企画の材料にしている調査は
+              <NavLink
+                href="/research"
+                className="text-ink underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-600"
+              >
+                Research
+              </NavLink>
+              でご覧いただけます。
+            </p>
+          </Reveal>
         </div>
       </Section>
 
@@ -135,7 +186,7 @@ export function CollaborationPage() {
             お待ちしています。
           </span>
         }
-        description="「こんなことできる？」という段階でも大丈夫です。まずはお気軽にお問い合わせください。"
+        description="「こんなことできる？」という段階や、予算・開催時期が決まっていない段階でも大丈夫です。まずはお気軽にお問い合わせください。"
         primary={{ label: 'お問い合わせ', to: '/contact' }}
         // 実績（会場名・組数・レポート）は /events にある。/workshop は体験紹介ページなので
         // 「実績」ラベルで送らない。
