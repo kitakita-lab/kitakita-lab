@@ -121,14 +121,18 @@ describe('checkLedgerOwner', () => {
 })
 
 describe('parseAllowed', () => {
-  it('カンマ・読点・空白区切りとバッククォートを受け付ける', () => {
-    expect(parseAllowed('docs/AUTOPILOT.md, `CLAUDE.md`、scripts/a.mjs  b.ts')).toEqual([
+  it('カンマ・読点・改行区切りとバッククォートを受け付ける', () => {
+    expect(parseAllowed('docs/AUTOPILOT.md, `CLAUDE.md`、scripts/a.mjs\nb.ts')).toEqual([
       'docs/AUTOPILOT.md',
       'CLAUDE.md',
       'scripts/a.mjs',
       'b.ts',
     ])
     expect(parseAllowed(undefined)).toEqual([])
+  })
+
+  it('パスの中の空白は区切りにしない', () => {
+    expect(parseAllowed('notes/new file.md, `docs/a b.md`')).toEqual(['notes/new file.md', 'docs/a b.md'])
   })
 })
 
@@ -185,6 +189,19 @@ describe('checkScope', () => {
     expect(r.ok).toBe(false)
     expect(r.violations.map((v) => v.path).sort()).toEqual(['public/robots.txt', 'src/a.ts', 'tmp/debug.log'])
     expect(r.reasons.join()).toContain('未 commit')
+  })
+
+  it('空白を含む許可ファイルも、git の出力（NUL 区切り）と同じパスとして照合する', () => {
+    const allowedWithSpace = parseAllowed('notes/new file.md, CLAUDE.md')
+    const ok = checkScope({
+      allowed: allowedWithSpace,
+      committed: parseNameStatusZ(['A', 'notes/new file.md', ''].join('\0')),
+      working: parsePorcelainZ([' M CLAUDE.md', ''].join('\0')),
+    })
+    expect(ok.ok).toBe(true)
+    // 空白で分けた名前（notes/new・file.md）は許可しない
+    const ng = checkScope({ allowed: allowedWithSpace, committed: [{ status: 'A', paths: ['file.md'] }], working: [] })
+    expect(ng.ok).toBe(false)
   })
 
   it('許可ファイルが空なら ok にしない', () => {

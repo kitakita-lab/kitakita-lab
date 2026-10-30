@@ -100,10 +100,13 @@ export function checkLedgerOwner({ ledger, session, actualHead, expectedHead }) 
   return { ok: reasons.length === 0, reasons }
 }
 
-/** 台帳の「許可ファイル」（カンマ・読点・空白区切り）を配列にする */
+/**
+ * 台帳の「許可ファイル」（カンマ・読点・改行区切り）を配列にする。
+ * パスの中の空白は区切りにしない（git の出力は NUL 区切りで空白を含むパスをそのまま返すため）。
+ */
 export function parseAllowed(text) {
   return String(text ?? '')
-    .split(/[,、\s]+/)
+    .split(/[,、\n]+/)
     .map((p) => p.trim().replace(/^`|`$/g, ''))
     .filter(Boolean)
 }
