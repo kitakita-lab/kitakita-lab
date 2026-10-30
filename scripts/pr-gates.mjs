@@ -13,6 +13,13 @@
  *     main の commit が Cloudflare Pages に本番デプロイされ、公開 URL で反映を確認できたか。
  *     デプロイ直後の 404 などの反映待ちは --wait 秒（既定 300）まで再試行する（lib/deploy-gate.mjs）。
  *     VERIFIED=0 / FAIL=1 / PENDING=2 / DEPLOYED_UNVERIFIED=3（デプロイ成功だが URL を確認できない）
+ *   node scripts/pr-gates.mjs ledger <PR番号> [--session <URL> [--expect-head <commit>] 項目=値 ...]
+ *     PR 本文の進捗台帳（docs/AUTOPILOT.md §4）。項目=値 がなければ読むだけ。あれば、書き込む直前に
+ *     セッションと head を照合し、目印の内側だけを書き換え、直後に取り直して残っていることを確かめる（lib/ledger.mjs）。
+ *     PASS=0 / FAIL=1（照合が合わない・書き込みが残っていない。PR 本文の更新は条件付き更新にならず、完全な排他ではない）
+ *   node scripts/pr-gates.mjs scope <PR番号> [--base <ref>]
+ *     変更されたファイル（commit 済み・未 commit・未追跡。リネームは元と新の両方）が、台帳の「許可ファイル」に
+ *     すべて入っているか（docs/AUTOPILOT.md §5）。--base は既定 origin/main（先に git fetch しておく）。PASS=0 / FAIL=1
  *
  * GitHub への通信は `gh api`（GitHub CLI、または Claude Code の gh）を使う。
  * 取得できなかった情報は合格扱いにしない。
@@ -22,6 +29,7 @@ import { setTimeout as sleep } from 'node:timers/promises'
 import { evaluateCodex, planCodexReview, codexRequestBody, CODEX_POLICY } from './lib/codex-gate.mjs'
 import { parseDeployArgs } from './lib/deploy-args.mjs'
 import { classifyPage, decideDeploy } from './lib/deploy-gate.mjs'
+import { parseLedger, updateLedgerBody, checkLedgerOwner, parseAllowed, parseNameStatusZ, parsePorcelainZ, checkScope } from './lib/ledger.mjs'
 
 const repo =
   process.env.GH_REPO ??
@@ -238,6 +246,67 @@ async function deploy(sha, urls, expect, { wait = 300, interval = 15 } = {}) {
   }
 }
 
+/** PR 本文の進捗台帳を読む・照合して書き換える（書き込みの直前と直後に取り直す） */
+function ledger(pr, args) {
+  const rest = [...args]
+  const take = (name) => {
+    const i = rest.indexOf(name)
+    if (i < 0) return undefined
+    const [, value] = rest.splice(i, 2)
+    return value
+  }
+  const session = take('--session')
+  const expectedHead = take('--expect-head')
+  const updates = Object.fromEntries(
+    rest.map((a) => {
+      const i = a.indexOf('=')
+      if (i <= 0) throw new Error(`項目=値 の形で指定する: ${a}`)
+      return [a.slice(0, i), a.slice(i + 1)]
+    }),
+  )
+  const before = gh(`repos/${repo}/pulls/${pr}`)
+  const parsed = parseLedger(before.body)
+  if (Object.keys(updates).length === 0) {
+    const check = session ? checkLedgerOwner({ ledger: parsed, session, actualHead: before.head.sha, expectedHead }) : null
+    const ok = parsed !== null && (check?.ok ?? true)
+    return { verdict: ok ? 'PASS' : 'FAIL', head: before.head.sha, ledger: parsed?.rows ?? null, reasons: check?.reasons ?? (parsed ? [] : ['台帳が読めない']) }
+  }
+  const check = checkLedgerOwner({ ledger: parsed, session, actualHead: before.head.sha, expectedHead })
+  if (!check.ok) return { verdict: 'FAIL', written: false, head: before.head.sha, reasons: check.reasons }
+  const next = updateLedgerBody(before.body, updates)
+  if (next !== before.body) {
+    execFileSync('gh', ['api', '-X', 'PATCH', `repos/${repo}/pulls/${pr}`, '--input', '-'], {
+      input: JSON.stringify({ body: next }),
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+  }
+  const after = gh(`repos/${repo}/pulls/${pr}`)
+  const kept = after.body === next && after.head.sha === before.head.sha
+  return {
+    verdict: kept ? 'PASS' : 'FAIL',
+    written: next !== before.body,
+    head: after.head.sha,
+    ledger: parseLedger(after.body)?.rows ?? null,
+    reasons: kept ? [] : ['書き込んだ内容が残っていない、または head が動いた（競合の疑い。書き込みを止める）'],
+  }
+}
+
+/** 変更範囲の検査。commit 済みの差分と、未 commit・未追跡の変更を、台帳の「許可ファイル」と照合する */
+function scope(pr, args) {
+  const i = args.indexOf('--base')
+  const base = i >= 0 ? args[i + 1] : 'origin/main'
+  const parsed = parseLedger(gh(`repos/${repo}/pulls/${pr}`).body)
+  if (!parsed) return { verdict: 'FAIL', reasons: ['台帳が読めない'] }
+  const git = (a) => execFileSync('git', a, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  const result = checkScope({
+    allowed: parseAllowed(parsed.rows['許可ファイル']),
+    committed: parseNameStatusZ(git(['diff', '--name-status', '-M', '-z', `${base}...HEAD`])),
+    working: parsePorcelainZ(git(['status', '--porcelain=v1', '-uall', '-z'])),
+  })
+  return { verdict: result.ok ? 'PASS' : 'FAIL', base, ...result }
+}
+
 const EXIT = { PASS: 0, VERIFIED: 0, FAIL: 1, PENDING: 2, DEPLOYED_UNVERIFIED: 3 }
 const [cmd, arg, ...rest] = process.argv.slice(2)
 let result
@@ -251,8 +320,13 @@ else if (cmd === 'codex-wait' && arg) {
 else if (cmd === 'deploy' && arg) {
   const { urls, expect, wait, interval } = parseDeployArgs(rest)
   result = await deploy(arg, urls, expect, { wait, interval })
-} else {
-  console.error('使い方: node scripts/pr-gates.mjs codex <PR> | codex-wait <PR> [--timeout 分] | checks <PR> | deploy <commit> [URL ...] --expect 文字列 [--wait 秒] [--interval 秒]')
+} else if (cmd === 'ledger' && arg) result = ledger(arg, rest)
+else if (cmd === 'scope' && arg) result = scope(arg, rest)
+else {
+  console.error(
+    '使い方: node scripts/pr-gates.mjs codex <PR> | codex-wait <PR> [--timeout 分] | checks <PR> | deploy <commit> [URL ...] --expect 文字列 [--wait 秒] [--interval 秒]' +
+      ' | ledger <PR> [--session <URL> [--expect-head <commit>] 項目=値 ...] | scope <PR> [--base <ref>]',
+  )
   process.exit(64)
 }
 console.log(JSON.stringify(result, null, 2))
