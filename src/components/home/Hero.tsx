@@ -1,4 +1,12 @@
 /**
+ * 画像の読み込み優先度。React 18.3 は camelCase の fetchPriority を DOM の属性として
+ * 認識せず警告を出すため、HTML の属性名（小文字の fetchpriority）でそのまま渡す。
+ * @types/react は fetchPriority だけを定義しているので、型の拡張はせず、この画像に限って
+ * オブジェクトの展開で渡す。React 19 に上げたら fetchPriority="high" に戻す。
+ */
+const highFetchPriority = { fetchpriority: 'high' }
+
+/**
  * Hero — ブランドの人格が最初に話す場所。
  * 名前の説明をしない。約束もしない。哲学を、静かに置くだけ。
  * 意味の解釈は読む人に委ねる（docs/BRAND.md）。
@@ -29,7 +37,7 @@ export function Hero() {
           src="/hero/hokkaido-field-1536.jpg"
           alt=""
           aria-hidden="true"
-          fetchPriority="high"
+          {...highFetchPriority}
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[50%_42%]"
         />
       </picture>
