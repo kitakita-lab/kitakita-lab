@@ -6,13 +6,13 @@
  *     CLAUDE.md が AGENTS.md を読み込んでいるかを表示する。
  *     すべて最新=0 / 手で変更・形の誤り=1 / 古い版・未導入・読み込みなし=2
  *   node scripts/harness-sync.mjs apply <リポジトリのフォルダ> ... [--add common,creative]
- *     導入済みのブロックを正本に更新し、--add のプロファイルを追加する。CLAUDE.md に @AGENTS.md がなければ足す。
+ *     導入済みのブロックを正本に更新し、--add のプロファイルを追加する。管理ブロックがあるときだけ、CLAUDE.md に @AGENTS.md がなければ足す。
  *     手で変更されたブロックがあるリポジトリは書き換えない（終了コード 1）。変更がなければ何も書かない。
  */
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
 import { join, basename, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { statusOf, planUpdate, ensureClaudeImport } from './lib/harness-sync.mjs'
+import { statusOf, planUpdate, ensureClaudeImport, parseBlocks } from './lib/harness-sync.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const profilesDir = resolve(here, '..', 'harness', 'profiles')
@@ -68,7 +68,10 @@ for (const dir of dirs) {
     worse(1)
     continue
   }
-  const imp = ensureClaudeImport(claude)
+  // 管理ブロックのない（未導入のまま終わる）リポジトリでは、CLAUDE.md に読み込み行を足さない
+  const finalAgents = plan.changed ? plan.text : agents
+  const hasBlocks = finalAgents != null && parseBlocks(finalAgents).blocks.length > 0
+  const imp = hasBlocks ? ensureClaudeImport(claude) : { text: claude, changed: false }
   if (plan.changed) writeFileSync(agentsPath, plan.text)
   if (imp.changed) writeFileSync(claudePath, imp.text)
   const summary = plan.changes.map((c) => `${c.name}:${c.action}`).join(' ') || '管理ブロックなし'
