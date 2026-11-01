@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # KitaKita Lab 公式サイト — 作業の前提
 
 札幌を拠点とする屋号「KitaKita Lab」の公式サイト（https://www.kitakita-lab.com）。

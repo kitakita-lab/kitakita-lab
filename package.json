@@ -20,6 +20,7 @@
     "gate:deploy": "node scripts/pr-gates.mjs deploy",
     "gate:ledger": "node scripts/pr-gates.mjs ledger",
     "gate:scope": "node scripts/pr-gates.mjs scope",
+    "harness:sync": "node scripts/harness-sync.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
