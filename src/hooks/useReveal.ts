@@ -18,6 +18,17 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(options?: {
     const node = ref.current
     if (!node) return
 
+    // index.html の保険（reveal-timeout）がすでに働いて表示されている要素は、
+    // 起動の印を付けたときに隠し直さないよう、先に表示の状態にしておく。
+    const timedOut = document.documentElement.classList.contains('reveal-timeout')
+    if (timedOut) node.classList.add('is-visible')
+    // 起動の印。これがない要素だけが、保険の対象になる（src/index.css）。
+    node.setAttribute('data-reveal-bound', '')
+    if (timedOut) {
+      setIsVisible(true)
+      return
+    }
+
     if (typeof IntersectionObserver === 'undefined') {
       setIsVisible(true)
       return

@@ -58,22 +58,28 @@
     @apply relative inline-flex items-center gap-1 text-ink transition-colors hover:text-clay-600;
   }
 
-  /* Reveal-on-scroll base state (paired with useReveal hook) */
+  /* Reveal-on-scroll (paired with useReveal hook)
+     隠すのは、JavaScript が動いて <html> に reveal-js が付いたときだけ（index.html）。
+     JavaScript が無効なら、.reveal は最初から表示される。 */
   .reveal {
-    opacity: 0;
-    transform: translateY(20px);
     transition:
       opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: opacity, transform;
   }
-  .reveal.is-visible {
+  .reveal-js .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  /* 3 秒たっても useReveal が起動しなかった要素（data-reveal-bound がない）は表示に戻す */
+  .reveal-js.reveal-timeout .reveal:not([data-reveal-bound]) {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal {
+    .reveal,
+    .reveal-js .reveal:not(.is-visible) {
       opacity: 1;
       transform: none;
       transition: none;

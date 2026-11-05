@@ -7,6 +7,21 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F7F8F8" />
 
+    <!-- スクロールで表示する演出（.reveal）の起動。JavaScript が動くときだけ
+         <html> に reveal-js を付け、要素を最初に隠す（src/index.css）。
+         JavaScript が無効なら、本文は最初から表示される。
+         3 秒たっても useReveal が起動しなかった要素（読み込みや hydration の失敗）は、
+         reveal-timeout で表示に戻す。 -->
+    <script>
+      ;(function () {
+        var root = document.documentElement
+        root.classList.add('reveal-js')
+        setTimeout(function () {
+          root.classList.add('reveal-timeout')
+        }, 3000)
+      })()
+    </script>
+
     <!-- ssg:head:start
          この区間は scripts/prerender.mjs がページ固有の
          title / meta / canonical / OG / JSON-LD に置き換える。
