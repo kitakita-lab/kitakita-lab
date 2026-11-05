@@ -71,8 +71,8 @@
     opacity: 0;
     transform: translateY(20px);
   }
-  /* 3 秒たっても useReveal が起動しなかった要素（data-reveal-bound がない）は表示に戻す */
-  .reveal-js.reveal-timeout .reveal:not([data-reveal-bound]) {
+  /* 3 秒たっても useReveal が起動しなかった要素（index.html が data-reveal-fallback を付ける）は表示に戻す */
+  .reveal-js .reveal[data-reveal-fallback]:not(.is-visible) {
     opacity: 1;
     transform: none;
   }
