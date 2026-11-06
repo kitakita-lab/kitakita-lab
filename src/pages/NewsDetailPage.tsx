@@ -11,6 +11,9 @@ import { formatDate } from '@/lib/date'
 import { Segments } from '@/components/ui/Segments'
 import { typeset } from '@/lib/typo'
 
+const linkClass =
+  'inline-flex items-center gap-1.5 text-[15px] font-medium text-clay-600 underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-700'
+
 export function NewsDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const item = newsItems.find((n) => n.slug === slug)
@@ -84,13 +87,24 @@ export function NewsDetailPage() {
             <ul className="mx-auto mt-10 max-w-prose space-y-3">
               {item.links.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="inline-flex items-center gap-1.5 text-[15px] font-medium text-clay-600 underline decoration-clay-300 underline-offset-4 transition-colors hover:text-clay-700"
-                  >
-                    {link.label}
-                    <Icon name="arrow" size={16} />
-                  </Link>
+                  {link.href.startsWith('https://') ? (
+                    // サイト外（note など）は新しいタブで開く。Link はサイト内の経路にしか使えない
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClass}
+                    >
+                      {link.label}
+                      <span className="sr-only">（新しいタブで開きます）</span>
+                      <Icon name="arrowUpRight" size={16} />
+                    </a>
+                  ) : (
+                    <Link to={link.href} className={linkClass}>
+                      {link.label}
+                      <Icon name="arrow" size={16} />
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

@@ -46,4 +46,12 @@ describe('news データ', () => {
       expect(prev).toBeGreaterThanOrEqual(curr)
     }
   })
+
+  it('関連リンクは、サイト内の経路（/）か https:// の URL である', () => {
+    for (const item of newsItems) {
+      for (const link of item.links ?? []) {
+        expect(link.href, `${item.slug} の ${link.label}`).toMatch(/^(\/|https:\/\/)/)
+      }
+    }
+  })
 })
