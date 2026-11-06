@@ -33,6 +33,9 @@ describe('parseHold', () => {
   it('全角コロンも読める。再確認日が日付でなければ無効', () => {
     expect(parseHold([{ body: `${HOLD_MARK}\n保留理由：理由\n再確認日：来週`, created_at: daysAgo(1) }])).toMatchObject({ valid: false })
   })
+  it('保留理由が空欄なら、次の行を理由として取り込まず無効にする', () => {
+    expect(parseHold([{ body: `${HOLD_MARK}\n保留理由:\n再確認日: 2026-11-20`, created_at: daysAgo(1) }])).toMatchObject({ reason: null, valid: false })
+  })
   it('再確認日が「解除」なら保留を解いたものとして扱う', () => {
     const h = parseHold([holdComment('理由', '2026-12-01', daysAgo(3)), { body: `${HOLD_MARK}\n再確認日: 解除`, created_at: daysAgo(1) }])
     expect(h).toMatchObject({ released: true })
@@ -40,9 +43,13 @@ describe('parseHold', () => {
 })
 
 describe('linkedIssues', () => {
-  it('Refs・Closes・Issue #・issues/ の参照を拾い、ただの #番号は拾わない', () => {
-    expect(linkedIssues('Refs #12\nCloses #3\n[Issue #7](x)\nhttps://github.com/o/r/issues/9\nPR #5 の続き')).toEqual([12, 3, 7, 9])
+  it('Refs・Closes・Issue #・同じリポジトリの issues/ の URL を拾い、ただの #番号は拾わない', () => {
+    expect(linkedIssues('Refs #12\nCloses #3\n[Issue #7](x)\nhttps://github.com/o/r/issues/9\nPR #5 の続き', 'o/r')).toEqual([12, 3, 7, 9])
     expect(linkedIssues(null)).toEqual([])
+  })
+  it('別のリポジトリの Issue の URL は拾わない', () => {
+    expect(linkedIssues('https://github.com/o/other/issues/4', 'o/site')).toEqual([])
+    expect(linkedIssues('https://github.com/O/Site/issues/4', 'o/site')).toEqual([4])
   })
 })
 
@@ -113,6 +120,17 @@ describe('buildInventory と renderReport', () => {
     { ...base, repo: 'o/site', number: 9, url: 'u9', hold: parseHold([holdComment('先方の回答待ち', '2026-12-01')]) },
   ]
   const inv = buildInventory(items, NOW)
+  it('別のリポジトリの Issue の URL を参照する PR は、同じ番号の Issue をまとめない', () => {
+    const inv2 = buildInventory(
+      [
+        { ...base, repo: 'o/site', number: 5, url: 'u5', body: 'https://github.com/o/other/issues/4' },
+        { ...base, repo: 'o/site', number: 4, kind: 'issue' as const, url: 'u4', title: '承認待ちの Issue' },
+      ],
+      NOW,
+    )
+    expect(inv2.find((i) => i.number === 4)?.pairedPr).toBeNull()
+    expect(renderReport(inv2, NOW)).toContain('要判断 1')
+  })
   it('PR が参照する同じリポジトリの Issue だけを PR にまとめる', () => {
     expect(inv.find((i) => i.repo === 'o/site' && i.number === 4)?.pairedPr).toBe(5)
     expect(inv.find((i) => i.repo === 'o/other')?.pairedPr).toBeNull()

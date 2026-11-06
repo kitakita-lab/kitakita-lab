@@ -36,7 +36,7 @@ export type Classified = {
 }
 
 export function parseHold(comments: Comment[] | null | undefined): Hold | null
-export function linkedIssues(body: string | null | undefined): number[]
+export function linkedIssues(body: string | null | undefined, repo?: string): number[]
 export function classifyItem(item: Omit<Item, 'repo' | 'number'> & Partial<Item>, now: Date): Classified
 export function buildInventory(items: Item[], now: Date): (Item & Classified & { pairedPr: number | null })[]
 export function renderReport(inventory: (Item & Classified & { pairedPr: number | null })[], now: Date): string

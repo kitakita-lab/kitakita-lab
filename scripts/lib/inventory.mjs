@@ -32,7 +32,8 @@ export function parseHold(comments) {
   const marked = (comments ?? []).filter((c) => typeof c?.body === 'string' && c.body.includes(HOLD_MARK))
   if (marked.length === 0) return null
   const latest = [...marked].sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).at(-1)
-  const field = (name) => latest.body.match(new RegExp(`^\\s*${name}\\s*[:：]\\s*(.+?)\\s*$`, 'm'))?.[1] ?? null
+  // 空白は行の中だけで照合する（空欄のとき次の行を値として取り込まない）。空欄は null
+  const field = (name) => latest.body.match(new RegExp(`^[ \\t]*${name}[ \\t]*[:：][ \\t]*(.*?)[ \\t]*$`, 'm'))?.[1] || null
   const reason = field('保留理由')
   const recheck = field('再確認日')
   const valid = Boolean(reason) && /^\d{4}-\d{2}-\d{2}$/.test(recheck ?? '')
@@ -40,11 +41,16 @@ export function parseHold(comments) {
   return { reason, recheck, recordedAt: latest.created_at, valid }
 }
 
-/** PR 本文から、同じリポジトリの Issue 番号への参照（Refs #12・Issue #12・issues/12）を拾う */
-export function linkedIssues(body) {
+/**
+ * PR 本文から、同じリポジトリの Issue 番号への参照（Refs #12・Issue #12・github.com/<repo>/issues/12）を拾う。
+ * URL は owner/repo が repo と一致するものだけ（別のリポジトリの Issue をまとめない）。repo がなければ URL は拾わない。
+ */
+export function linkedIssues(body, repo) {
   const out = new Set()
-  for (const m of String(body ?? '').matchAll(/(?:\b(?:Refs|Closes|Fixes|Resolves)\s+|Issue\s*)#(\d+)|\/issues\/(\d+)/gi)) {
-    out.add(Number(m[1] ?? m[2]))
+  const text = String(body ?? '')
+  for (const m of text.matchAll(/(?:\b(?:Refs|Closes|Fixes|Resolves)\s+|Issue\s*)#(\d+)/gi)) out.add(Number(m[1]))
+  for (const m of text.matchAll(/github\.com\/([\w.-]+\/[\w.-]+)\/issues\/(\d+)/gi)) {
+    if (repo && m[1].toLowerCase() === repo.toLowerCase()) out.add(Number(m[2]))
   }
   return [...out]
 }
@@ -130,7 +136,7 @@ export function buildInventory(items, now) {
   const prLinks = new Map() // `${repo}#${issue}` -> PR 番号
   for (const it of items) {
     if (it.kind !== 'pr') continue
-    for (const n of linkedIssues(it.body)) prLinks.set(`${it.repo}#${n}`, it.number)
+    for (const n of linkedIssues(it.body, it.repo)) prLinks.set(`${it.repo}#${n}`, it.number)
   }
   return items.map((it) => {
     const result = classifyItem(it, now)
