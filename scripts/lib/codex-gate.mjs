@@ -108,7 +108,7 @@ export function evaluateCodex({ headSha, comments, reviews, threads }) {
  *   - 同じ commit への依頼は、誰が投稿したものも数える（初回＋再依頼 1 回まで。重複依頼をしない）
  *   - レビュー回数の上限（既定 3 回。リスク区分で 1／3／5／5）は「Codex が実際にレビューした commit の数」（受領のある commit）で数える。
  *     応答のなかった依頼・同じ commit への再依頼は数えない。依頼の総数は別に数え、上限×同じ commit への依頼の上限を超えたら止める
- *   - 上限に達し、head が未レビューなら判定は CAPPED（合格ではない。人間が判断する）
+ *   - 上限に達し、head が未レビューなら判定は CAPPED（合格ではない。人間が判断する）。未解決のスレッドが残っていれば FAIL を優先する
  *   - 依頼・再依頼の前に、head の CI が成功していることを条件にする（ci が渡されたとき。失敗なら止め、実行中なら待つ）
  *   - 同種の指摘の繰り返し（repeatCheck）: 2 回続けば原因分析の記録まで依頼しない、3 回続けば止める
  *   - FAIL（未解決の指摘）は再依頼で解消しない。指摘に対応して新しい commit を積む
@@ -377,8 +377,13 @@ export function planCodexReview({ headSha, headCommittedAt, now, comments, revie
     if (used >= policy.maxReviewRounds) {
       const limit = `レビュー回数の上限（${policy.maxReviewRounds} 回）に達している`
       const capped = { ...base, verdict: 'CAPPED' }
+      // 未解決のスレッド（前のレビューの指摘）が残っていれば、上限到達よりも FAIL を優先する（未解決の指摘を CAPPED で隠さない）
+      const open = Array.isArray(threads) ? threads.filter((t) => !t.resolved).length : null
+      if (open) {
+        return { ...base, verdict: 'FAIL', action: 'stop', elapsedMinutes: null, reasons: [limit, `未解決のレビュースレッドが ${open} 件ある（上限に達していても FAIL。指摘への対応が先）`] }
+      }
       if (!integration?.verified) {
-        return { ...capped, action: 'stop', elapsedMinutes: null, reasons: [limit, ...(integration ? [`統合の例外に当たらない: ${integration.reason}`] : []), 'CAPPED（合格ではない。人間が判断する）'] }
+        return { ...capped, action: 'stop', elapsedMinutes: null, reasons: [limit, ...(integration ? [`統合の例外に当たらない: ${integration.reason}`] : []), ...(open === null ? ['レビュースレッドを確認できない'] : []), 'CAPPED（合格ではない。人間が判断する）'] }
       }
       if (requests.some((r) => r.kind === 'integration' && !r.forHead)) {
         return { ...capped, action: 'stop', elapsedMinutes: null, reasons: [limit, '統合の例外は PR につき 1 回まで（使用済み）', 'CAPPED（合格ではない。人間が判断する）'] }

@@ -127,7 +127,8 @@ function codex(pr) {
   // 上限に達して head が未レビュー（依頼もない）なら CAPPED。合格ではない
   const commit = gh(`repos/${repo}/commits/${p.head.sha}`)
   const plan = planCodexReview({ headSha: p.head.sha, headCommittedAt: commit.commit?.committer?.date, now: new Date().toISOString(), ...ctx, policy: { ...CODEX_POLICY, maxReviewRounds: risk.maxReviewRounds } })
-  if (plan.verdict === 'CAPPED') return { ...out, verdict: 'CAPPED', reasons: plan.reasons, roundsUsed: plan.roundsUsed }
+  // 上限到達: 未解決のスレッドがあれば FAIL、なければ CAPPED（どちらも合格ではない）
+  if (plan.verdict === 'CAPPED' || plan.verdict === 'FAIL') return { ...out, verdict: plan.verdict, reasons: plan.reasons, roundsUsed: plan.roundsUsed }
   return out
 }
 

@@ -262,6 +262,14 @@ describe('planCodexReview', () => {
     expect(r.action).toBe('stop')
   })
 
+  it('上限に達していても、未解決のスレッドが残っていれば CAPPED ではなく FAIL（未解決の指摘を隠さない）', () => {
+    const shas = ['a1a1a1a1a1', 'b2b2b2b2b2', 'c3c3c3c3c3']
+    const r = plan(shas.map((s) => receipt(s.padEnd(40, '0'))), '2026-10-29T12:29:00Z', { threads: [{ resolved: true }, { resolved: false }] })
+    expect(r).toMatchObject({ verdict: 'FAIL', action: 'stop' })
+    // スレッドを取得できないときは CAPPED のまま（合格扱いにしない）
+    expect(plan(shas.map((s) => receipt(s.padEnd(40, '0'))), '2026-10-29T12:29:00Z', { threads: null }).verdict).toBe('CAPPED')
+  })
+
   it('依頼の総数が上限（レビュー上限×同じ commit への依頼の上限）に達したら、新しい依頼をしない', () => {
     const many = Array.from({ length: 6 }, (_, i) => marked(`${i}`.repeat(40), 'initial', `2026-10-29T12:0${i}:00Z`))
     const r = plan(many, '2026-10-29T12:29:00Z')
