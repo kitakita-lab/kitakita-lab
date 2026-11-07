@@ -90,7 +90,7 @@ function reviewThreads(pr) {
 function codexContext(pr) {
   const p = gh(`repos/${repo}/pulls/${pr}`)
   const comments = ghAll(`repos/${repo}/issues/${pr}/comments`).map((c) => ({ login: c.user?.login, body: c.body, createdAt: c.created_at, updatedAt: c.updated_at }))
-  const reviews = ghAll(`repos/${repo}/pulls/${pr}/reviews`).map((r) => ({ login: r.user?.login, body: r.body }))
+  const reviews = ghAll(`repos/${repo}/pulls/${pr}/reviews`).map((r) => ({ login: r.user?.login, body: r.body, createdAt: r.submitted_at }))
   return { p, comments, reviews, threads: reviewThreads(pr) }
 }
 
@@ -177,7 +177,7 @@ async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
     if (!integrations.has(head)) integrations.set(head, commit.parents?.length === 2 ? integrationCheck(head, ctx.p.base.ref) : null)
     const { files, risk, reviewComments } = riskContext(pr, ctx.p)
     // 行コメントを取得できなければ、繰り返しを確かめられないので依頼しない（合格扱いにもしない）
-    const repeat = reviewComments === null ? { action: 'stop', reasons: ['Codex の行コメントを取得できない（同種の指摘の繰り返しを確かめられない）'] } : repeatCheck({ rounds: findingRounds(reviewComments), comments: ctx.comments, changedFiles: files })
+    const repeat = reviewComments === null ? { action: 'stop', reasons: ['Codex の行コメントを取得できない（同種の指摘の繰り返しを確かめられない）'] } : repeatCheck({ rounds: findingRounds(reviewComments, [...ctx.comments, ...ctx.reviews]), comments: ctx.comments, changedFiles: files })
     const ci = checks(pr).verdict
     const policy = { ...CODEX_POLICY, maxReviewRounds: risk.maxReviewRounds }
     return { head, risk, ...planCodexReview({ headSha: head, headCommittedAt, now: new Date().toISOString(), integration: integrations.get(head), ...ctx, policy, ci, repeat }) }

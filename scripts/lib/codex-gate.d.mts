@@ -39,7 +39,10 @@ export function classifyRisk(input: { files: string[] | null; declared?: string 
 }
 export function raiseTier(tier: ReviewTier): ReviewTier
 export type FindingRound = { commit: string; paths: string[]; severe: boolean; at: string }
-export function findingRounds(reviewComments: { login: string; body: string; path?: string; commitId?: string; createdAt?: string }[]): FindingRound[]
+export function findingRounds(
+  reviewComments: { login: string; body: string; path?: string; commitId?: string; createdAt?: string }[],
+  receiptItems?: (CodexComment & { createdAt?: string })[],
+): FindingRound[]
 export function rootCauseBody(commit: string, tests: string[], note: string): string
 export type RepeatResult = { action: 'ok' | 'block' | 'stop'; reasons: string[] }
 export function repeatCheck(input: { rounds: FindingRound[]; comments: CodexComment[]; changedFiles: string[] | null }): RepeatResult

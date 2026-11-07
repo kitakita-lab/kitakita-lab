@@ -203,21 +203,32 @@ export function raiseTier(tier) {
 const SEVERITY_RE = /!\[(P[0-3]) Badge\]/
 
 /**
- * Codex の行コメントを、レビューした commit ごとにまとめる（同種の指摘の繰り返しを見つけるため）。
+ * Codex のレビューを、レビューした commit ごとにまとめる（同種の指摘の繰り返しを見つけるため）。
+ * 指摘のなかったレビュー（受領だけの commit）も 1 回として入れる。指摘なしの回をはさめば、繰り返しは途切れる。
  * @param {{login:string, body:string, path?:string, commitId?:string, createdAt?:string}[]} reviewComments PR の行コメント
- * @returns {{ commit: string, paths: string[], severe: boolean, at: string }[]} 古い順
+ * @param {{login:string, body:string, createdAt?:string}[]} [receiptItems] 受領を含む Issue コメントとレビュー（createdAt は投稿・提出の時刻）
+ * @returns {{ commit: string, paths: string[], severe: boolean, at: string }[]} 古い順。commit は先頭 7 桁
  */
-export function findingRounds(reviewComments) {
+export function findingRounds(reviewComments, receiptItems = []) {
   const by = new Map()
+  const round = (sha, at) => {
+    const key = sha.slice(0, 7)
+    const r = by.get(key) ?? { commit: key, paths: new Set(), severe: false, at: at ?? '' }
+    if (at && (!r.at || at < r.at)) r.at = at
+    by.set(key, r)
+    return r
+  }
+  for (const c of receiptItems) {
+    if (!isCodex(c.login)) continue
+    const sha = (c.body ?? '').match(RECEIPT_RE)?.[1]
+    if (sha) round(sha, c.createdAt)
+  }
   for (const c of reviewComments) {
     if (!isCodex(c.login) || !c.commitId) continue
-    const key = c.commitId.slice(0, 10)
-    const r = by.get(key) ?? { commit: key, paths: new Set(), severe: false, at: c.createdAt ?? '' }
+    const r = round(c.commitId, c.createdAt)
     if (c.path) r.paths.add(c.path)
     const sev = (c.body ?? '').match(SEVERITY_RE)?.[1]
     if (sev === 'P0' || sev === 'P1') r.severe = true
-    if ((c.createdAt ?? '') < r.at) r.at = c.createdAt
-    by.set(key, r)
   }
   return [...by.values()].sort((a, b) => a.at.localeCompare(b.at)).map((r) => ({ ...r, paths: [...r.paths].sort() }))
 }
@@ -226,7 +237,7 @@ export function findingRounds(reviewComments) {
 const ROOT_CAUSE_RE = /<!--\s*harness-root-cause:v1\s*(\{[^}]*\})\s*-->/
 
 export function rootCauseBody(commit, tests, note) {
-  return `${note}\n\n<!-- harness-root-cause:v1 ${JSON.stringify({ commit: commit.slice(0, 10), tests })} -->`
+  return `${note}\n\n<!-- harness-root-cause:v1 ${JSON.stringify({ commit: commit.slice(0, 7), tests })} -->`
 }
 
 /**
@@ -236,19 +247,24 @@ export function rootCauseBody(commit, tests, note) {
  * @param {{ rounds: ReturnType<typeof findingRounds>, comments: {login:string, body:string}[], changedFiles: string[] | null }} input
  */
 export function repeatCheck({ rounds, comments, changedFiles }) {
-  let streak = rounds.length ? 1 : 0
+  // 直近の回から、すべての回に共通するファイルを絞り込みながら数える（隣り合う組だけで数えると、別のファイルの連続を同じと数える）
+  let streak = 0
   let shared = []
-  for (let i = rounds.length - 1; i > 0; i--) {
-    const common = rounds[i].paths.filter((p) => rounds[i - 1].paths.includes(p))
-    if (!common.length) break
-    if (streak === 1) shared = common
-    streak++
+  if (rounds.length && rounds.at(-1).paths.length) {
+    shared = rounds.at(-1).paths
+    streak = 1
+    for (let i = rounds.length - 2; i >= 0; i--) {
+      const common = shared.filter((p) => rounds[i].paths.includes(p))
+      if (!common.length) break
+      shared = common
+      streak++
+    }
   }
   const last3 = rounds.slice(-3)
   if (streak >= 3) return { action: 'stop', reasons: [`同じファイルへの指摘が ${streak} 回続いた（${shared.join(', ')}）。上限が残っていても止めて人間に報告する`] }
   if (last3.length === 3 && last3.every((r) => r.severe)) return { action: 'stop', reasons: ['直近 3 回のレビューで、続けて P0/P1 の指摘が出た。上限が残っていても止めて人間に報告する'] }
   if (streak === 2) {
-    const target = rounds.at(-1).commit
+    const target = rounds.at(-1).commit.slice(0, 7)
     const notes = comments
       .filter((c) => c.login && !c.login.endsWith('[bot]'))
       .map((c) => (c.body ?? '').match(ROOT_CAUSE_RE)?.[1])
@@ -260,7 +276,7 @@ export function repeatCheck({ rounds, comments, changedFiles }) {
           return null
         }
       })
-      .filter((n) => n && String(n.commit).slice(0, 10) === target)
+      .filter((n) => n && String(n.commit).slice(0, 7) === target)
     const ok = notes.some((n) => Array.isArray(n.tests) && n.tests.length > 0 && Array.isArray(changedFiles) && n.tests.every((t) => changedFiles.includes(t)))
     if (!ok) {
       return {

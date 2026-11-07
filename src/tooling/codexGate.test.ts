@@ -410,8 +410,8 @@ describe('findingRounds・repeatCheck（同種の指摘の繰り返し）', () =
   it('Codex 以外の行コメントは数えない。commit ごとにまとめ、P0/P1 を重大として印を付ける', () => {
     const rounds = findingRounds([r1, { ...r2, login: 'chatgpt-codex-connector-fake' }, r3])
     expect(rounds.map((r) => [r.commit, r.severe])).toEqual([
-      ['a1a1a1a1a1', true],
-      ['c3c3c3c3c3', false],
+      ['a1a1a1a', true],
+      ['c3c3c3c', false],
     ])
   })
   it('同じファイルへの指摘が 2 回続き、原因分析の記録がなければ block', () => {
@@ -433,6 +433,21 @@ describe('findingRounds・repeatCheck（同種の指摘の繰り返し）', () =
     const b = line('b2b2b2b2b2', 'b.py', 'P0', '2026-11-07T08:43:00Z')
     const c = line('c3c3c3c3c3', 'c.py', 'P1', '2026-11-07T08:47:00Z')
     expect(repeatCheck({ rounds: findingRounds([a, b, c]), comments: [], changedFiles: [] }).action).toBe('stop')
+  })
+  it('Codex の指摘 #106-1 の再現: x → x,y → y は同じファイルが 3 回続いたことにならない（2 回なので block）', () => {
+    const a = line('a1a1a1a1a1', 'x.js', 'P2', '2026-11-07T08:38:00Z')
+    const b1 = line('b2b2b2b2b2', 'x.js', 'P2', '2026-11-07T08:43:00Z')
+    const b2 = line('b2b2b2b2b2', 'y.js', 'P2', '2026-11-07T08:43:01Z')
+    const c = line('c3c3c3c3c3', 'y.js', 'P2', '2026-11-07T08:47:00Z')
+    expect(repeatCheck({ rounds: findingRounds([a, b1, b2, c]), comments: [], changedFiles: [] }).action).toBe('block')
+  })
+  it('Codex の指摘 #106-2 の再現: 指摘なしのレビュー（受領だけ）をはさめば、繰り返しは途切れる', () => {
+    const a = line('a1a1a1a1a1', 'x.js', 'P2', '2026-11-07T08:38:00Z')
+    const passB = { ...receipt('b2b2b2b2b2'.padEnd(40, '0')), createdAt: '2026-11-07T08:43:00Z' }
+    const c = line('c3c3c3c3c3', 'x.js', 'P2', '2026-11-07T08:47:00Z')
+    const rounds = findingRounds([a, c], [passB])
+    expect(rounds.map((r) => r.paths.length)).toEqual([1, 0, 1])
+    expect(repeatCheck({ rounds, comments: [], changedFiles: [] }).action).toBe('ok')
   })
   it('繰り返しがなければ ok', () => {
     const a = line('a1a1a1a1a1', 'a.py', 'P1', '2026-11-07T08:38:00Z')
