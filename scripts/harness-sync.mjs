@@ -3,7 +3,8 @@
  *
  *   node scripts/harness-sync.mjs status <リポジトリのフォルダ> ...
  *     各リポジトリの AGENTS.md の管理ブロックが正本と同じか（最新 / 古い版 / 手で変更 / 未導入）と、
- *     CLAUDE.md が AGENTS.md を読み込んでいるかを表示する。
+ *     CLAUDE.md が AGENTS.md を読み込んでいるかを表示する。あわせて、固有ルール（管理ブロックの外・docs/harness.md・
+ *     config/review-policy.json）にある Codex レビューの回数の記述を「!」で一覧にする（共通ルールとの衝突の検出。終了コードは変えない）。
  *     すべて最新=0 / 手で変更・形の誤り=1 / 古い版・未導入・読み込みなし=2
  *   node scripts/harness-sync.mjs apply <リポジトリのフォルダ> ... [--add common,creative]
  *     導入済みのブロックを正本に更新し、--add のプロファイルを追加する。管理ブロックがあるときだけ、CLAUDE.md に @AGENTS.md がなければ足す。
@@ -12,7 +13,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
 import { join, basename, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { statusOf, planUpdate, ensureClaudeImport, parseBlocks } from './lib/harness-sync.mjs'
+import { statusOf, planUpdate, ensureClaudeImport, parseBlocks, findReviewLimitRules } from './lib/harness-sync.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const profilesDir = resolve(here, '..', 'harness', 'profiles')
@@ -54,6 +55,9 @@ for (const dir of dirs) {
     const cells = Object.entries(profiles).map(([p, s]) => `${p}=${LABEL[s]}`)
     console.log(`${name}\t${cells.join('\t')}\tCLAUDE.md→AGENTS.md=${imported ? 'あり' : 'なし'}`)
     for (const e of errors) console.log(`  ✗ ${e}`)
+    // 固有ルールにある Codex レビューの回数の記述（共通ルールより優先される。展開の前に人間がどちらに合わせるかを決める）
+    const ruleFiles = ['AGENTS.md', 'CLAUDE.md', 'docs/harness.md', 'config/review-policy.json'].map((f) => ({ path: f, text: read(join(dir, f)) }))
+    for (const r of findReviewLimitRules(ruleFiles)) console.log(`  ! 固有ルール（Codex の回数）: ${r.path}:${r.line} ${r.text}`)
     if (errors.length || Object.values(profiles).some((s) => s === 'modified' || s === 'unknown')) worse(1)
     else if (!imported || Object.values(profiles).includes('outdated')) worse(2)
     // absent は「そのリポジトリの対象外」もありうるため、common が未導入のときだけ数える

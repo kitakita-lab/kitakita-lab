@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { evaluateCodex, parseCodexState, receiptCommits, planCodexReview, codexRequests, codexRequestBody, CODEX_POLICY } from '../../scripts/lib/codex-gate.mjs'
+import { evaluateCodex, parseCodexState, receiptCommits, planCodexReview, codexRequests, codexRequestBody, CODEX_POLICY, classifyRisk, raiseTier, findingRounds, repeatCheck, rootCauseBody } from '../../scripts/lib/codex-gate.mjs'
 import { parseDeployArgs } from '../../scripts/lib/deploy-args.mjs'
 
 /**
@@ -239,13 +239,59 @@ describe('planCodexReview', () => {
     expect(r.reasons.join()).toContain('上限')
   })
 
-  it('同じ commit への再依頼は、レビュー回数に数えない', () => {
+  it('同じ commit への再依頼・応答のない依頼は、レビュー回数に数えない（受領のある commit だけを数える）', () => {
     const r = plan(
       [receipt('a1a1a1a1a1'.padEnd(40, '0')), receipt('b2b2b2b2b2'.padEnd(40, '0')), marked(HEAD, 'initial', '2026-10-29T12:30:00Z'), running(HEAD, '2026-10-29T12:30:20Z')],
       '2026-10-29T13:01:00Z',
     )
-    expect(r.roundsUsed).toBe(3)
+    expect(r.roundsUsed).toBe(2)
+    expect(r.requestsTotal).toBe(1)
     expect(r.action).toBe('rerequest')
+  })
+
+  it('応答のなかった古い commit への依頼は回数に数えず、新しい head に依頼できる', () => {
+    const r = plan([receipt('a1a1a1a1a1'.padEnd(40, '0')), marked(OLD, 'initial', '2026-10-29T12:00:00Z'), marked(OLD, 'rerequest', '2026-10-29T12:20:00Z')], '2026-10-29T12:29:00Z')
+    expect(r.roundsUsed).toBe(1)
+    expect(r.action).toBe('request')
+  })
+
+  it('上限に達して head が未レビューなら CAPPED（合格ではない）', () => {
+    const shas = ['a1a1a1a1a1', 'b2b2b2b2b2', 'c3c3c3c3c3']
+    const r = plan(shas.map((s) => receipt(s.padEnd(40, '0'))), '2026-10-29T12:29:00Z')
+    expect(r.verdict).toBe('CAPPED')
+    expect(r.action).toBe('stop')
+  })
+
+  it('依頼の総数が上限（レビュー上限×同じ commit への依頼の上限）に達したら、新しい依頼をしない', () => {
+    const many = Array.from({ length: 6 }, (_, i) => marked(`${i}`.repeat(40), 'initial', `2026-10-29T12:0${i}:00Z`))
+    const r = plan(many, '2026-10-29T12:29:00Z')
+    expect(r.action).toBe('stop')
+    expect(r.reasons.join()).toContain('依頼の総数')
+  })
+
+  it('CI が失敗していれば依頼しない（stop）、実行中なら待つ（wait）、成功なら依頼する', () => {
+    expect(plan([], '2026-10-29T12:29:00Z', { ci: 'FAIL' })).toMatchObject({ action: 'stop', verdict: 'PENDING' })
+    expect(plan([], '2026-10-29T12:29:00Z', { ci: 'PENDING' }).action).toBe('wait')
+    expect(plan([], '2026-10-29T12:29:00Z', { ci: 'PASS' }).action).toBe('request')
+  })
+
+  it('再依頼の前にも CI を確かめる', () => {
+    expect(plan([req('2026-10-29T12:30:54Z')], '2026-10-29T13:01:00Z', { ci: 'FAIL' }).action).toBe('stop')
+  })
+
+  it('リスク区分の上限を使う: 軽微（1 回）は 1 commit をレビュー済みなら CAPPED、重要領域（5 回）は 3 commit 後も依頼する', () => {
+    const three = ['a1a1a1a1a1', 'b2b2b2b2b2', 'c3c3c3c3c3'].map((s) => receipt(s.padEnd(40, '0')))
+    expect(plan(three.slice(0, 1), '2026-10-29T12:29:00Z', { policy: { ...CODEX_POLICY, maxReviewRounds: 1 } }).verdict).toBe('CAPPED')
+    expect(plan(three, '2026-10-29T12:29:00Z', { policy: { ...CODEX_POLICY, maxReviewRounds: 5 } }).action).toBe('request')
+  })
+
+  it('同種の指摘の繰り返し: block なら新しい依頼をしない、stop なら止める（どちらも合格にしない）', () => {
+    const block = plan([], '2026-10-29T12:29:00Z', { repeat: { action: 'block', reasons: ['原因分析が必要'] } })
+    expect(block).toMatchObject({ action: 'stop', verdict: 'PENDING' })
+    const stop = plan([], '2026-10-29T12:29:00Z', { repeat: { action: 'stop', reasons: ['3 回続いた'] } })
+    expect(stop.action).toBe('stop')
+    // 依頼済みの head の停滞による再依頼は、block では止めない（同じ commit の応答待ち）
+    expect(plan([req('2026-10-29T12:30:54Z')], '2026-10-29T13:01:00Z', { repeat: { action: 'block', reasons: ['x'] } }).action).toBe('rerequest')
   })
 
   it('依頼の時刻を読めなければ stop（合格扱いにしない）', () => {
@@ -314,6 +360,85 @@ describe('planCodexReview（統合の例外）', () => {
     expect(plan([...three, req], verified, '2026-10-29T13:01:00Z').action).toBe('rerequest')
     const rereq = { login: 'kitakita-lab', body: codexRequestBody(HEAD, 'rerequest'), createdAt: '2026-10-29T13:01:00Z' }
     expect(plan([...three, req, rereq], verified, '2026-10-29T13:32:00Z').action).toBe('stop')
+  })
+})
+
+describe('classifyRisk（リスク区分）', () => {
+  it('文書だけなら軽微（1 回）', () => {
+    expect(classifyRisk({ files: ['docs/BRAND.md', 'README.md'] })).toMatchObject({ tier: 'minor', maxReviewRounds: 1 })
+  })
+  it('ふつうのソースの変更は通常（3 回）', () => {
+    expect(classifyRisk({ files: ['src/data/news.ts', 'docs/BRAND.md'] })).toMatchObject({ tier: 'standard', maxReviewRounds: 3 })
+  })
+  it('依存関係・ビルドの変更は基盤（5 回）', () => {
+    expect(classifyRisk({ files: ['package.json', 'src/data/news.ts'] }).tier).toBe('foundation')
+  })
+  it('CI・ゲート・運用ルール・セキュリティヘッダーは重要領域（5 回）', () => {
+    for (const f of ['.github/workflows/ci.yml', 'scripts/lib/codex-gate.mjs', 'harness/profiles/common.md', 'AGENTS.md', 'docs/AUTOPILOT.md', 'public/_headers']) {
+      expect(classifyRisk({ files: [f] }).tier, f).toBe('critical')
+    }
+  })
+  it('AUTOPILOT・EVENT-UPDATE は docs の文書でも軽微にしない', () => {
+    expect(classifyRisk({ files: ['docs/EVENT-UPDATE.md'] }).tier).toBe('critical')
+  })
+  it('変更ファイルを取得できない・空なら、低リスクとして扱わない（通常）', () => {
+    expect(classifyRisk({ files: null }).tier).toBe('standard')
+    expect(classifyRisk({ files: [] }).tier).toBe('standard')
+  })
+  it('申告で上げられる（ラベルでもキーでも読む）。下げる申告は採らない', () => {
+    expect(classifyRisk({ files: ['src/data/news.ts'], declared: '重要領域' }).tier).toBe('critical')
+    expect(classifyRisk({ files: ['src/data/news.ts'], declared: 'foundation' }).tier).toBe('foundation')
+    const down = classifyRisk({ files: ['scripts/pr-gates.mjs'], declared: '軽微' })
+    expect(down.tier).toBe('critical')
+    expect(down.reasons.join()).toContain('採らない')
+  })
+  it('読めない申告は無視する（ファイルから決めた区分のまま）', () => {
+    expect(classifyRisk({ files: ['docs/x.md'], declared: 'とても重要' }).tier).toBe('minor')
+  })
+  it('raiseTier は一段上げる（最上位はそのまま）', () => {
+    expect(raiseTier('minor')).toBe('standard')
+    expect(raiseTier('critical')).toBe('critical')
+  })
+})
+
+describe('findingRounds・repeatCheck（同種の指摘の繰り返し）', () => {
+  const line = (commit: string, path: string, sev: string, at: string) => ({ login: BOT, body: `**<sub><sub>![${sev} Badge](https://img.shields.io/badge/${sev}-orange?style=flat)</sub></sub>  指摘`, path, commitId: commit.padEnd(40, '0'), createdAt: at })
+  const r1 = line('a1a1a1a1a1', 'kacc/importers/pdf.py', 'P1', '2026-11-07T08:38:00Z')
+  const r2 = line('b2b2b2b2b2', 'kacc/importers/pdf.py', 'P1', '2026-11-07T08:43:00Z')
+  const r3 = line('c3c3c3c3c3', 'kacc/importers/pdf.py', 'P2', '2026-11-07T08:47:00Z')
+
+  it('Codex 以外の行コメントは数えない。commit ごとにまとめ、P0/P1 を重大として印を付ける', () => {
+    const rounds = findingRounds([r1, { ...r2, login: 'chatgpt-codex-connector-fake' }, r3])
+    expect(rounds.map((r) => [r.commit, r.severe])).toEqual([
+      ['a1a1a1a1a1', true],
+      ['c3c3c3c3c3', false],
+    ])
+  })
+  it('同じファイルへの指摘が 2 回続き、原因分析の記録がなければ block', () => {
+    expect(repeatCheck({ rounds: findingRounds([r1, r2]), comments: [], changedFiles: [] }).action).toBe('block')
+  })
+  it('原因分析の記録（対象 commit・回帰テストが PR の変更に含まれる）があれば ok', () => {
+    const note = { login: 'kitakita-lab', body: rootCauseBody('b2b2b2b2b2', ['tests/test_pdf.py'], '原因: 行を黙って捨てる処理が 2 か所にあった') }
+    expect(repeatCheck({ rounds: findingRounds([r1, r2]), comments: [note], changedFiles: ['tests/test_pdf.py'] }).action).toBe('ok')
+    // 回帰テストのファイルが変更に含まれなければ、記録として認めない
+    expect(repeatCheck({ rounds: findingRounds([r1, r2]), comments: [note], changedFiles: [] }).action).toBe('block')
+    // bot が書いた目印は認めない
+    expect(repeatCheck({ rounds: findingRounds([r1, r2]), comments: [{ ...note, login: BOT }], changedFiles: ['tests/test_pdf.py'] }).action).toBe('block')
+  })
+  it('3 回続けば、上限が残っていても stop', () => {
+    expect(repeatCheck({ rounds: findingRounds([r1, r2, r3]), comments: [], changedFiles: [] }).action).toBe('stop')
+  })
+  it('別のファイルでも、直近 3 回続けて P0/P1 なら stop（新しい重大な不具合の繰り返し）', () => {
+    const a = line('a1a1a1a1a1', 'a.py', 'P1', '2026-11-07T08:38:00Z')
+    const b = line('b2b2b2b2b2', 'b.py', 'P0', '2026-11-07T08:43:00Z')
+    const c = line('c3c3c3c3c3', 'c.py', 'P1', '2026-11-07T08:47:00Z')
+    expect(repeatCheck({ rounds: findingRounds([a, b, c]), comments: [], changedFiles: [] }).action).toBe('stop')
+  })
+  it('繰り返しがなければ ok', () => {
+    const a = line('a1a1a1a1a1', 'a.py', 'P1', '2026-11-07T08:38:00Z')
+    const b = line('b2b2b2b2b2', 'b.py', 'P2', '2026-11-07T08:43:00Z')
+    expect(repeatCheck({ rounds: findingRounds([a, b]), comments: [], changedFiles: [] }).action).toBe('ok')
+    expect(repeatCheck({ rounds: [], comments: [], changedFiles: [] }).action).toBe('ok')
   })
 })
 

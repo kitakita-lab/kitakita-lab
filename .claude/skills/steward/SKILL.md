@@ -47,8 +47,9 @@ description: KitaKita Lab の「いつものハーネス」（AI 司令塔）で
 ## 指摘・失敗への対応
 
 - Codex の指摘は §6 で「採用」「却下候補」「保留」に分ける。却下候補・保留が 1 件でもあれば止める。
-- 採用した指摘は修正 commit を積み、スレッドに対応内容を返信して解決する。修正 commit は 2 件・総 commit は 4 件まで。
-- Codex のレビューは commit 3 つまで（`gate:codex-wait` の上限）。上限到達や PENDING を PASS として扱わない。
+- 採用した指摘は修正 commit を積み、スレッドに対応内容を返信して解決する。修正 commit・総 commit の上限は `docs/AUTOPILOT.md` §9（リスク区分で変わる）。
+- Codex のレビュー回数の上限はリスク区分で決まる（軽微 1／通常 3／基盤 5／重要領域 5。`docs/AUTOPILOT.md` §7）。
+  上限到達（CAPPED）や PENDING を PASS として扱わない。レビューの規則を変える PR では、`main` のゲートで依頼・判定する。
 
 ## 最終承認待ちで止めるとき（工程 14・15）
 
