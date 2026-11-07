@@ -47,6 +47,7 @@ export type Classified = {
 export type Entry = Item & Classified & { pairedPr: number | null }
 
 export function jstDate(d: Date): string
+export function isValidDate(s: string | null | undefined): boolean
 export function latestRecord(comments: Comment[] | null | undefined, mark: string): Record | null
 export function parseHold(comments: Comment[] | null | undefined): Hold | null
 export function parseDeadline(input?: {

@@ -4,6 +4,7 @@ import {
   DEADLINE_MARK,
   MAX_DECISIONS,
   jstDate,
+  isValidDate,
   latestRecord,
   parseHold,
   parseDeadline,
@@ -38,6 +39,25 @@ const deadlineComment = (date: string, at = daysAgo(3), id = 50) => ({
   updated_at: at,
 })
 const due = (date: string) => ({ date, source: '本文' })
+
+describe('isValidDate', () => {
+  it('暦の上で実在しない日付を受け付けない', () => {
+    expect(isValidDate('2026-11-30')).toBe(true)
+    expect(isValidDate('2028-02-29')).toBe(true)
+    expect(isValidDate('2026-13-01')).toBe(false)
+    expect(isValidDate('2026-02-30')).toBe(false)
+    expect(isValidDate('2026-1-1')).toBe(false)
+    expect(isValidDate(null)).toBe(false)
+  })
+  it('実在しない再確認日の保留は無効、期限は読めないものとして扱う（Codex の指摘の再現）', () => {
+    expect(parseHold([holdComment('理由', '2026-13-01')])).toMatchObject({ valid: false })
+    expect(classifyItem({ ...base, hold: parseHold([holdComment('理由', '2026-13-01')]) }, NOW).category).not.toBe('保留中')
+    expect(parseDeadline({ body: '期限: 2026-02-30' })).toMatchObject({ invalid: true })
+    expect(deadlineStatus({ date: '2026-13-01', source: '本文' }, NOW).state).toBe('unknown')
+    expect(planRecord([], 'hold', { reason: 'r', recheck: '2026-13-01' }, { expectLatest: 'none', today: '2026-11-09' }).action).toBe('error')
+    expect(planRecord([], 'deadline', { date: '2026-02-30', basis: 'b' }, { expectLatest: 'none', today: '2026-11-09' }).action).toBe('error')
+  })
+})
 
 describe('jstDate', () => {
   it('日本時間の日付にする（UTC 15:00 は翌日）', () => {
@@ -173,21 +193,50 @@ describe('classifyItem', () => {
 })
 
 describe('buildInventory', () => {
-  it('PR が参照する同じリポジトリの Issue だけを PR にまとめ、Issue の期限を PR が引き継ぐ', () => {
+  it('PR が参照する同じリポジトリの Issue だけを PR にまとめる', () => {
     const inv = buildInventory(
       [
-        { ...base, repo: 'o/site', number: 5, url: 'u5', body: 'Refs #4', deadline: due('2026-11-30') },
-        { ...base, repo: 'o/site', number: 4, kind: 'issue' as const, url: 'u4', title: '案件', deadline: due('2026-11-11') },
+        { ...base, repo: 'o/site', number: 5, url: 'u5', body: 'Refs #4\n承認待ち' },
+        { ...base, repo: 'o/site', number: 4, kind: 'issue' as const, url: 'u4', title: '案件' },
         { ...base, repo: 'o/other', number: 4, kind: 'issue' as const, url: 'x4', title: '別' },
       ],
       NOW,
     )
-    const pr = inv.find((i) => i.number === 5)
     expect(inv.find((i) => i.repo === 'o/site' && i.number === 4)?.pairedPr).toBe(5)
     expect(inv.find((i) => i.repo === 'o/other')?.pairedPr).toBeNull()
-    expect(pr?.deadline).toMatchObject({ date: '2026-11-11' })
-    expect(pr?.due.urgent).toBe(true)
-    expect(pr?.due.text).toContain('Issue #4')
+  })
+  it('自分の期限を持つ Issue はまとめず、単独で緊急として出す', () => {
+    const inv = buildInventory(
+      [
+        { ...base, repo: 'o/site', number: 5, url: 'u5', body: 'Refs #4\n承認待ち' },
+        { ...base, repo: 'o/site', number: 4, kind: 'issue' as const, url: 'u4', title: '案件', deadline: due('2026-11-11') },
+      ],
+      NOW,
+    )
+    expect(inv.find((i) => i.number === 4)?.pairedPr).toBeNull()
+    expect(selectDecisions(inv).urgent.map((i) => i.number)).toEqual([4])
+  })
+  it('PR が保留中でも、再確認日が来た Issue は単独で判断事項に出す（Codex の指摘の再現）', () => {
+    const inv = buildInventory(
+      [
+        { ...base, repo: 'o/r', number: 1, url: 'u1', body: 'Refs #2', hold: parseHold([holdComment('PR 側', '2026-12-01')]) },
+        { ...base, repo: 'o/r', number: 2, kind: 'issue' as const, url: 'u2', title: 'Issue 側', hold: parseHold([holdComment('Issue 側', '2026-11-09')]) },
+      ],
+      NOW,
+    )
+    const md = renderReport(inv, NOW, { repos: ['o/r'], notion: 'ok' })
+    expect(md).toContain('要判断 1・保留中 1')
+    expect(selectDecisions(inv).others.map((i) => i.number)).toEqual([2])
+  })
+  it('記録のない Issue でも、自分が要判断で PR が要判断でなければ単独で出す', () => {
+    const inv = buildInventory(
+      [
+        { ...base, repo: 'o/r', number: 1, url: 'u1', body: 'Refs #2' },
+        { ...base, repo: 'o/r', number: 2, kind: 'issue' as const, url: 'u2', title: 'デザイン承認待ち' },
+      ],
+      NOW,
+    )
+    expect(inv.find((i) => i.number === 2)?.pairedPr).toBeNull()
   })
   it('別のリポジトリの Issue の URL を参照する PR は、同じ番号の Issue をまとめない', () => {
     const inv = buildInventory(

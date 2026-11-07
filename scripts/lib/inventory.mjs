@@ -19,6 +19,12 @@ export const MAX_DECISIONS = 5 // 判断事項の通常の上限。緊急の案�
 
 const DAY = 86_400_000
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+/** YYYY-MM-DD の形で、暦の上で実在する日付か（2026-13-01・2026-02-30 は不可） */
+export const isValidDate = (s) => {
+  if (!DATE_RE.test(s ?? '')) return false
+  const t = Date.parse(`${s}T00:00:00Z`)
+  return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === s
+}
 const toDate = (s) => (s ? new Date(s) : null)
 const days = (from, to) => Math.floor((to.getTime() - from.getTime()) / DAY)
 const dateOnly = (d) => d.toISOString().slice(0, 10)
@@ -65,7 +71,7 @@ export function parseHold(comments) {
   const recheck = field(rec.body, '再確認日')
   const base = { id: rec.id, recordedAt: rec.recordedAt, edited: rec.edited, count: rec.count }
   if (recheck === '解除') return { ...base, released: true }
-  return { ...base, reason, recheck, valid: Boolean(reason) && DATE_RE.test(recheck ?? '') }
+  return { ...base, reason, recheck, valid: Boolean(reason) && isValidDate(recheck) }
 }
 
 /**
@@ -80,17 +86,17 @@ export function parseDeadline({ body, comments, milestone } = {}) {
   if (rec) {
     const v = field(rec.body, '期限')
     if (v === '解除') return null
-    return DATE_RE.test(v ?? '') ? { date: v, source: '期限の記録', edited: rec.edited } : { invalid: true, source: '期限の記録' }
+    return isValidDate(v) ? { date: v, source: '期限の記録', edited: rec.edited } : { invalid: true, source: '期限の記録' }
   }
   const fromBody = field(body, '期限')
-  if (fromBody) return DATE_RE.test(fromBody) ? { date: fromBody, source: '本文' } : { invalid: true, source: '本文' }
+  if (fromBody) return isValidDate(fromBody) ? { date: fromBody, source: '本文' } : { invalid: true, source: '本文' }
   if (milestone?.due_on) return { date: jstDate(new Date(milestone.due_on)), source: `マイルストーン「${milestone.title ?? ''}」` }
   return null
 }
 
 /** 期限の状態。overdue（超過）・soon（DUE_SOON_DAYS 日以内）・later・unknown（期限不明） */
 export function deadlineStatus(deadline, now) {
-  if (!deadline?.date) return { state: 'unknown', daysLeft: null, urgent: false }
+  if (!isValidDate(deadline?.date)) return { state: 'unknown', daysLeft: null, urgent: false }
   const daysLeft = dateDiff(deadline.date, jstDate(now))
   const state = daysLeft < 0 ? 'overdue' : daysLeft <= DUE_SOON_DAYS ? 'soon' : 'later'
   return { state, daysLeft, urgent: state !== 'later' }
@@ -177,7 +183,7 @@ export function classifyItem(item, now) {
     category = '不明'
     reasons.push('停止理由・判断待ちの記載が見つからない')
   }
-  if (hold && !hold.valid) reasons.push('保留の記録があるが、保留理由か再確認日（YYYY-MM-DD）が読めない')
+  if (hold && !hold.valid) reasons.push('保留の記録があるが、保留理由か再確認日（実在する YYYY-MM-DD）が読めない')
   if (item.hold?.edited) reasons.push('最新の保留の記録が作成後に編集されている（記録は追記で残す決まり）')
   if (deadline?.edited) reasons.push('最新の期限の記録が作成後に編集されている')
 
@@ -208,7 +214,9 @@ export function classifyItem(item, now) {
 
 /**
  * 全件を判定し、Issue を同じリポジトリで参照している開いた PR の下にまとめる。
- * まとめた Issue に期限があれば、PR は自分と Issue のうち最も早い期限を持つ（期限を取りこぼさない）。
+ * ただし次の Issue はまとめずに単独で表示する（PR の区分に隠れて判断事項から消えないようにする）:
+ *   - 自分の保留・期限の記録（または本文の期限）を持つ
+ *   - 自分は「要判断」なのに、まとめ先の PR が「要判断」でない（保留中・終了候補・不明）
  * items: [{ repo, kind, number, title, body, draft, created_at, updated_at, url, hold, deadline }]
  */
 export function buildInventory(items, now) {
@@ -217,23 +225,13 @@ export function buildInventory(items, now) {
     if (it.kind !== 'pr') continue
     for (const n of linkedIssues(it.body, it.repo)) prLinks.set(`${it.repo}#${n}`, it.number)
   }
-  const pairedOf = (it) => (it.kind === 'issue' ? prLinks.get(`${it.repo}#${it.number}`) ?? null : null)
-  const issueDeadlines = new Map() // `${repo}#${PR}` -> [deadline]
-  for (const it of items) {
-    const pr = pairedOf(it)
-    if (pr !== null && it.deadline?.date) {
-      const key = `${it.repo}#${pr}`
-      issueDeadlines.set(key, [...(issueDeadlines.get(key) ?? []), { ...it.deadline, source: `Issue #${it.number} の${it.deadline.source}` }])
-    }
-  }
-  return items.map((it) => {
-    let deadline = it.deadline ?? null
-    if (it.kind === 'pr') {
-      for (const d of issueDeadlines.get(`${it.repo}#${it.number}`) ?? []) {
-        if (!deadline?.date || d.date < deadline.date) deadline = d
-      }
-    }
-    return { ...it, ...classifyItem({ ...it, deadline }, now), deadline: deadline, pairedPr: pairedOf(it) }
+  const classified = items.map((it) => ({ ...it, ...classifyItem(it, now) }))
+  const prCategory = new Map(classified.filter((it) => it.kind === 'pr').map((it) => [`${it.repo}#${it.number}`, it.category]))
+  return classified.map((it) => {
+    const pr = it.kind === 'issue' ? prLinks.get(`${it.repo}#${it.number}`) ?? null : null
+    const ownRecord = Boolean((it.hold && !it.hold.released) || it.deadline)
+    const hidden = it.category === '要判断' && prCategory.get(`${it.repo}#${pr}`) !== '要判断'
+    return { ...it, pairedPr: pr !== null && !ownRecord && !hidden ? pr : null }
   })
 }
 
@@ -329,12 +327,12 @@ export function planRecord(comments, kind, values, { expectLatest, today } = {})
   if (kind === 'hold') {
     if (values.recheck !== '解除') {
       if (!values.reason) errors.push('保留理由が空')
-      if (!DATE_RE.test(values.recheck ?? '')) errors.push('再確認日が YYYY-MM-DD でない')
+      if (!isValidDate(values.recheck)) errors.push('再確認日が実在する YYYY-MM-DD でない')
       else if (today && values.recheck <= today) errors.push('再確認日が今日以前')
     }
   } else if (kind === 'deadline') {
     if (values.date !== '解除') {
-      if (!DATE_RE.test(values.date ?? '')) errors.push('期限が YYYY-MM-DD でない')
+      if (!isValidDate(values.date)) errors.push('期限が実在する YYYY-MM-DD でない')
       if (!values.basis) errors.push('期限の根拠が空（推測で期限を書かない）')
     }
   } else errors.push(`種類が不明: ${kind}`)
