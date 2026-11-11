@@ -43,6 +43,20 @@ export type NewsItem = {
 
 export const newsItems: NewsItem[] = [
   {
+    slug: 'note-ai-report-review-2026-11',
+    title: 'noteに新しい記事を公開しました｜AIを活用した報告書づくり',
+    titleSegments: ['noteに', '新しい記事を', '公開しました｜', 'AIを活用した', '報告書づくり'],
+    date: '2026-11-11',
+    category: 'お知らせ',
+    excerpt:
+      '実際のイベントでの経験をもとに、AIが作成した報告書をそのまま提出せず、どのように確認・修正しているのかをnoteの記事にまとめました。',
+    body: [
+      'KitaKita Labでは、イベントやワークショップの運営だけでなく、AIを活用した報告書づくりにも取り組んでいます。',
+      '今回は、実際のイベントでの経験をもとに、AIが作成した報告書をそのまま提出せず、どのように確認・修正しているのかを記事にまとめました。',
+    ],
+    links: [{ label: 'noteの記事を読む', href: 'https://note.com/kitakitalab1125/n/n0f2b7be6709d' }],
+  },
+  {
     slug: 'note-report-ai-2026-11',
     title: 'AIを使った報告書づくりの実務記録を、noteで公開しました',
     titleSegments: ['AIを使った', '報告書づくりの', '実務記録を、', 'noteで', '公開しました'],
