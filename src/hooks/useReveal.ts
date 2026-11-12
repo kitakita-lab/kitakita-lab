@@ -18,6 +18,15 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(options?: {
     const node = ref.current
     if (!node) return
 
+    // 起動の印。3 秒の時点でこれがない要素だけが、index.html の保険の対象になる。
+    node.setAttribute('data-reveal-bound', '')
+    // 保険（data-reveal-fallback）ですでに表示されている要素は、隠し直さずに表示のままにする。
+    // ページ遷移などで新しく表示された要素には付いていないので、通常どおり監視する。
+    if (node.hasAttribute('data-reveal-fallback')) {
+      setIsVisible(true)
+      return
+    }
+
     if (typeof IntersectionObserver === 'undefined') {
       setIsVisible(true)
       return
