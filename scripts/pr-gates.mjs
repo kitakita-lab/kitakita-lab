@@ -2,10 +2,13 @@
  * PR のマージ・公開の判定（実績更新ハーネス。docs/EVENT-UPDATE.md 参照）。
  *
  *   node scripts/pr-gates.mjs codex <PR番号>
- *     Codex レビューの合否。PASS=0 / FAIL=1 / PENDING=2 で終了する。
+ *     Codex レビューの合否。PASS=0 / FAIL=1 / PENDING=2 / CAPPED=4（リスク区分の上限に達し、head が未レビュー。合格ではない）。
+ *     リスク区分（変更ファイルと台帳の「リスク区分」の高い方）とレビュー上限も表示する。
  *   node scripts/pr-gates.mjs codex-wait <PR番号> [--timeout <分>]
  *     レビューを依頼し、完了まで待つ（lib/codex-gate.mjs の planCodexReview）。依頼から 30 分たっても完了しなければ
- *     同じ commit に 1 回だけ再依頼し、それでも完了しなければ止める。終了時の合否は codex と同じ判定（PASS=0 / FAIL=1 / PENDING=2）。
+ *     同じ commit に 1 回だけ再依頼し、それでも完了しなければ止める。終了時の合否は codex と同じ判定（PASS=0 / FAIL=1 / PENDING=2 / CAPPED=4）。
+ *     依頼の前に head の CI の成功を確かめる。上限はリスク区分で決まる（1／3／5／5）。同種の指摘が 2 回続けば、原因分析の記録
+ *     （harness-root-cause:v1）があるまで新しい依頼をしない。3 回続く・直近 3 回続けて P0/P1 なら、上限が残っていても止める。
  *     レビュー回数の上限（3 回）の後でも、head が最新 main の取り込みだけの merge commit なら、最終確認を 1 回だけ依頼する。
  *   node scripts/pr-gates.mjs checks <PR番号>
  *     PR の head commit の CI（Quality Checks・Cloudflare Pages など）が全件成功か。PASS=0 / FAIL=1 / PENDING=2
@@ -26,7 +29,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { setTimeout as sleep } from 'node:timers/promises'
-import { evaluateCodex, planCodexReview, codexRequestBody, CODEX_POLICY } from './lib/codex-gate.mjs'
+import { evaluateCodex, planCodexReview, codexRequestBody, CODEX_POLICY, classifyRisk, findingRounds, repeatCheck } from './lib/codex-gate.mjs'
 import { parseDeployArgs } from './lib/deploy-args.mjs'
 import { classifyPage, decideDeploy } from './lib/deploy-gate.mjs'
 import { parseLedger, updateLedgerBody, checkLedgerOwner, parseAllowed, parseNameStatusZ, parsePorcelainZ, checkScope } from './lib/ledger.mjs'
@@ -87,14 +90,46 @@ function reviewThreads(pr) {
 function codexContext(pr) {
   const p = gh(`repos/${repo}/pulls/${pr}`)
   const comments = ghAll(`repos/${repo}/issues/${pr}/comments`).map((c) => ({ login: c.user?.login, body: c.body, createdAt: c.created_at, updatedAt: c.updated_at }))
-  const reviews = ghAll(`repos/${repo}/pulls/${pr}/reviews`).map((r) => ({ login: r.user?.login, body: r.body }))
+  const reviews = ghAll(`repos/${repo}/pulls/${pr}/reviews`).map((r) => ({ login: r.user?.login, body: r.body, createdAt: r.submitted_at }))
   return { p, comments, reviews, threads: reviewThreads(pr) }
 }
 
+/**
+ * リスク区分とレビュー上限（lib/codex-gate.mjs の classifyRisk）。変更ファイルと、台帳の「リスク区分」（申告）の高い方。
+ * 変更ファイルを取得できなければ通常以上（低リスクとして扱わない）。
+ */
+function riskContext(pr, p) {
+  let files = null
+  try {
+    files = ghAll(`repos/${repo}/pulls/${pr}/files`).map((f) => f.filename)
+  } catch {
+    files = null
+  }
+  const declared = parseLedger(p.body ?? '')?.rows['リスク区分'] ?? null
+  const risk = classifyRisk({ files, declared })
+  const reviewComments = (() => {
+    try {
+      return ghAll(`repos/${repo}/pulls/${pr}/comments`).map((c) => ({ login: c.user?.login, body: c.body, path: c.path, commitId: c.original_commit_id ?? c.commit_id, createdAt: c.created_at }))
+    } catch {
+      return null
+    }
+  })()
+  return { files, risk, reviewComments }
+}
+
 function codex(pr) {
-  const { p, comments, reviews, threads } = codexContext(pr)
+  const ctx = codexContext(pr)
+  const { p, comments, reviews, threads } = ctx
   const result = evaluateCodex({ headSha: p.head.sha, comments, reviews, threads })
-  return { pr: Number(pr), head: p.head.sha, state: p.state, draft: p.draft, ...result }
+  const { risk } = riskContext(pr, p)
+  const out = { pr: Number(pr), head: p.head.sha, state: p.state, draft: p.draft, ...result, risk: { tier: risk.tier, label: risk.label, maxReviewRounds: risk.maxReviewRounds, reasons: risk.reasons } }
+  if (result.verdict !== 'PENDING') return out
+  // 上限に達して head が未レビュー（依頼もない）なら CAPPED。合格ではない
+  const commit = gh(`repos/${repo}/commits/${p.head.sha}`)
+  const plan = planCodexReview({ headSha: p.head.sha, headCommittedAt: commit.commit?.committer?.date, now: new Date().toISOString(), ...ctx, policy: { ...CODEX_POLICY, maxReviewRounds: risk.maxReviewRounds } })
+  // 上限到達: 未解決のスレッドがあれば FAIL、なければ CAPPED（どちらも合格ではない）
+  if (plan.verdict === 'CAPPED' || plan.verdict === 'FAIL') return { ...out, verdict: plan.verdict, reasons: plan.reasons, roundsUsed: plan.roundsUsed }
+  return out
 }
 
 /**
@@ -141,7 +176,12 @@ async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
     const commit = gh(`repos/${repo}/commits/${head}`)
     const headCommittedAt = commit.commit?.committer?.date
     if (!integrations.has(head)) integrations.set(head, commit.parents?.length === 2 ? integrationCheck(head, ctx.p.base.ref) : null)
-    return { head, ...planCodexReview({ headSha: head, headCommittedAt, now: new Date().toISOString(), integration: integrations.get(head), ...ctx }) }
+    const { files, risk, reviewComments } = riskContext(pr, ctx.p)
+    // 行コメントを取得できなければ、繰り返しを確かめられないので依頼しない（合格扱いにもしない）
+    const repeat = reviewComments === null ? { action: 'stop', reasons: ['Codex の行コメントを取得できない（同種の指摘の繰り返しを確かめられない）'] } : repeatCheck({ rounds: findingRounds(reviewComments, [...ctx.comments, ...ctx.reviews]), comments: ctx.comments, changedFiles: files })
+    const ci = checks(pr).verdict
+    const policy = { ...CODEX_POLICY, maxReviewRounds: risk.maxReviewRounds }
+    return { head, risk, ...planCodexReview({ headSha: head, headCommittedAt, now: new Date().toISOString(), integration: integrations.get(head), ...ctx, policy, ci, repeat }) }
   }
   let last
   let lastKey = ''
@@ -174,7 +214,13 @@ async function codexWait(pr, { timeoutMinutes, pollSeconds = 30 }) {
     await sleep(pollSeconds * 1000)
   }
   const final = codex(pr)
-  return { ...final, stalled: last.action === 'stop' && final.verdict === 'PENDING', plan: { action: last.action, requestsOnHead: last.requestsOnHead, roundsUsed: last.roundsUsed, elapsedMinutes: last.elapsedMinutes, reasons: last.reasons }, integration: integrations.get(last.head) ?? null, log }
+  return {
+    ...final,
+    stalled: last.action === 'stop' && final.verdict === 'PENDING',
+    plan: { action: last.action, requestsOnHead: last.requestsOnHead, roundsUsed: last.roundsUsed, requestsTotal: last.requestsTotal, maxReviewRounds: last.maxReviewRounds, elapsedMinutes: last.elapsedMinutes, reasons: last.reasons },
+    integration: integrations.get(last.head) ?? null,
+    log,
+  }
 }
 
 function checks(pr) {
@@ -307,7 +353,7 @@ function scope(pr, args) {
   return { verdict: result.ok ? 'PASS' : 'FAIL', base, ...result }
 }
 
-const EXIT = { PASS: 0, VERIFIED: 0, FAIL: 1, PENDING: 2, DEPLOYED_UNVERIFIED: 3 }
+const EXIT = { PASS: 0, VERIFIED: 0, FAIL: 1, PENDING: 2, DEPLOYED_UNVERIFIED: 3, CAPPED: 4 }
 const [cmd, arg, ...rest] = process.argv.slice(2)
 let result
 if (cmd === 'codex' && arg) result = codex(arg)
