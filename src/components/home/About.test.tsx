@@ -8,7 +8,7 @@ describe('About', () => {
     const { container } = renderWithProviders(<About />)
 
     expect(container.textContent).toContain(
-      '現在の活動のひとつが、ハンドメイドアクセサリーブランド ikyu と取り組むフラワーボトルづくり体験です。2026年6月から10月にかけて、札幌市・北広島市の商業施設や公共空間で8会期を開催。制作されたフラワーボトルは、計1,552本になりました。',
+      '現在の活動のひとつが、ハンドメイドアクセサリーブランド ikyu と取り組むフラワーボトルづくり体験です。2026年6月から11月にかけて、札幌市・北広島市の商業施設や公共空間で9会期を開催。制作されたフラワーボトルは、計1,829本になりました。',
     )
     expect(screen.getByRole('link', { name: '開催実績を見る' })).toHaveAttribute('href', '/events')
     expect(screen.getByRole('link', { name: '開催のご相談について' })).toHaveAttribute(

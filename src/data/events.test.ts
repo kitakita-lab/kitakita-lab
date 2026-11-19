@@ -174,3 +174,22 @@ describe('brandJourney（ひとつのブランドの、歩み）', () => {
     }
   })
 })
+
+describe('ラソラ札幌（2026年11月）の実績', () => {
+  const e = events.find((x) => x.slug === 'lasora-sapporo-2026-11')
+
+  it('参加組数・参加人数・制作数・開催日数が、報告書の値のまま掲載されている（指標を混同しない）', () => {
+    expect(e?.stats).toEqual([
+      { value: '148組', label: '総参加組数' },
+      { value: '339名', label: '総参加人数' },
+      { value: '277本', label: 'フラワーボトル制作数' },
+      { value: '5日間', label: '開催期間' },
+    ])
+  })
+
+  it('本文に、週末 2 日間と最多参加日の数字が報告書のとおりに書かれている', () => {
+    const text = (e?.sections ?? []).flatMap((s) => s.body).join('')
+    expect(text).toContain('土曜・日曜の2日間で、106組')
+    expect(text).toContain('11月15日（日）の54組・136名')
+  })
+})
