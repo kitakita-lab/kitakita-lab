@@ -146,3 +146,27 @@ export function ensureClaudeImport(claudeText) {
   if (/^@AGENTS\.md\s*$/m.test(claudeText)) return { text: claudeText, changed: false }
   return { text: `@AGENTS.md\n\n${claudeText.replace(/^\n+/, '')}`, changed: true }
 }
+
+/**
+ * リポジトリ固有のルールにある「Codex レビューの回数」の記述を探す（共通ルールとの衝突の検出）。
+ * 共通ルール（harness/profiles/review.md）はリスク区分で上限を決めるが、固有ルールが優先するため、固有ルールに回数が書かれていれば
+ * そちらが効く。展開の前に一覧にして、人間がどちらに合わせるかを決める（自動では書き換えない）。
+ * 管理ブロックの中（共通ルールそのもの）は数えない。
+ * @param {{ path: string, text: string | null }[]} files
+ * @returns {{ path: string, line: number, text: string }[]}
+ */
+export function findReviewLimitRules(files) {
+  const out = []
+  const CAP = /(最大|上限)[^\n。]{0,12}\d+\s*回|\d+\s*回(まで|以内)|commit\s*\d+\s*つまで|"(reviewCap|maxReviewRounds)"\s*:\s*\d+|maxReviewRounds\s*:\s*\d+/
+  const TOPIC = /codex|レビュー|review/i
+  for (const f of files) {
+    if (f.text == null) continue
+    const { lines, blocks } = parseBlocks(f.text)
+    const inBlock = (i) => blocks.some((b) => i >= b.start && i <= b.end)
+    lines.forEach((line, i) => {
+      if (inBlock(i)) return
+      if (TOPIC.test(line) && CAP.test(line)) out.push({ path: f.path, line: i + 1, text: line.trim().slice(0, 160) })
+    })
+  }
+  return out
+}
