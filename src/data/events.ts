@@ -52,6 +52,12 @@ export type EventSection = {
    * スマホ幅で語中（「見せ／方」「見／えなかった」）で折れる見出しにだけ持たせる。
    */
   headingSegments?: string[]
+  /**
+   * 360px 未満でも headingSegments の各単位の内側で折り返さない（既定は折り返す）。
+   * 「冬を待つ、花あそび。」のように途中で割りたくない単位があり、どの単位も
+   * 320px 幅（本文の幅 272px。360px 未満の見出しは 22px）で 1 行に収まる見出しにだけ指定する。
+   */
+  headingNoWrapNarrow?: boolean
   body: string[]
   /** チェックリスト形式で見せたいポイント */
   points?: string[]
@@ -162,7 +168,8 @@ export const events: EventReport[] = [
       },
       {
         heading: '「冬を待つ、花あそび。」の会場づくり',
-        headingSegments: ['「冬を待つ、', '花あそび。」の', '会場づくり'],
+        headingSegments: ['「冬を待つ、花あそび。」', 'の会場づくり'],
+        headingNoWrapNarrow: true,
         body: [
           '今回は、広いイベントコートでの開催です。「冬を待つ、花あそび。」をテーマに、KitaKita Labが大型POPやバナーを企画・制作しました。花材や完成見本、ikyuのアクセサリー展示、ワークショップの席を組み合わせ、会場全体をikyuの花の世界観で彩っています。',
         ],
