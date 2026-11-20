@@ -61,7 +61,7 @@ export function About() {
           <div className="!mt-10 border-t border-line pt-8">
             <p className="text-[15px] leading-relaxed text-ink-muted">
               {typeset(
-                '現在の活動のひとつが、ハンドメイドアクセサリーブランド ikyu と取り組むフラワーボトルづくり体験です。2026年6月から10月にかけて、札幌市・北広島市の商業施設や公共空間で8会期を開催。制作されたフラワーボトルは、計1,552本になりました。',
+                '現在の活動のひとつが、ハンドメイドアクセサリーブランド ikyu と取り組むフラワーボトルづくり体験です。2026年6月から11月にかけて、札幌市・北広島市の商業施設や公共空間で9会期を開催。制作されたフラワーボトルは、計1,829本になりました。',
               )}
             </p>
             <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
