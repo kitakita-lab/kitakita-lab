@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { Seo } from '@/components/Seo'
 import { scriptBreaks, typeset } from '@/lib/typo'
 import { Segments } from '@/components/ui/Segments'
+import { cn } from '@/lib/cn'
 import { site } from '@/data/site'
 import { Section } from '@/components/ui/Section'
 import { Reveal } from '@/components/ui/Reveal'
@@ -151,9 +152,18 @@ export function EventDetailPage() {
             <div className="min-w-0 space-y-12">
               {event.sections?.map((section) => (
                 <Reveal key={section.heading}>
-                  <h2 className="text-2xl sm:text-3xl">
+                  <h2
+                    className={cn(
+                      'text-2xl sm:text-3xl',
+                      // 単位の内側で折り返さない見出しは、320px 幅でも 1 行に収まるよう 360px 未満だけ少し小さくする
+                      section.headingNoWrapNarrow && 'max-[359px]:text-[22px]',
+                    )}
+                  >
                     {section.headingSegments ? (
-                      <Segments segments={section.headingSegments} />
+                      <Segments
+                        segments={section.headingSegments}
+                        relaxBelow360={!section.headingNoWrapNarrow}
+                      />
                     ) : (
                       section.heading
                     )}

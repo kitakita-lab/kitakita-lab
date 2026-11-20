@@ -193,3 +193,24 @@ describe('ラソラ札幌（2026年11月）の実績', () => {
     expect(text).toContain('11月15日（日）の54組・136名')
   })
 })
+
+describe('見出しの折り返し（headingNoWrapNarrow）', () => {
+  it('360px 未満でも折り返さない見出しは、どの単位も 12 文字以内（320px 幅の本文 272px に、360px 未満の 22px で収まる。22×12＝264px）', () => {
+    for (const e of events) {
+      for (const s of e.sections ?? []) {
+        if (!s.headingNoWrapNarrow) continue
+        expect(s.headingSegments, `${e.slug}「${s.heading}」`).toBeDefined()
+        for (const seg of s.headingSegments ?? []) {
+          expect([...seg].length, `${e.slug}「${seg}」`).toBeLessThanOrEqual(12)
+        }
+      }
+    }
+  })
+
+  it('ラソラ札幌のテーマ見出しは「冬を待つ、花あそび。」をひとまとまりにする', () => {
+    const e = events.find((x) => x.slug === 'lasora-sapporo-2026-11')
+    const s = e?.sections?.find((x) => x.heading === '「冬を待つ、花あそび。」の会場づくり')
+    expect(s?.headingSegments).toEqual(['「冬を待つ、花あそび。」', 'の会場づくり'])
+    expect(s?.headingNoWrapNarrow).toBe(true)
+  })
+})
