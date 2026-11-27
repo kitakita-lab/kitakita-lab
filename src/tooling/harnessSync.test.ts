@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { normalize, revOf, renderBlock, parseBlocks, statusOf, planUpdate, ensureClaudeImport } from '../../scripts/lib/harness-sync.mjs'
+import { normalize, revOf, renderBlock, parseBlocks, statusOf, planUpdate, ensureClaudeImport, findReviewLimitRules } from '../../scripts/lib/harness-sync.mjs'
 
 /**
  * 共通ハーネスの展開（scripts/lib/harness-sync.mjs・harness/README.md）のテスト。
@@ -140,5 +140,23 @@ describe('正本（harness/profiles）', () => {
     expect(text).not.toMatch(/notion\.(so|site|com)|[0-9a-f]{32}|[\w.+-]+@[\w-]+\.[a-z]{2,}/)
     // 管理ブロックの目印を本文に含めない（入れ子になる）
     expect(text).not.toContain('kitakita-harness')
+  })
+})
+
+describe('findReviewLimitRules（固有ルールの Codex の回数）', () => {
+  it('管理ブロックの外にある回数の記述を見つける（ブロックの中・回数のない記述は数えない）', () => {
+    const agents = [
+      '# 固有ルール',
+      '- Codex のレビューは最大2回。',
+      '- レビューでは好みより事実を優先する。',
+      renderBlock('common', '- Codex レビューの上限は 5 回（共通ルールの本文）'),
+    ].join('\n')
+    const r = findReviewLimitRules([
+      { path: 'AGENTS.md', text: agents },
+      { path: 'docs/harness.md', text: '**レビューの依頼は 1 つの PR で 2 回まで**（初回＋再レビュー 1 回）。' },
+      { path: 'config/review-policy.json', text: '{\n  "reviewCap": 2\n}' },
+      { path: 'CLAUDE.md', text: null },
+    ])
+    expect(r.map((x) => `${x.path}:${x.line}`)).toEqual(['AGENTS.md:2', 'docs/harness.md:1', 'config/review-policy.json:2'])
   })
 })

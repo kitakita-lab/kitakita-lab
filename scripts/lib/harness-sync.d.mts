@@ -18,3 +18,4 @@ export function planUpdate(
   options?: { add?: string[] },
 ): { text: string; changes: Change[]; errors: string[]; changed: boolean }
 export function ensureClaudeImport(claudeText: string | null | undefined): { text: string; changed: boolean }
+export function findReviewLimitRules(files: { path: string; text: string | null }[]): { path: string; line: number; text: string }[]
