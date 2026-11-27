@@ -8,7 +8,18 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
-import { creatorRoles, creatorValues } from '@/data/creators'
+import { Link } from 'react-router-dom'
+import { EmailOff } from '@/components/ui/EmailOff'
+import { site } from '@/data/site'
+import {
+  creatorRoles,
+  creatorValues,
+  applicationFields,
+  applicationNotes,
+  applicationSteps,
+  applicationPrivacy,
+  buildApplicationMailto,
+} from '@/data/creators'
 
 export function CreatorsPage() {
   return (
@@ -16,7 +27,7 @@ export function CreatorsPage() {
       <Seo
         title="作家・つくり手の募集"
         path="/creators"
-        description="KitaKita Labは、一緒に「ちょっと進めてみる」仲間を探しています。ワークショップ講師、イベント出店、はじめての企業案件まで。実績より、進めてみたい気持ちを大切にします。"
+        description="KitaKita Labは、今後のワークショップや体験イベントでご一緒できる作家・つくり手・事業者の方を募集しています。応募はメールで受け付けています。"
       />
 
       <PageHeader
@@ -46,8 +57,8 @@ export function CreatorsPage() {
           </>
         }
       >
-        <Button to="/contact" size="lg">
-          お問い合わせ
+        <Button href="#apply" size="lg">
+          応募の方法
           <Icon name="arrow" size={18} />
         </Button>
       </PageHeader>
@@ -100,7 +111,9 @@ export function CreatorsPage() {
                   <Icon name="check" size={18} />
                 </span>
                 <div>
-                  <h3 className="text-lg text-ink">{role.title}</h3>
+                  <h3 className="text-lg text-ink">
+                    <Segments segments={role.titleSegments} />
+                  </h3>
                   <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
                     {typeset(role.description)}
                   </p>
@@ -108,6 +121,89 @@ export function CreatorsPage() {
               </Card>
             </Reveal>
           ))}
+        </div>
+      </Section>
+
+      {/* 募集について */}
+      <Section tone="paper" spacing="lg">
+        <SectionHeading
+          eyebrow="About this call"
+          title={<Segments segments={['募集に', 'ついて']} />}
+          description="将来の商業施設や企業イベントでの体験の企画に、一緒に取り組める方との接点づくりを目的としています。"
+        />
+        <ul className="mx-auto mt-10 max-w-prose space-y-3 text-[15px] leading-relaxed text-ink-muted">
+          {applicationNotes.map((note) => (
+            <li key={note} className="flex gap-3">
+              <span aria-hidden="true" className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-clay-300" />
+              <span>{typeset(note)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mx-auto mt-6 max-w-prose text-[15px] leading-relaxed text-ink-muted">
+          これまでに開催した体験イベントは、
+          <Link to="/events" className="text-clay-600 underline decoration-clay-300 underline-offset-4 hover:text-clay-700">
+            Events
+          </Link>
+          でご紹介しています。
+        </p>
+      </Section>
+
+      {/* 応募の方法（メール） */}
+      <Section id="apply" tone="tint" spacing="lg">
+        <SectionHeading
+          eyebrow="How to apply"
+          title={<Segments segments={['応募の', '方法']} />}
+          description="応募は、メールで受け付けています。次の内容を添えて、お送りください。"
+        />
+        <div className="mx-auto mt-10 max-w-prose">
+          <ul className="space-y-2 text-[15px] leading-relaxed text-ink">
+            {applicationFields.map((f) => (
+              <li key={f.label} className="flex gap-3">
+                <Icon name="check" size={18} className="mt-1 shrink-0 text-clay-600" />
+                <span>
+                  {f.label}
+                  {f.optional && <span className="text-ink-soft">（任意）</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="mt-10 text-sm font-normal text-ink-muted">応募先のメールアドレス</h3>
+          <EmailOff>
+            <p className="mt-2 select-all break-all text-2xl text-ink sm:text-3xl">{site.email}</p>
+            <div className="mt-6">
+              <Button href={buildApplicationMailto()} size="lg">
+                <Icon name="mail" size={18} />
+                メールで応募する
+              </Button>
+            </div>
+          </EmailOff>
+          <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+            {typeset('メールアプリが開かない場合は、上のアドレスあてに、お使いのメールから送信してください。')}
+          </p>
+
+          <h3 className="mt-12 text-lg text-ink">応募後の流れ</h3>
+          <ol className="mt-4 space-y-4">
+            {applicationSteps.map((step, i) => (
+              <li key={step.title} className="flex gap-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-clay-100 text-sm text-clay-600">
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="text-[15px] text-ink">{step.title}</p>
+                  <p className="mt-1 text-[15px] leading-relaxed text-ink-muted">{typeset(step.body)}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <h3 className="mt-12 text-lg text-ink">いただいた情報の取り扱い</h3>
+          <div className="mt-4 space-y-2 text-[15px] leading-relaxed text-ink-muted">
+            {applicationPrivacy.map((t) => (
+              <p key={t}>{typeset(t)}</p>
+            ))}
+            <p>{typeset(`運営：${site.operator}（KitaKita Lab）`)}</p>
+          </div>
         </div>
       </Section>
 
@@ -125,8 +221,8 @@ export function CreatorsPage() {
             まずは話してみることから。進めてみたいことを、聞かせてください。
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button to="/contact" size="lg">
-              応募・お問い合わせ
+            <Button href="#apply" size="lg">
+              応募の方法を見る
               <Icon name="arrow" size={18} />
             </Button>
             <Button to="/faq" size="lg" variant="secondary">
